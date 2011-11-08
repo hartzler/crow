@@ -1,9 +1,9 @@
-![crow image](https://raw.github.com/hartzler/crow/master/resources/crow.gif "Crow")
-
 Crow
 ----
 
-a budding rich media chat client for xmpp/muc
+![crow image](https://raw.github.com/hartzler/crow/master/resources/crow.gif "Crow")
+
+A budding rich media chat client for xmpp/muc.
 
 ###project layout
 
