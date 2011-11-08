@@ -1,3 +1,5 @@
+![crow image](https://raw.github.com/hartzler/crow/master/resources/crow.gif "Crow")
+
 Crow
 ----
 
