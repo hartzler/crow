@@ -5,14 +5,14 @@ a budding rich media chat client for xmpp/muc
 
 ###project layout
 
-* src/ - the chromeless application
 * chromeless/ - submodule for the chromeless fork
 * modules/ - custom chromeless javascript modules
+* src/ - the chromeless application
+* resources/ - for the xulrunner package
 
 when cloning, you will need to 
 
-`git submodule init`
-`git submodule update`
+`git submodule init && git submodule update`
 
 To run Crow, 
 
@@ -22,5 +22,6 @@ To run Crow,
 ### Credits
 
 Borrows from / uses:
+
 * https://github.com/vpj/xmpp-js
 * https://github.com/mozilla/chromeless
