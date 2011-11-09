@@ -6,6 +6,20 @@
     body {
       padding-top: 60px;
     }
+    #chat .chatline {
+      padding: 1em; 
+    }
+    #chat .system {
+      color: #ccc;
+      font-size: 8pt;
+    }
+    #friends-panel {
+      display: none;
+    }
+    #disconnect-panel {
+      display: none;
+      margin-bottom: 1em;
+    }
   </style>
 </head>
 <body>
@@ -26,7 +40,7 @@
   <div class="container-fluid">
     <div class="sidebar">
       <div class="well">
-        <div class="">
+        <div id="connect-panel">
           <form action="" class="form-stacked">
             <div class="clearfix">
               <label for="jid">JID</label>
@@ -38,6 +52,14 @@
             </div>
             <button id="connect" class="btn primary">Connect</button>
           </form>
+        </div>
+        <div id="disconnect-panel">
+          <button id="disconnect" class="btn danger">Disonnect</button>
+        </div>
+        <div id="friends-panel">
+          <h2>Friends</h2>
+          <div id="friends">
+          </div>
         </div>
       </div>
 

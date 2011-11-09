@@ -854,6 +854,7 @@ const Stanza = {
 
   /* Parse a presence stanza */
   parsePresence: function(aStanza) {
+    /*
     var p = {show: Ci.imIStatusInfo.STATUS_AVAILABLE,
              status: null};
     var show = aStanza.getChildren("show");
@@ -878,6 +879,7 @@ const Stanza = {
       status = status[0].innerXML();
       p.status = status;
     }
+   */
 
     return p;
   },
@@ -890,7 +892,7 @@ const Stanza = {
       return null;
     var v = aStanza.getChildren("vCard");
     if (v.length <= 0)
-      return null;
+      return vCard;
     v = v[0];
     for each (var c in v.children) {
       if (c.type == "node") {
@@ -974,12 +976,14 @@ const Stanza = {
   },
 
   _addChild: function(aNode, aData) {
-    if (typeof(aData) == "string") {
-      aNode.addText(aData);
-    }
-    else {
-      aNode.addChild(aData);
-      aData.parent_node = aData;
+    if(aData) {
+      if (typeof(aData) == "string") {
+        aNode.addText(aData);
+      }
+      else {
+        aNode.addChild(aData);
+        aData.parent_node = aData;
+      }
     }
   },
 
@@ -1671,8 +1675,12 @@ XMPPSession.prototype = {
           this._listener.onPresenceStanza(aStanza);
         else if (aName == "message")
           this._listener.onMessageStanza(aStanza);
-        else if (aName == "iq")
+        else if (aName == "iq") {
+          // PING
+          if(aStanza.getElement(["iq","ping"])!=null)
+            this.sendStanza(Stanza.iq("result",aStanza.attributes.id,aStanza.attributes.from));
           this._listener.onIQStanza(aName, aStanza);
+        }
         else
           this._listener.onXmppStanza(aName, aStanza);
 
@@ -1766,4 +1774,5 @@ exports.session = function(aJid, aPassword, aHost, aPort, aSecurity, aListener) 
   var jid = parseJID(aJid);
   var aDomain = jid.domain;
   return new XMPPSession(aHost, aPort, aSecurity, jid, aDomain, aPassword, aListener);
-}
+};
+exports.Stanza = Stanza;
