@@ -1,4 +1,23 @@
 var xmpp = require('xmpp')
+var file = require('file')
+
+function log(s) {
+  console.log(s);
+}
+
+function load_defaults() {
+
+  try {
+    log("reading local prefs...");
+    var local=JSON.parse(file.read(require('app-paths').browserCodeDir + "/local.json"));
+    log("local.json: " + local.toSource());
+    $('#jid').val(local.jid);
+    $('#password').val(local.password);
+  }
+  catch(e) {
+    log("error reading local prefs..." + e.toString());
+  }
+}
 
 function chat(txt) {
   console.log("CHAT: " + txt);
@@ -27,4 +46,5 @@ function connect(e) {
 
 $(document).ready(function() {
   $('#connect').on("click",connect);
+  load_defaults();
 });
