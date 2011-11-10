@@ -1,2 +1,2 @@
 #!/bin/sh
-./chromeless/chromeless src
+(cd src/ && cake build) && ./chromeless/chromeless src
