@@ -1,78 +1,83 @@
 <html>
-<head>
-  <title>Crow</title>
-  <link href="bootstrap.css" rel="stylesheet" type="text/css">
-  <style type="text/css"> 
-    body {
-      padding-top: 60px;
-    }
-    #chat .chatline {
-      padding: 1em; 
-    }
-    #chat .system {
-      color: #ccc;
-      font-size: 8pt;
-    }
-    #friends-panel {
-      display: none;
-    }
-    #disconnect-panel {
-      display: none;
-      margin-bottom: 1em;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="topbar"> 
-    <div class="topbar-inner"> 
-      <div class="container-fluid"> 
-        <a class="brand" href="#">Crow</a> 
-        <ul class="nav"> 
-          <li class="active"><a href="#">Home</a></li> 
-          <li><a href="#about">About</a></li> 
-        </ul> 
-        <p class="pull-right">XMPP is crazy...</p> 
-      </div> 
-    </div> 
-  </div> 
-
-  <div class="container-fluid">
-    <div class="sidebar">
-      <div class="well">
-        <div id="connect-panel">
-          <form action="" class="form-stacked">
-            <div class="clearfix">
-              <label for="jid">JID</label>
-              <div class="input"><input id="jid" type="text" class="span3"></div>
-            </div>
-            <div class="clearfix">
-              <label for="password">Password</label>
-              <div class="input"><input id="password" type="password" class="span3"></div>
-            </div>
-            <button id="connect" class="btn primary">Connect</button>
-          </form>
+  <head>
+    <title>Crow</title>
+    <link href='bootstrap.css' rel='stylesheet' type='text/css'>
+      <style type='text/css'>
+        /*<![CDATA[*/
+          body {
+            padding-top: 60px;
+          }
+          #chat .chatline {
+            padding: 1em; 
+          }
+          #chat .system {
+            color: #ccc;
+            font-size: 8pt;
+          }
+          #friends-panel {
+            display: none;
+          }
+          #disconnect-panel {
+            display: none;
+            margin-bottom: 1em;
+          }
+        /*]]>*/
+      </style>
+    </link>
+    <body></body>
+    <div class='topbar'>
+      <div class='topbar-inner'>
+        <div class='container-fluid'>
+          <a class='brand' href='#'>Crow</a>
+          <ul class='nav'>
+            <li class='active'>
+              <a href='#'>Home</a>
+            </li>
+            <li>
+              <a href='#about'>About</a>
+            </li>
+          </ul>
+          <p class='pull-right'>XMPP is crazy...</p>
         </div>
-        <div id="disconnect-panel">
-          <button id="disconnect" class="btn danger">Disonnect</button>
-        </div>
-        <div id="friends-panel">
-          <h2>Friends</h2>
-          <div id="friends">
+      </div>
+    </div>
+    <div class='container-fluid'>
+      <div class='sidebar'>
+        <div class='well'>
+          <div id='connect-panel'>
+            <form action='' class='form-stacked'>
+              <div class='clearfix'>
+                <label for='jid'>JID</label>
+                <div class='input'>
+                  <input class='span3' id='jid' type='text' />
+                </div>
+              </div>
+              <div class='clearfix'>
+                <label for='password'>Password</label>
+                <div class='input'>
+                  <input class='span3' id='password' type='password' />
+                </div>
+              </div>
+              <button class='btn primary' id='connect'>Connect</button>
+            </form>
+          </div>
+          <div id='disconnect-panel'>
+            <button class='btn danger' id='disconnect'>Disonnect</button>
+          </div>
+          <div id='friends-panel'>
+            <h2>Friends</h2>
+            <div id='friends'></div>
           </div>
         </div>
       </div>
-
-    </div>
-    <div class="content">
-      <div class="page-header"> 
-        <h1>Chat</h1>
+      <div class='content'>
+        <div class='page-header'>
+          <h1>Chat</h1>
+        </div>
+        <div id='chat'></div>
       </div>
-      <div id="chat"></div>
     </div>
-  </div>
-
-</body>
-<script src="jquery-1.7.min.js"></script>
-<script src="crow.js"></script>
+  </head>
+  <script src='jquery-1.7.min.js'></script>
+  <script src='crow.js'></script>
 </html>

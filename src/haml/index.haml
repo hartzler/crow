@@ -1,0 +1,59 @@
+%html
+  %head
+    %title Crow
+    %link{:href => "bootstrap.css", :rel => "stylesheet", :type => "text/css"}
+      :css
+        body {
+          padding-top: 60px;
+        }
+        #chat .chatline {
+          padding: 1em; 
+        }
+        #chat .system {
+          color: #ccc;
+          font-size: 8pt;
+        }
+        #friends-panel {
+          display: none;
+        }
+        #disconnect-panel {
+          display: none;
+          margin-bottom: 1em;
+        }
+    %body
+    .topbar
+      .topbar-inner
+        .container-fluid
+          %a.brand{:href => "#"} Crow
+          %ul.nav
+            %li.active
+              %a{:href => "#"} Home
+            %li
+              %a{:href => "#about"} About
+          %p.pull-right XMPP is crazy...
+    .container-fluid
+      .sidebar
+        .well
+          #connect-panel
+            %form.form-stacked{:action => ""}
+              .clearfix
+                %label{:for => "jid"} JID
+                .input
+                  %input#jid.span3{:type => "text"}/
+              .clearfix
+                %label{:for => "password"} Password
+                .input
+                  %input#password.span3{:type => "password"}/
+              %button#connect.btn.primary Connect
+          #disconnect-panel
+            %button#disconnect.btn.danger Disonnect
+          #friends-panel
+            %h2 Friends
+            #friends
+      .content
+        .page-header
+          %h1 Chat
+        #chat
+  %script{:src => "jquery-1.7.min.js"}
+  %script{:src => "crow.js"}
+
