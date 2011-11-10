@@ -10,6 +10,9 @@ A budding rich media chat client for xmpp/muc.
 * chromeless/ - submodule for the chromeless fork
 * modules/ - custom chromeless javascript modules
 * src/ - the chromeless application
+* src/haml - the haml files that will be html
+* src/coffee - the coffee script files that will be javascript 
+* src/scss - the scss files that will be stylesheets
 * resources/ - for the xulrunner package
 
 when cloning, you will need to 
@@ -27,3 +30,6 @@ Borrows from / uses:
 
 * https://github.com/vpj/xmpp-js
 * https://github.com/mozilla/chromeless
+* http://haml-lang.com/
+* http://sass-lang.com/
+* http://jashkenas.github.com/coffee-script/
