@@ -1,3 +1,6 @@
 *~
 *.swp
 src/local.json
+src/.sass-cache
+.rvmrc
+build
