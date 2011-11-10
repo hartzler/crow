@@ -1,0 +1,56 @@
+fs     = require 'fs'
+{exec} = require 'child_process'
+path = require 'path'
+
+path.dirname 
+appFolders= [
+  # omit src/ and .coffee to make the below lines a little shorter
+  '/'
+]
+task "build:coffee","build just chat",->
+  exec "coffee --compile  -o javascript/ coffee"
+
+task "build:haml","build just chat",->
+  fs.readdir "haml", (err, files) =>
+    for file, index in files then do (file,index)->
+      ofile=file.replace("haml","")
+      console.log("haml haml/#{file} html/#{ofile}html")
+      exec "haml haml/#{file} html/#{ofile}html"
+
+task "build:scss","build just chat",->
+  fs.readdir "scss", (err, files) =>
+    for file, index in files then do (file,index)->
+      ofile=file.replace("scss","")
+      console.log("sass scss/#{file} css/#{ofile}css")
+      exec "sass scss/#{file} css/#{ofile}css"
+
+task "build",->
+  invoke "build:coffee"
+  invoke "build:haml"
+  invoke "build:scss"
+  
+option '-d', '--input_dir [OUTPUT_DIR]', ''
+task 'build:old', 'Build single application file from source files',(options) ->
+  appContents = []
+  appFolders=[options.input_dir]
+  for folder, index in appFolders then do (folder, index) ->
+    fs.readdir folder, (err, files) =>
+      for file, index in files then do (file,index)->
+        console.log(file)
+        if(file.indexOf(".coffee")!=-1)
+          fs.readFile "#{folder}/#{file}", 'utf8', (err, fileContents) ->
+            throw err if err
+            appContents.push(fileContents)
+      console.log(appContents)
+
+  console.log(appContents.join('\n\n'))
+  fs.writeFile "#{options.input_dir}/app.coffee", appContents.join('\n\n'), 'utf8', (err) ->
+    throw err if err
+    console.log( "coffee --compile  -o javascript/  #{options.input_dir}app.coffee")
+    exec "coffee --compile  -o javascript/  #{options.input_dir}app.coffee", (err, stdout, stderr) ->
+      throw err if err
+      console.log stdout + stderr
+      fs.unlink 'coffee/app.coffee', (err) ->
+        throw err if err
+        console.log 'Done.'
+
