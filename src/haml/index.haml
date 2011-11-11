@@ -10,10 +10,18 @@
           .container-fluid
             %a.brand{:href => "#"} Crow
             %ul.nav
-              %li.active
-                %a{:href => "#"} Home
+              %li.home-menu.dropdown
+                %a.dropdown-toggle{:href => "#"} Home
+                %ul.dropdown-menu
+                  %li 
+                    %a{:href=>"#"}Accounts
+                  %li 
+                    %a{:href=>"#"}Plugins
+                  %li 
+                    %a{:href=>"#"}Settings
               %li
                 %a{:href => "#about"} About
+
             %p.pull-right XMPP is crazy...
       .container-fluid
         .sidebar
@@ -45,5 +53,7 @@
             .right
           .main-footer
   %script{:src => "jquery-1.7.min.js"}
+  %script{:src => "bootstrap-dropdown.js"}
   %script{:src => "crow.js"}
+  %script{:src => "menus.js"}
 
