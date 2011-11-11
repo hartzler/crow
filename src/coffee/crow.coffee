@@ -1,15 +1,22 @@
+xmpp = require("xmpp")
+file = require("file")
+
+window.resizeTo(800,600)
+$(window).resize () ->
+  mdiv = $('#page .content .main-body .chat .messages')
+  mdiv.height window.innerHeight-190  # hack!?! how should this work...
+
 timestamp = (s) ->
   now = new Date()
   ts = now.toISOString()
   switch $.type(s)
-    when "object"
-      ts + " " + s.toSource()
-    when "undefined", "null"
-      null
-    else
-      ts + " " + s
+    when "object" then ts + " " + s.toSource()
+    when "undefined", "null" then null
+    else ts + " " + s
+
 log = (s) ->
   console.log timestamp(s)
+
 load_defaults = ->
   try
     log "reading local prefs..."
@@ -19,12 +26,16 @@ load_defaults = ->
     $("#password").val local.password
   catch e
     log "error reading local prefs..." + e.toString()
+
 chat = (txt, klazz) ->
   console.log "CHAT: " + txt
   chatline = $("<div class=\"chatline\"/>").text(timestamp(txt))
   chatline.addClass klazz  if klazz
-  $("#chat").append chatline
-  $("#chat").append "<br>"
+  msgs=$("#page .content .main-body .chat .messages")
+  msgs.append chatline
+  msgs.append "<br>"
+  msgs.animate({scrollTop: msgs.prop('scrollHeight')})
+
 render_friends = (account, friends, changed) ->
   $("#connect-panel").hide()
   $("#disconnect-panel").delay("fast").show()
@@ -42,12 +53,14 @@ render_friends = (account, friends, changed) ->
     n.append $("<div class=\"name\"/>").text(friend.fullname)
     n.append $("<img/>").attr("src", friend.icon)  if friend.icon
     fdiv.append n
+
 friend = (session, jid, alias, presence, chatElement) ->
   @session = session
   @jid = jid
   @alias = alias
   @presence = presence
   @chatElement = chatElement
+
 account = (jid, password, friend_listener) ->
   account = this
   @jid = jid
@@ -110,20 +123,22 @@ account = (jid, password, friend_listener) ->
       chat aStanza.convertToString(), "system"
 
   @session = xmpp.session(@jid, @password, "bardicgrove.org", 5222, [ "starttls" ], @listener)
+
+current = "nothin"
 connect = (e) ->
   current = new account($("#jid").val(), $("#password").val(), render_friends)
   current.connect()
   chat "connecting " + current.name() + " ..."
+
 disconnect = (e) ->
   $("#connect-panel").delay("slow").slideDown()
   $("#disconnect-panel").hide()
   $("#friends-panel").hide()
   current.disconnect()
-xmpp = require("xmpp")
-file = require("file")
-current = null
+
 $(document).ready ->
   $("#connect").on "click", connect
   $("#disconnect").on "click", disconnect
   load_defaults()
+  window.resizeTo(800,600)
 
