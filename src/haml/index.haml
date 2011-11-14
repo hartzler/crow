@@ -3,6 +3,7 @@
     %title Crow
     %link{:href => "bootstrap.css", :rel => "stylesheet", :type => "text/css"}
     %link{:href => "crow.css", :rel => "stylesheet", :type => "text/css"}
+    %link{:href => "log.css", :rel => "stylesheet", :type => "text/css"}
   %body
     #page
       .topbar
@@ -19,6 +20,8 @@
                     %a{:href=>"#"}Plugins
                   %li 
                     %a{:href=>"#"}Settings
+                  %li 
+                    %a#toggle_logs{:href=>"#"}Toggle Logs
               %li
                 %a{:href => "#about"} About
 
@@ -43,17 +46,20 @@
               %h2 Friends
               #friends
         .content
-          .main-header
-            %strong Chat
-          .main-body
-            .chat 
-              .messages
-              .command
-                %textarea
-            .right
-          .main-footer
+          .log{"style"=>"display:none"}
+          .chats
+            .main-header
+              %strong Chat
+            .main-body
+              .chat 
+                .messages
+                .command
+                  %textarea
+              .right
+            .main-footer
   %script{:src => "jquery-1.7.min.js"}
   %script{:src => "bootstrap-dropdown.js"}
+  %script{:src => "log.js"}
   %script{:src => "crow.js"}
   %script{:src => "menus.js"}
 
