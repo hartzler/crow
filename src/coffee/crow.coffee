@@ -145,4 +145,5 @@ $(document).ready ->
   $("#disconnect").on "click", disconnect
   load_defaults()
   window.resizeTo(800,600)
+  $('.tabs').tabs()
 

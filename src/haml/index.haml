@@ -48,19 +48,41 @@
         .content
           .log{"style"=>"display:none"}
           .chats
-            .main-header
-              %strong Chat
-            .main-body
-              .chat 
-                .messages
-                .command
-                  %textarea
-              .right
-            .main-footer
+            %ul.tabs
+              %li.active
+                %a{:href => "#home"} Home
+              %li
+                %a{:href => "#help"} Help 
+
+            .pill-content
+              #home.active
+                .main-header
+                  %strong Chat Home
+                .main-body
+                  .chat 
+                    .messages
+                    .command
+                      %textarea
+                  .right
+                .main-footer
+              #help.active
+                .main-header
+                  %strong Chat help
+                .main-body
+                  .chat 
+                    .messages
+                    .command
+                      %textarea
+                  .right
+                .main-footer
+
+                          
   %script{:src => "jquery-1.7.min.js"}
   %script{:src => "bootstrap-dropdown.js"}
+  %script{:src => "bootstrap-tabs.js"}
   %script{:src => "log.js"}
   %script{:src => "crow.js"}
   %script{:src => "menus.js"}
+  %script{:src => "messages.js"}
   %script{:src => "hotkeys.js"}
 
