@@ -8,7 +8,7 @@ class CrowLog
 
   @log: (message,level) ->
     level||=@levels['error']
-    @logs.push([level,(new Date()).getTime(),message])
+    @logs.push([level,(new Date()).toISOString(),message])
     console.log(message)
     @update_log_window()
 

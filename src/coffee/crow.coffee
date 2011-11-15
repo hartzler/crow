@@ -10,11 +10,12 @@ timestamp = (s) ->
   now = new Date()
   ts = now.toISOString()
   switch $.type(s)
-    when "object" then ts + " " + s.toSource()
+    when "object" then  s.toSource()
     when "undefined", "null" then null
-    else ts + " " + s
+    else s
 
 log = (s) ->
+  CrowLog.log timestamp(s)
   console.log timestamp(s)
 
 load_defaults = ->
@@ -28,7 +29,7 @@ load_defaults = ->
     log "error reading local prefs..." + e.toString()
 
 chat = (txt, klazz) ->
-  console.log "CHAT: " + txt
+  log "CHAT: " + txt
   chatline = $("<div class=\"chatline\"/>").text(timestamp(txt))
   chatline.addClass klazz  if klazz
   msgs=$("#page .content .main-body .chat .messages")
@@ -94,6 +95,7 @@ account = (jid, password, friend_listener) ->
     , account.show()
 
   @update_friends = (friend) ->
+    log("update_friends")
     account.friend_listener account, account.friends, friend
 
   @listener =
@@ -102,14 +104,16 @@ account = (jid, password, friend_listener) ->
       chat b
 
     onConnection: ->
-      chat account.name() + " connect!", "system"
+      log " connect! system"
       account.send account.presence()
+      render_friends()
 
     onPresenceStanza: (stanza) ->
+      log "onPresenceStanza"
       chat stanza.convertToString(), "system"
       friend = xmpp.Stanza.parseVCard(stanza)
+      log friend
       if friend
-        chat friend
         account.friends[friend.jid.jid] = friend
         account.update_friends friend
 
@@ -128,7 +132,7 @@ current = "nothin"
 connect = (e) ->
   current = new account($("#jid").val(), $("#password").val(), render_friends)
   current.connect()
-  chat "connecting " + current.name() + " ..."
+  log "connecting "
 
 disconnect = (e) ->
   $("#connect-panel").delay("slow").slideDown()
