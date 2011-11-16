@@ -46,13 +46,10 @@
               %h2 Friends
               #friends
         .content
-          .log{"style"=>"display:none"}
           .chats
-            %ul.tabs
+            %ul.tabs{"data-tabs"=>"tabs"}
               %li.active
                 %a{:href => "#home"} Home
-              %li
-                %a{:href => "#help"} Help 
 
             .pill-content
               #home.active
@@ -65,17 +62,7 @@
                       %textarea
                   .right
                 .main-footer
-              #help.active
-                .main-header
-                  %strong Chat help
-                .main-body
-                  .chat 
-                    .messages
-                    .command
-                      %textarea
-                  .right
-                .main-footer
-
+              
                           
   %script{:src => "jquery-1.7.min.js"}
   %script{:src => "bootstrap-dropdown.js"}
