@@ -4,70 +4,75 @@
     %link{:href => "bootstrap.css", :rel => "stylesheet", :type => "text/css"}
     %link{:href => "crow.css", :rel => "stylesheet", :type => "text/css"}
     %link{:href => "log.css", :rel => "stylesheet", :type => "text/css"}
-  %body
-    #page
-      .topbar
-        .topbar-inner
-          .container-fluid
-            %a.brand{:href => "#"} Crow
-            %ul.nav
-              %li.home-menu.dropdown
-                %a.dropdown-toggle{:href => "#"} Home
-                %ul.dropdown-menu
-                  %li 
-                    %a{:href=>"#"}Accounts
-                  %li 
-                    %a{:href=>"#"}Plugins
-                  %li 
-                    %a{:href=>"#"}Settings
-                  %li 
-                    %a#toggle_logs{:href=>"#"}Toggle Logs
-              %li
-                %a{:href => "#about"} About
 
-            %p.pull-right XMPP is crazy...
-      .container-fluid
-        .sidebar
-          .well
-            #connect-panel
-              %form.form-stacked{:action => ""}
-                .clearfix
-                  %label{:for => "jid"} JID
-                  .input
-                    %input#jid.span3{:type => "text"}/
-                .clearfix
-                  %label{:for => "password"} Password
-                  .input
-                    %input#password.span3{:type => "password"}/
-                %button#connect.btn.primary Connect
-            #disconnect-panel
-              %button#disconnect.btn.danger Disonnect
-            #friends-panel
-              %h2 Friends
-              #friends
-        .content
-          .chats
-            %ul.tabs{"data-tabs"=>"tabs"}
-              %li.active
-                %a{:href => "#home"} Home
+  %body.vsplit
+    .topbar
+      .topbar-inner
+        .container-fluid
+          %a.brand{:href => "#"} Crow
+          %ul.nav
+            %li.home-menu.dropdown
+              %a.dropdown-toggle{:href => "#"} Home
+              %ul.dropdown-menu
+                %li 
+                  %a{:href=>"#"}Accounts
+                %li 
+                  %a{:href=>"#"}Plugins
+                %li 
+                  %a{:href=>"#"}Settings
+                %li 
+                  %a#toggle_logs{:href=>"#"}Toggle Logs
+            %li
+              %a{:href => "#about"} About
 
-            .pill-content
-              #home.active
-                .main-header
-                  %strong Chat Home
-                .main-body
-                  .chat 
-                    .messages
-                    .command
-                      %textarea
-                  .right
-                .main-footer
-              
-                          
+          %p.pull-right XMPP is crazy...
+    
+    .container-fluid.expand.hsplit
+      .sidebar
+        .well
+          #connect-panel
+            %form.form-stacked{:action => ""}
+              .clearfix
+                %label{:for => "jid"} JID
+                .input
+                  %input#jid.span3{:type => "text"}/
+              .clearfix
+                %label{:for => "password"} Password
+                .input
+                  %input#password.span3{:type => "password"}/
+              %button#connect.btn.primary Connect
+          #disconnect-panel
+            %button#disconnect.btn.danger Disonnect
+          #friends-panel
+            %h2 Friends
+            #friends
+
+      .content.expand.vsplit
+        .toolbar Toolbar
+        %ul.tabs
+          %li
+            %a{:href=>'#log'} Log
+          %li.active
+            %a{:href=>'#chat1'} Chat1
+        #conversations.pill-content.expand
+          #log
+            %h2 Log 
+          #chat1.conversation.hsplit.active
+            .expand.vsplit
+              .messages.expand
+                %h2 Chat1
+              .command
+                %textarea
+            .room-info
+        .footer
+    .footer
+
   %script{:src => "jquery-1.7.min.js"}
   %script{:src => "bootstrap-dropdown.js"}
   %script{:src => "bootstrap-tabs.js"}
+  %script{:src => "split.js"}
   %script{:src => "log.js"}
+  %script{:src => "models.js"}
   %script{:src => "crow.js"}
   %script{:src => "menus.js"}
   %script{:src => "messages.js"}

@@ -1,22 +1,9 @@
-xmpp = require("xmpp")
 file = require("file")
+xmpp = require("xmpp")
 
-window.resizeTo(800,600)
-$(window).resize () ->
-  mdiv = $('#page .content .main-body .chat .messages')
-  mdiv.height window.innerHeight-190  # hack!?! how should this work...
-
-timestamp = (s) ->
-  now = new Date()
-  ts = now.toISOString()
-  switch $.type(s)
-    when "object" then  s.toSource()
-    when "undefined", "null" then null
-    else s
-
+logger = new Logger("Crow", 'debug', CrowLog)
 log = (s) ->
-  CrowLog.log timestamp(s)
-  console.log timestamp(s)
+  logger.debug s
 
 load_defaults = ->
   try
@@ -29,10 +16,11 @@ load_defaults = ->
     log "error reading local prefs..." + e.toString()
 
 chat = (txt, klazz) ->
-  log "CHAT: " + txt
-  chatline = $("<div class=\"chatline\"/>").text(timestamp(txt))
+  log "CHAT:"
+  log txt
+  chatline = $("<div class=\"chatline\"/>").text(txt)
   chatline.addClass klazz  if klazz
-  msgs=$("#page .content .main-body .chat .messages")
+  msgs=$("#chat1 .messages")
   msgs.append chatline
   msgs.append "<br>"
   msgs.animate({scrollTop: msgs.prop('scrollHeight')})
