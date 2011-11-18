@@ -35,6 +35,7 @@ class Account
     @from = @jid + "/" + @resource
 
   connect: () ->
+    @logger.debug([@jid,@password,@host,@port])
     @session = xmpp.session @jid, @password, @host, @port, [ "starttls" ],
       onError: (aName, aStanza) =>
         @logger.error aStanza.convertToString()
@@ -42,15 +43,15 @@ class Account
   
       onConnection: =>
         @logger.debug "connect"
-        @callbacks.connect(@)
-        @send presence()
+        @callbacks.connect(this)
+        @presence()
   
       onPresenceStanza: (stanza) =>
         @logger.debug "onPresenceStanza"
         @logger.debug stanza.convertToString()
         friend = xmpp.Stanza.parseVCard(stanza)
         @logger.debug friend
-        @callbacks.friend(this, new Friend(friend.jid,stanza,false,this)) if friend
+        @callbacks.friend(this, new Friend(friend.jid,null,false,this.name)) if friend
 
       onMessageStanza: (aStanza) =>
         @logger.debug aStanza.convertToString()
@@ -65,8 +66,6 @@ class Account
         @callbacks.raw this, aStanza
 
     @session.connect()
-
-  name: () -> @jid
 
   disconnect: () ->
     @session.disconnect()
@@ -85,10 +84,10 @@ class Account
     xmpp.Stanza.message from: @from, message
 
   presence: (show,status) ->
-    send presence_node(show,status)
+    @send @presence_node(show,status)
 
   message: (to,message) ->
-    send message_node(to,message)
+    @send @message_node(to,message)
       
   friend: (friend) ->
     # TODO: implement
@@ -112,19 +111,20 @@ class Crow
     @logger or= new Logger("Crow",'debug',@callbacks)
 
   account: (name,jid,password,host,port) ->
-    @accounts[name] = new Account jid,password,host,port,@logger,
+    @accounts[name] = new Account name,jid,password,host,port,@logger,
       error: @callbacks.error
       connect: @callbacks.connect
+      disconnect: @callbacks.disconnect
       friend: (account,friend) =>
-        @friends[friend.jid] = friend
+        @friends[friend.jid.jid] = friend
         @callbacks.friend(account,friend)
       iq: @callbacks.iq
       raw: @callbacks.raw
       message: (account,message) =>
-        from = (friend for friend in @friends when friend.jid is messages.from)[0]
+        from = (friend for friend in @friends when friend.jid is message.from)[0]
         unless @conversations[from]
           @conversations[from] = new Conversation(account,from)
-          @callbacks.conversation(@conversations[messages.from])
+          @callbacks.conversation(@conversations[message.from])
         @callbacks.message(@conversations[from],message)
     @accounts[name].connect()
   

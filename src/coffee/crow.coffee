@@ -1,7 +1,6 @@
 file = require("file")
-xmpp = require("xmpp")
 
-logger = new Logger("Crow", 'debug', CrowLog)
+logger = new Logger("UI", 'debug', CrowLog)
 log = (s) ->
   logger.debug s
 
@@ -25,16 +24,17 @@ chat = (txt, klazz) ->
   msgs.append "<br>"
   msgs.animate({scrollTop: msgs.prop('scrollHeight')})
 
-render_friends = (account, friends, changed) ->
+render_friends = (friends, changed) ->
   $("#connect-panel").hide()
   $("#disconnect-panel").delay("fast").show()
   $("#friends-panel").delay("slow").slideDown()
-  log "render_friends"
-  log friends
+  log "render_friends..."
   fdiv = $("#friends")
   fdiv.empty()
-  for jid of friends
-    friend = friends[jid]
+  for jid,friend of friends
+    log "jid"
+    log jid
+    log "friend"
     log friend
     n = $("<div/>")
     n.addClass "friend"
@@ -42,91 +42,29 @@ render_friends = (account, friends, changed) ->
     n.append $("<div class=\"name\"/>").text(friend.fullname)
     n.append $("<img/>").attr("src", friend.icon)  if friend.icon
     fdiv.append n
+  log "done render_friends."
 
-friend = (session, jid, alias, presence, chatElement) ->
-  @session = session
-  @jid = jid
-  @alias = alias
-  @presence = presence
-  @chatElement = chatElement
+crow = new Crow null,
+  error: (account,stanza) ->
+  message: (account,stanza) -> chat(stanza.convertToString(),"message")
+  friend: (account,friend) ->
+    render_friends(crow.friends,friend)
+  iq: (account,stanza) ->
+  raw: (account,stanza) ->
+  connect: (account) -> log "conected!"
+  disconnect: (account) ->
+  conversation: (account,conversation) ->
+  log: CrowLog.log
 
-account = (jid, password, friend_listener) ->
-  account = this
-  @jid = jid
-  @resource = "Crow"
-  @from = @jid + "/" + @resource
-  @name = ->
-    account.jid
-
-  @password = password
-  @friends = {}
-  @presence =
-    status: "chat"
-    show: null
-
-  @friend_listener = friend_listener
-  @connect = ->
-    account.session.connect()
-
-  @disconnect = ->
-    account.session.disconnect()
-
-  @send = (stanza) ->
-    account.session.sendStanza stanza
-
-  @show = ->
-    (if account.presence.show then xmpp.Stanza.node("show", null, {}, account.presence.show) else null)
-
-  @presence = ->
-    xmpp.Stanza.presence
-      from: account.from
-    , account.show()
-
-  @update_friends = (friend) ->
-    log("update_friends")
-    account.friend_listener account, account.friends, friend
-
-  @listener =
-    onError: (a, b) ->
-      chat a
-      chat b
-
-    onConnection: ->
-      log " connect! system"
-      account.send account.presence()
-      render_friends()
-
-    onPresenceStanza: (stanza) ->
-      log "onPresenceStanza"
-      chat stanza.convertToString(), "system"
-      friend = xmpp.Stanza.parseVCard(stanza)
-      log friend
-      if friend
-        account.friends[friend.jid.jid] = friend
-        account.update_friends friend
-
-    onMessageStanza: (aStanza) ->
-      chat aStanza.convertToString(), "system"
-
-    onIQStanza: (aName, aStanza) ->
-      chat aStanza.convertToString(), "system"
-
-    onXmppStanza: (aName, aStanza) ->
-      chat aStanza.convertToString(), "system"
-
-  @session = xmpp.session(@jid, @password, "bardicgrove.org", 5222, [ "starttls" ], @listener)
-
-current = "nothin"
 connect = (e) ->
-  current = new account($("#jid").val(), $("#password").val(), render_friends)
-  current.connect()
-  log "connecting "
+  log "connecting..."
+  crow.account("test",$("#jid").val(), $("#password").val(),"bardicgrove.org",5222)
 
 disconnect = (e) ->
   $("#connect-panel").delay("slow").slideDown()
   $("#disconnect-panel").hide()
   $("#friends-panel").hide()
-  current.disconnect()
+  account.disconnect for account in crow.accounts
 
 $(document).ready ->
   $("#connect").on "click", connect

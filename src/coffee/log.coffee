@@ -1,16 +1,16 @@
 class CrowLog
-  @logs = []
+  @logs: []  
 
   @log: (date,level,context,message) ->
-    @logs.push [date,level,context,message]
+    CrowLog.logs.push [date,level,context,message]
     console.log("#{date.toISOString()} #{level} [#{context}] #{message}")
-    CrowLog.update_log_window()
+    $('#log').append CrowLog.format_log([date,level,context,message])
 
   @update_log_window: ->
     log = $('#log')
     log.empty()
-    for l in @logs
-      log.append @format_log(l)
+    for l in CrowLog.logs
+      log.append CrowLog.format_log(l)
 
   @format_log: (l) ->
     [date,level,context,message]=l
