@@ -1,5 +1,6 @@
 file = require("file")
 
+crow = null
 logger = new Logger("UI", 'debug', CrowLog)
 log = (s) ->
   logger.debug s
@@ -14,12 +15,47 @@ load_defaults = ->
   catch e
     log "error reading local prefs..." + e.toString()
 
-chat = (txt, klazz) ->
+add_conversation = (id,title,model) ->
+  return if $("##{id}").length > 0
+  log "add_conversation #{id}, #{title}"
+  li = $("<li/>")
+  li.addClass "active"
+  a = $("<a/>")
+  a.attr "href", "##{id}"
+  log "href=#{a.attr("href")}"
+  a.text title
+  li.append a
+  tabs = $('.content > ul.tabs')
+  tabs.children('.active').removeClass "active"
+  tabs.append li
+
+  div = $("#conversation-template").clone()
+  div.attr "id",id
+  div.data "model", model
+  div.addClass "active"
+  div.show()
+  div.find('.messages h2').text(title)
+
+  convs = $('#conversations')
+  convs.children('.active').removeClass "active"
+  convs.append div
+  
+  try
+    logger.debug "SPLITS"
+    splits($("##{id}"))
+  catch e
+    logger.error "ERROR: splits"
+    logger.error e
+    logger.error e.stack
+
+  tabs.tabs()
+
+chat = (parent, txt, klazz) ->
   log "CHAT:"
   log txt
   chatline = $("<div class=\"chatline\"/>").text(txt)
   chatline.addClass klazz  if klazz
-  msgs=$("#chat1 .messages")
+  msgs = parent
   msgs.append chatline
   msgs.append "<br>"
   msgs.animate({scrollTop: msgs.prop('scrollHeight')})
@@ -36,25 +72,25 @@ render_friends = (friends, changed) ->
     log jid
     log "friend"
     log friend
-    n = $("<div/>")
-    n.addClass "friend"
-    n.append $("<div class=\"jid\"/>").text(friend.jid.jid)
-    n.append $("<div class=\"name\"/>").text(friend.fullname)
-    n.append $("<img/>").attr("src", friend.icon)  if friend.icon
-    fdiv.append n
+    div = $("""
+    <div class="friend">
+      <div class="jid">#{Util.h friend.jid.jid}</div>
+    </div>
+    """)
+    fdiv.append div
+    div.data("model",friend)
   log "done render_friends."
 
-crow = new Crow null,
-  error: (account,stanza) ->
-  message: (account,stanza) -> chat(stanza.convertToString(),"message")
-  friend: (account,friend) ->
-    render_friends(crow.friends,friend)
-  iq: (account,stanza) ->
-  raw: (account,stanza) ->
-  connect: (account) -> log "conected!"
-  disconnect: (account) ->
-  conversation: (account,conversation) ->
-  log: CrowLog.log
+start_conversation = (e) ->
+  log "start conversation"
+  friend = $(e.target).closest('.friend').data("model")
+  log "friend:"
+  log friend
+  if friend
+    c = crow.conversation(friend)
+    add_conversation(friend.safeid(), friend.jid.jid, c)
+  else
+    logger.error "failed to start conversation with unknown friend: #{$(e.target).text()}"
 
 connect = (e) ->
   log "connecting..."
@@ -66,9 +102,23 @@ disconnect = (e) ->
   $("#friends-panel").hide()
   account.disconnect for account in crow.accounts
 
+crow = new Crow null,
+  error: (account,stanza) ->
+  message: (conversation,msg) -> chat($("##{conversation.from.safeid()} .messages"), msg, "message")
+  friend: (account,friend) ->
+    render_friends(crow.friends,friend)
+  iq: (account,stanza) ->
+  raw: (account,stanza) ->
+  connect: (account) -> log "conected!"
+  disconnect: (account) ->
+  conversation: (account,conversation) ->
+    add_conversation(conversation.from.safeid(),conversation.from.jid.jid,conversation)
+  log: CrowLog.log
+
 $(document).ready ->
   $("#connect").on "click", connect
   $("#disconnect").on "click", disconnect
+  $("#friends .friend").live "click", start_conversation
   load_defaults()
   window.resizeTo(800,600)
   $('.tabs').tabs()

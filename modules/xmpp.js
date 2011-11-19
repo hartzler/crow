@@ -712,6 +712,10 @@ function createParser(aListener) {
       }
 
       var node = new XMLNode(this._node, aUri, aLocalName, aQName, aAttributes);
+      if (this.prefix) {
+        node.prefix = this.prefix;
+        this.prefix = null;
+      }
       if (this._node) {
         this._node.addChild(node);
       }
@@ -749,7 +753,7 @@ function createParser(aListener) {
 
     ignorableWhitespace: function(aWhitespace) { },
 
-    startPrefixMapping: function(aPrefix, aUri) { },
+    startPrefixMapping: function(aPrefix, aUri) { this.prefix = aPrefix; },
 
     endPrefixMapping: function(aPrefix) { },
 
@@ -1020,6 +1024,7 @@ TextNode.prototype = {
 /* XML node */
 function XMLNode(aParentNode, aUri, aLocalName, aQName, aAttr) {
   this.parent_node = aParentNode;
+  this.prefix=null;
   this.uri = aUri;
   this.localName = aLocalName;
   this.qName = aQName;
@@ -1156,7 +1161,7 @@ XMLNode.prototype = {
   /* Private methods */
   _getXmlns: function() {
     if (this.uri)
-      return "xmlns=\"" + this.uri + "\"";
+      return "xmlns" + (this.prefix ? ":" + this.prefix : '') + "=\"" + this.uri + "\"";
     else
       return "";
   },

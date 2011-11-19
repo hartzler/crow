@@ -1,5 +1,6 @@
-splits = () ->
-  $.each $('.vsplit, .hsplit'), (i,split) ->
+splits = (node) ->
+  nodes = $('.vsplit, .hsplit') unless node
+  $.each nodes, (i,split) ->
     split = $(split)
     expand = split.children('.expand:first')
     others = expand.siblings()
@@ -30,5 +31,6 @@ splits = () ->
     expand.css(fields['pre'],pre)
     expand.css(fields['post'],post)
 
+window.splits = splits
 $(document).ready ->
   splits()

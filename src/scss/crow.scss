@@ -11,6 +11,31 @@ body {
   display: none;
   margin-bottom: 1em; }
 
+#conversation-template {
+  display: block;
+}
+
+ul.tabs {
+  margin: 0px;
+  border-width: 1px 0 0 0;
+  padding-bottom: 0px;
+}
+ul.tabs li {
+  margin-top: -1;
+  margin-bottom: 0;
+}
+ul.tabs li a {
+  -webkit-border-radius: 0 0 4px 4px;
+  -moz-border-radius: 0 0 4px 4px;
+  border-radius: 0 0 4px 4px;
+  padding-top: 2px; 
+  padding-bottom: 2px; 
+  padding-left: 4px; 
+  padding-right: 4px; 
+  height: 1em;
+  line-height: 1em;
+}
+
 .container-fluid {
   padding-right: 0px;
   margin-right: 1em;
@@ -40,26 +65,34 @@ body {
     #log {
       height: 100%;
       overflow: auto;
+      padding-left: 0em;
+      padding-right: 0em;
+    }
+    #conversation-template {
+      display: none;
     }
 
     .conversation {
       height: 100%;
-      .messages {
-        overflow: auto;
-        .chatline {
-          padding: 1em;
+      .left {
+        height: 100%;
+        .messages {
+          overflow: auto;
+          .chatline {
+            padding: 1em;
+          }
+          .system {
+            color: #ccc;
+            font-size: 8pt;
+          }
         }
-        .system {
-          color: #ccc;
-          font-size: 8pt;
-        }
-      }
-      .command {
-        height: 4em;
-        padding: 3px;
-        textarea {
-          width: 100%;
-          height: 100%;
+        .command {
+          height: 4em;
+          padding: 3px;
+          textarea {
+            width: 100%;
+            height: 100%;
+          }
         }
       }
       .room-info {
@@ -71,6 +104,5 @@ body {
 #content-footer {
   height: 1em;
   border-top: 1px solid black;
-  background-color: green;
 }
 

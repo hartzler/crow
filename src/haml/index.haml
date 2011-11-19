@@ -49,21 +49,19 @@
 
       .content.expand.vsplit
         .toolbar Toolbar
-        %ul.tabs
-          %li
-            %a{:href=>'#log'} Log
-          %li.active
-            %a{:href=>'#chat1'} Chat1
         #conversations.pill-content.expand
-          #log
+          #log.active
             %h2 Log 
-          #chat1.conversation.hsplit.active
-            .expand.vsplit
+          #conversation-template.conversation.hsplit
+            .left.expand.vsplit
               .messages.expand
-                %h2 Chat1
+                %h2 Chat Title
               .command
                 %textarea
             .room-info
+        %ul.tabs
+          %li.active
+            %a{:href=>'#log'} Log
         .footer
     .footer
 
@@ -71,8 +69,9 @@
   %script{:src => "bootstrap-dropdown.js"}
   %script{:src => "bootstrap-tabs.js"}
   %script{:src => "split.js"}
-  %script{:src => "log.js"}
+  %script{:src => "util.js"}
   %script{:src => "models.js"}
+  %script{:src => "log.js"}
   %script{:src => "crow.js"}
   %script{:src => "menus.js"}
   %script{:src => "messages.js"}

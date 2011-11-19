@@ -55,15 +55,15 @@ class Account
 
       onMessageStanza: (aStanza) =>
         @logger.debug aStanza.convertToString()
-        @callbacks.message this, aStanza
+        @callbacks.message this, $($.parseXML(aStanza.convertToString())).children(':first')
   
       onIQStanza: (aName, aStanza) =>
         @logger.debug aStanza.convertToString()
-        @callbacks.iq this, aStanza
+        @callbacks.iq this, $($.parseXML(aStanza.convertToString())).children(':first')
 
       onXmppStanza: (aName, aStanza) =>
         @logger.debug aStanza.convertToString()
-        @callbacks.raw this, aStanza
+        @callbacks.raw this, $($.parseXML(aStanza.convertToString())).children(':first')
 
     @session.connect()
 
@@ -94,12 +94,14 @@ class Account
 
 class Friend
   constructor: (@jid,@presence,@is_room,@account) ->
+  
+  safeid: () -> @jid.jid.replace(/[^a-zA-Z 0-9]+/g,'')
 
 class Conversation
   constructor: (@account,@from,@callbacks) ->
 
   send: (msg) ->
-    msg.from = @from.jid
+    msg.from = @from.jid.jid
     @account.send(msg)
 
 class Crow
@@ -121,15 +123,26 @@ class Crow
       iq: @callbacks.iq
       raw: @callbacks.raw
       message: (account,message) =>
-        from = (friend for friend in @friends when friend.jid is message.from)[0]
-        unless @conversations[from]
-          @conversations[from] = new Conversation(account,from)
-          @callbacks.conversation(@conversations[message.from])
-        @callbacks.message(@conversations[from],message)
+        @logger.debug "message: #{Util.dom_to_string(message)}"
+        @logger.debug "message from: #{message.attr("from")}"
+        jid = message.attr("from").replace(/\/.*/,'')
+        @logger.debug "message from jid: #{jid}"
+        from = @friends[jid]
+        @logger.debug "message from friend: #{from}"
+        unless @conversations[jid]
+          @logger.debug "creating conversation from #{jid}"
+          @conversations[jid] = new Conversation(account.name,from)
+          @logger.debug "created conversation#{@conversations[jid]}"
+          @callbacks.conversation(account,@conversations[jid])
+        body = message.children('body')[0]
+        html = message.find('html body')[0]
+        if body
+          @callbacks.message(@conversations[jid],body.textContent)
+
     @accounts[name].connect()
   
   conversation: (friend) ->
-    @conversations[friend] or= new Conversation(friend.account,friend)
+    @conversations[friend] or= new Conversation(@accounts[friend.account],friend)
 
   friend: (friend) ->
     friend.account.friend(friend)

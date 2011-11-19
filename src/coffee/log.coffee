@@ -14,7 +14,7 @@ class CrowLog
 
   @format_log: (l) ->
     [date,level,context,message]=l
-    "<div class='log#{level}'>#{date.toISOString()} #{level} [#{context}] #{message}</div>"
+    "<div class='log#{level} context-#{context}'>#{date.toISOString()} #{level} [#{context}] #{message}</div>"
  
   @toggle_log_window: ->
     # blah
