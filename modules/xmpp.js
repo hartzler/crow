@@ -856,34 +856,27 @@ const Stanza = {
     return Stanza.node("presence", null, aAttr, aData);
   },
 
+  parseFromJID: function(aStanza) {
+    return parseJID(aStanza.attributes["from"]);
+  },
+
   /* Parse a presence stanza */
   parsePresence: function(aStanza) {
-    /*
-    var p = {show: Ci.imIStatusInfo.STATUS_AVAILABLE,
-             status: null};
+    var p = {show: "chat", status: null};
+
     var show = aStanza.getChildren("show");
     if (show.length > 0) {
-      show = show[0].innerXML();
-      if (show == "away")
-        p.show = Ci.imIStatusInfo.STATUS_AWAY;
-      else if (show == "chat")
-        p.show = Ci.imIStatusInfo.STATUS_AVAILABLE;
-      else if (show == "dnd")
-        p.show = Ci.imIStatusInfo.STATUS_UNAVAILABLE;
-      else if (show == "xa")
-        p.show = Ci.imIStatusInfo.STATUS_IDLE;
+      p.show = show[0].innerXML();
     }
 
     if (aStanza.attributes["type"] == "unavailable") {
-      p.show = Ci.imIStatusInfo.STATUS_OFFLINE;
+      p.show = "unavailable"
     }
 
     var status = aStanza.getChildren("status");
     if (status.length > 0) {
-      status = status[0].innerXML();
-      p.status = status;
+      p.status = status[0].innerXML();
     }
-   */
 
     return p;
   },
@@ -903,9 +896,10 @@ const Stanza = {
         if (c.localName == "FN")
           vCard.fullname = c.innerXML();
         if (c.localName == "PHOTO") {
-          var icon = saveIcon(vCard.jid.jid,
-                   c.getChildren("TYPE")[0].innerXML(),
-                   c.getChildren("BINVAL")[0].innerXML());
+          //var icon = saveIcon(vCard.jid.jid,
+                   //c.getChildren("TYPE")[0].innerXML(),
+                   //c.getChildren("BINVAL")[0].innerXML());
+          var icon = {type:c.getChildren("TYPE")[0].innerXML(), binval:c.getChildren("BINVAL")[0].innerXML()}
           vCard.icon = icon;
         }
       }

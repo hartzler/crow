@@ -3,7 +3,8 @@ splits = (node) ->
   $.each nodes, (i,split) ->
     split = $(split)
     expand = split.children('.expand:first')
-    others = expand.siblings()
+    before = ($(e) for e in expand.siblings() when $(e).index() < expand.index())
+    after = ($(e) for e in expand.siblings().reverse() when $(e).index() > expand.index())
     pre = post = 0
 
     if split.hasClass("vsplit")
@@ -13,17 +14,19 @@ splits = (node) ->
       fields = {zeros:["top","bottom"],pre:"left",post:"right"}
       size=(e) -> e.width()
 
-    # non-expands
-    $.each others, (i, e) ->
-      e = $(e)
+    init = (e)->
       e.css("position","absolute")
       e.css(name,0) for name in fields['zeros']
-      if e.index() < expand.index()
-        e.css(fields['pre'],pre)
-        pre += size(e)
-      else
-        e.css(fields['post'],post)
-        post += size(e)
+
+    # non-expands
+    for e in before
+      init(e)
+      e.css(fields['pre'],pre)
+      pre += size(e)
+    for e in after
+      init(e)
+      e.css(fields['post'],post)
+      post += size(e)
 
     # expand
     expand.css("position","absolute")

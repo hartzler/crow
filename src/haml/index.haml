@@ -45,20 +45,32 @@
             %button#disconnect.btn.danger Disonnect
           #friends-panel
             %h2 Friends
+            #friend-template.template.friend
+              .icon
+              .show
+              .name
+              .status
             #friends
 
       .content.expand.vsplit
         .toolbar Toolbar
         #conversations.pill-content.expand
-          #log.active
-            %h2 Log 
-          #conversation-template.conversation.hsplit
+          #conversation-template.template.conversation.hsplit
             .left.expand.vsplit
               .messages.expand
-                %h2 Chat Title
+                #chatline-template.template.chatline
+                  .time
+                  .from
+                  .body
               .command
                 %textarea
             .room-info
+          #log.active
+            #logline-template.logline
+              .time
+              .level
+              .context
+              .log
         %ul.tabs
           %li.active
             %a{:href=>'#log'} Log
@@ -68,8 +80,8 @@
   %script{:src => "jquery-1.7.min.js"}
   %script{:src => "bootstrap-dropdown.js"}
   %script{:src => "bootstrap-tabs.js"}
-  %script{:src => "split.js"}
   %script{:src => "util.js"}
+  %script{:src => "split.js"}
   %script{:src => "models.js"}
   %script{:src => "log.js"}
   %script{:src => "crow.js"}

@@ -1,10 +1,12 @@
 file = require("file")
+hotkey = require("hotkey")
 
 crow = null
 logger = new Logger("UI", 'debug', CrowLog)
 log = (s) ->
   logger.debug s
 
+# TODO: implement persistent settings
 load_defaults = ->
   try
     log "reading local prefs..."
@@ -15,50 +17,66 @@ load_defaults = ->
   catch e
     log "error reading local prefs..." + e.toString()
 
+clone_template = (id) ->
+  div = $(id).clone()
+  div.attr('id',null)
+  div.show()
+  div
+
+activate_conversation = (conversation) ->
+  log "activate_conversation: #{conversation.attr('id')}"
+  tabs = $('ul.tabs')
+  tabs.find("li.active").removeClass('active')
+  tabs.find("a[href$=\"#{conversation.attr('id')}\"]").closest('li').addClass('active')
+  $("#conversations").children(".active").removeClass('active')
+  conversation.addClass('active')
+  if conversation.hasClass('conversation')
+    conversation.find('.command textarea').focus()
+  tabs.tabs()
+
 add_conversation = (id,title,model) ->
   return if $("##{id}").length > 0
   log "add_conversation #{id}, #{title}"
   li = $("<li/>")
-  li.addClass "active"
   a = $("<a/>")
   a.attr "href", "##{id}"
   log "href=#{a.attr("href")}"
   a.text title
   li.append a
   tabs = $('.content > ul.tabs')
-  tabs.children('.active').removeClass "active"
   tabs.append li
 
-  div = $("#conversation-template").clone()
-  div.attr "id",id
+  div = clone_template "#conversation-template"
+  div.attr('id',id)
   div.data "model", model
   div.addClass "active"
-  div.show()
   div.find('.messages h2').text(title)
 
-  convs = $('#conversations')
-  convs.children('.active').removeClass "active"
-  convs.append div
+  $('#conversations').append div
+
+  activate_conversation(div)
   
-  try
-    logger.debug "SPLITS"
-    splits($("##{id}"))
-  catch e
-    logger.error "ERROR: splits"
-    logger.error e
-    logger.error e.stack
+  command = $("##{id} .command textarea")
+  command.keypress (e) ->
+    if e.keyCode == 13
+      e.preventDefault()
+      log "command model: #{model}"
+      msg = command.val()
+      log "command message: #{msg}"
+      crow.send model, msg
+      chat div.find('.messages'), {from:"me",body:msg,time:new Date()}, "self"
+      command.val '' # clear
 
-  tabs.tabs()
-
-chat = (parent, txt, klazz) ->
-  log "CHAT:"
-  log txt
-  chatline = $("<div class=\"chatline\"/>").text(txt)
-  chatline.addClass klazz  if klazz
-  msgs = parent
-  msgs.append chatline
-  msgs.append "<br>"
-  msgs.animate({scrollTop: msgs.prop('scrollHeight')})
+chat = (parent, msg, klazz) ->
+  log "chat: #{msg.toSource()}"
+  if msg.body
+    chatline = clone_template "#chatline-template"
+    chatline.addClass klazz  if klazz
+    chatline.find('.from').text(msg.from)
+    chatline.find('.time').text("@ #{msg.time.getHours()}:#{msg.time.getMinutes()}")
+    chatline.find('.body').text(msg.body)
+    parent.append chatline
+    parent.scrollToBottom()
 
 render_friends = (friends, changed) ->
   $("#connect-panel").hide()
@@ -68,27 +86,25 @@ render_friends = (friends, changed) ->
   fdiv = $("#friends")
   fdiv.empty()
   for jid,friend of friends
-    log "jid"
-    log jid
-    log "friend"
-    log friend
-    div = $("""
-    <div class="friend">
-      <div class="jid">#{Util.h friend.jid.jid}</div>
-    </div>
-    """)
-    fdiv.append div
+    div = clone_template "#friend-template"
+    log "friend show: #{friend.show()}"
+    div.find('.show').addClass(friend.show())
+    div.find('.name').text(friend.display())
+    div.find('.status').text(friend.status())
+    icon =  $('<img />')
+    icon.attr('src',friend.icon_uri('default_friend.png'))
+    log "icon src: " + icon.attr('src').substring(0,100)
+    div.find('.icon').append(icon)
     div.data("model",friend)
+    fdiv.append div
   log "done render_friends."
 
 start_conversation = (e) ->
-  log "start conversation"
   friend = $(e.target).closest('.friend').data("model")
-  log "friend:"
-  log friend
+  log "start conversation w/ friend: #{friend.jid.jid}"
   if friend
     c = crow.conversation(friend)
-    add_conversation(friend.safeid(), friend.jid.jid, c)
+    add_conversation(friend.safeid(), friend.display(), c)
   else
     logger.error "failed to start conversation with unknown friend: #{$(e.target).text()}"
 
@@ -104,7 +120,13 @@ disconnect = (e) ->
 
 crow = new Crow null,
   error: (account,stanza) ->
-  message: (conversation,msg) -> chat($("##{conversation.from.safeid()} .messages"), msg, "message")
+  message: (conversation,msg) ->
+    parent = $("##{conversation.from.safeid()} .messages")
+    msg =
+      time: new Date()
+      body: msg
+      from: conversation.from.display()
+    chat parent, msg, "message"
   friend: (account,friend) ->
     render_friends(crow.friends,friend)
   iq: (account,stanza) ->
@@ -112,7 +134,7 @@ crow = new Crow null,
   connect: (account) -> log "conected!"
   disconnect: (account) ->
   conversation: (account,conversation) ->
-    add_conversation(conversation.from.safeid(),conversation.from.jid.jid,conversation)
+    add_conversation(conversation.from.safeid(),conversation.from.display(),conversation)
   log: CrowLog.log
 
 $(document).ready ->
@@ -123,3 +145,13 @@ $(document).ready ->
   window.resizeTo(800,600)
   $('.tabs').tabs()
 
+
+hotkeys = {}
+hotkeys["meta-#{n}"]=(if n is 0 then -1 else n) for n in [0..9]
+log "hotkeys: #{hotkeys.toSource()}"
+for hot,n of hotkeys
+  do (hot,n) -> 
+    hotkey.register hot, ->
+      #log "hotkey: #{n} #{hot}"
+      c = $($('#conversations').children().get()[n])
+      activate_conversation c if c.attr('id') && c.attr('id') != 'conversation-template'
