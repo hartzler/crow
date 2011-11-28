@@ -1,3 +1,2 @@
 #!/bin/sh
-(cd src/ && cake build) && ./chromeless/chromeless build
-
+rake && open build/Crow.app --args -jsconsole

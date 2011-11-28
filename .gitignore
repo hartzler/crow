@@ -4,3 +4,6 @@ src/local.json
 src/.sass-cache
 .rvmrc
 build
+.sass-cache
+cache
+xulrunner-sdk*

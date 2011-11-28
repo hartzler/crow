@@ -1,5 +1,6 @@
-file = require("file")
-hotkey = require("hotkey")
+# TODO: xulrunner these
+#file = require("file")
+#hotkey = require("hotkey")
 
 crow = null
 logger = new Logger("UI", 'debug', CrowLog)
@@ -141,17 +142,18 @@ $(document).ready ->
   $("#connect").on "click", connect
   $("#disconnect").on "click", disconnect
   $("#friends .friend").live "click", start_conversation
-  load_defaults()
+  #load_defaults()
   window.resizeTo(800,600)
   $('.tabs').tabs()
 
 
-hotkeys = {}
-hotkeys["meta-#{n}"]=(if n is 0 then -1 else n) for n in [0..9]
-log "hotkeys: #{hotkeys.toSource()}"
-for hot,n of hotkeys
-  do (hot,n) -> 
-    hotkey.register hot, ->
-      #log "hotkey: #{n} #{hot}"
-      c = $($('#conversations').children().get()[n])
-      activate_conversation c if c.attr('id') && c.attr('id') != 'conversation-template'
+# TODO: xulrunner this
+#hotkeys = {}
+#hotkeys["meta-#{n}"]=(if n is 0 then -1 else n) for n in [0..9]
+#log "hotkeys: #{hotkeys.toSource()}"
+#for hot,n of hotkeys
+#  do (hot,n) -> 
+#    hotkey.register hot, ->
+#      #log "hotkey: #{n} #{hot}"
+#      c = $($('#conversations').children().get()[n])
+#      activate_conversation c if c.attr('id') && c.attr('id') != 'conversation-template'

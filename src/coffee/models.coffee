@@ -1,5 +1,6 @@
 #todo move xmpp stuff out of here
-xmpp = require("xmpp")
+xmpp = {}
+Components.utils.import("resource://app/modules/xmpp.js",xmpp)
 
 class XmppStanza
   constructor: (@xml) ->

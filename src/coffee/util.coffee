@@ -1,6 +1,19 @@
 # general utils
 Util = {}
 
+# simple pub/sub
+class PubSub
+  constructor: ->
+    @events = {}
+  on: (name,f)=>
+    @events[name] or= jQuery.Callbacks()
+    @events[name].add(f)
+  pub: (name,args...)=>
+    @events[name].fire.apply(null,args) if @events[name]
+  chain: (pubsub, name)=>
+    @events[name] = pubsub.events[name] or= jQuery.Callbacks()
+Util.PubSub = PubSub
+
 class Logger
   @levels: {error:0 ,warn:1 ,info:2 ,debug:3}
   @level_names: ['error','warn','info','debug']

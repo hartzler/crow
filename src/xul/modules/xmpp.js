@@ -37,7 +37,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-const {Cc,Ci,Cm,Cr,Cu} = require("chrome");
+var EXPORTED_SYMBOLS = ["Stanza", "session"];
+
+const Cc = Components.classes;
+const Ci = Components.interfaces;
+const Cu = Components.utils;
+const Cr = Components.results;
+const Cm = Components.manager;
 
 // imports
 Cu.import("resource://gre/modules/FileUtils.jsm");
@@ -126,9 +132,9 @@ const Socket = {
 
         // Add a URI scheme since, by default, some protocols (i.e. IRC) don't
         // have a URI scheme before the host.
-        //var uri = Services.io.newURI(this.uriScheme + this.host, null, null);
-        var ioService = Cc['@mozilla.org/network/io-service;1'].getService(Ci.nsIIOService);
-        var uri = ioService.newURI(this.uriScheme + this.host, null, null);
+        var uri = Services.io.newURI(this.uriScheme + this.host, null, null);
+        //var ioService = Cc['@mozilla.org/network/io-service;1'].getService(Ci.nsIIOService);
+        //var uri = ioService.newURI(this.uriScheme + this.host, null, null);
         this._proxyCancel = proxyService.asyncResolve(uri, this.proxyFlags, this);
       } catch(e) {
         // We had some error getting the proxy service, just don't use one.
@@ -393,8 +399,8 @@ const Socket = {
                                 this.connectTimeout);
     }
 
-    //this.transport.setEventSink(this, Services.tm.currentThread);
-    this.transport.setEventSink(this, Ci.nsIThreadManager.currentThread);
+    this.transport.setEventSink(this, Services.tm.currentThread);
+    //this.transport.setEventSink(this, Ci.nsIThreadManager.currentThread);
 
     // No limit on the output stream buffer
     this._outputStream = this.transport.openOutputStream(0, // flags
@@ -681,8 +687,8 @@ function createParser(aListener) {
       aListener.onError("parse-error", aError);
     },
 
-    fatelError: function(aLocator, aError) {
-      aListener.onError("parse-fatel-error", aError);
+    fatalError: function(aLocator, aError) {
+      aListener.onError("parse-fatal-error", aError);
     },
 
     ignorableWarning: function(aLocator, aError) {
@@ -1236,7 +1242,8 @@ function saveIcon(aJid, aType, aEncodedContent) {
 function debug(aString) {
   //dump(aString);
   //dump("\n");
-  console.log("XMPP: " + aString);
+  //console.log("XMPP: " + aString);
+  log(aString);
 }
 
 /* Log */
@@ -1244,9 +1251,9 @@ function log(aString) {
   if (typeof(aString) == "undefined" || !aString)
     aString = "null";
 
-  //Services.console.logStringMessage("" + aString);
-  var console = ["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);  
-  console.logStringMessage("" + aString);
+  Services.console.logStringMessage("" + aString);
+  //var console = ["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);  
+  //console.logStringMessage("" + aString);
 }
 
 /* Print a object for debugging */
@@ -1769,9 +1776,8 @@ StanzaEventManager.prototype = {
 };
 
 
-exports.session = function(aJid, aPassword, aHost, aPort, aSecurity, aListener) {
+function session(aJid, aPassword, aHost, aPort, aSecurity, aListener) {
   var jid = parseJID(aJid);
   var aDomain = jid.domain;
   return new XMPPSession(aHost, aPort, aSecurity, jid, aDomain, aPassword, aListener);
 };
-exports.Stanza = Stanza;
