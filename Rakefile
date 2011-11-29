@@ -5,7 +5,9 @@ platform=:mac
 builddir = 'build'
 xul = "xulrunner-sdk"
 xuluri = {
-  :mac => {:base=>"http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/8.0.1/sdk", :file=>"xulrunner-8.0.1.en-US.mac-x86_64.sdk.tar.bz2"}
+  :base=>"http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/6.0.2/sdk/",
+  :mac => { :file=>"xulrunner-6.0.2.en-US.mac-x86_64.sdk.tar.bz2"},
+  :linux => {:file=>"xulrunner-6.0.2.en-US.linux-x86_64.sdk.tar.bz2"},
 }
 
 task :default => [:package]
@@ -15,7 +17,7 @@ task :xul do
   unless File.exist?(xul)
     unless File.exist?("cache/#{uri[:file]}")
       `mkdir -p cache`
-      `curl "#{uri[:base]}/#{uri[:file]}" > cache/#{uri[:file]}`
+      `curl "#{xuluri[:base]}/#{uri[:file]}" > cache/#{uri[:file]}`
     end
     `tar -xjf cache/#{uri[:file]}`
   end
