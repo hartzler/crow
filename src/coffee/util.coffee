@@ -15,6 +15,7 @@ class PubSub
 Util.PubSub = PubSub
 
 class Logger
+  $ = jQuery
   @levels: {error:0 ,warn:1 ,info:2 ,debug:3}
   @level_names: ['error','warn','info','debug']
 

@@ -1,4 +1,6 @@
 class CrowLog
+  $ = jQuery
+  Logger = window.Logger
   @logs: []
 
   @log: (date,level,context,message) ->
