@@ -34,8 +34,8 @@ task :build do
     open(erb,"w"){|f| f.puts ERB.new(File.read("#{erb}.erb")).result()}
   end
   #`coffee -o #{builddir}/xul/content/ src/coffee`
-  `rm -Rf #{builddir}/xul/content/coffee && rm -Rf #{builddir}/xul/content/javascript `
-  ["#{builddir}/xul/content/coffee "," #{builddir}/xul/content/javascript"].each{|dir|`mkdir -p #{dir}`}
+  `rm -Rf #{builddir}/xul/content/coffee && rm -Rf #{builddir}/xul/content/javascript  && rm -Rf #{builddir}/xul/content/local`
+  ["#{builddir}/xul/content/local","#{builddir}/xul/content/coffee "," #{builddir}/xul/content/javascript"].each{|dir|`mkdir -p #{dir}`}
 
   ` cp -R src/coffee/* #{builddir}/xul/content/coffee`
   Dir["src/haml/*.haml"].each{|haml|`haml #{haml} #{builddir}/xul/content/#{File.basename(haml,".haml")}.html`}
