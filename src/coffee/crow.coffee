@@ -111,7 +111,7 @@ start_conversation = (e) ->
 
 connect = (e) ->
   log "connecting..."
-  crow.account("test",$("#jid").val(), $("#password").val(),"bardicgrove.org",5222)
+  crow.account("test",$("#jid").val(), $("#password").val(),$("#host").val(),$("#port").val())
 
 disconnect = (e) ->
   $("#connect-panel").delay("slow").slideDown()

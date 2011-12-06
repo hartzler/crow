@@ -40,6 +40,14 @@
                 %label{:for => "password"} Password
                 .input
                   %input#password.span3{:type => "password"}/
+              .clearfix
+                %label{:for => "host"} Host
+                .input
+                  %input#host.span3{:type => "text", :value=>"bardicgrove.org"}/
+              .clearfix
+                %label{:for => "port"} Port
+                .input
+                  %input#port.span3{:type => "text", :value=>"5222"}/
               %button#connect.btn.primary Connect
           #disconnect-panel
             %button#disconnect.btn.danger Disonnect
