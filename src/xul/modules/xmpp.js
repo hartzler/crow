@@ -774,6 +774,9 @@ function createParser(aListener) {
   return parser;
 }
 
+
+//== TODO: move this all into app
+
 //== xmlnode
 
 const $NS = {
@@ -1186,10 +1189,6 @@ function btoa(aInput) {
   return AppShellService.hiddenDOMWindow.btoa(aInput);
 }
 
-/* Normalize a string
- * Removes all characters except alpha-numerics */
-function normalize(aString) aString.replace(/[^a-z0-9]/gi, "").toLowerCase()
-
 /* Parse Jabber ID */
 function parseJID(aJid) {
   var res = {};
@@ -1240,10 +1239,11 @@ function saveIcon(aJid, aType, aEncodedContent) {
 
 /* Print debugging output */
 function debug(aString) {
-  //dump(aString);
-  //dump("\n");
+  dump("XMPP: ");
+  dump(aString);
+  dump("\n");
   //console.log("XMPP: " + aString);
-  log(aString);
+  //log(aString);
 }
 
 /* Log */
@@ -1252,8 +1252,6 @@ function log(aString) {
     aString = "null";
 
   Services.console.logStringMessage("" + aString);
-  //var console = ["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);  
-  //console.logStringMessage("" + aString);
 }
 
 /* Print a object for debugging */

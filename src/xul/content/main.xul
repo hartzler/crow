@@ -1,7 +1,28 @@
 <?xml version="1.0"?>
 <!--<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>-->
 <window id="main" title="Crow" width="800" height="600" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <!-- coffee script -->
   <script type="application/x-javascript" src="chrome://crow/content/coffee-script.js"/>
   <script type="application/x-javascript" src="chrome://crow/content/coffee_builder.js"/>
-  <iframe id="content" src="chrome://crow/content/index.html" flex="1"/>
+
+  <!-- deck of untrusted iframes floated over ui iframe to allow secure rish media conversations -->
+  <stack flex="1">
+    <!-- crow ui -->
+    <iframe id="ui" flex="1" src="chrome://crow/content/index.html"/>
+    <deck id="untrusted" top="65px" left="250px">
+      <iframe type="content" flex="1" src="data:text/html,%3Chtml%3E%3Cbody%3ETEST%3C/body%3E%3C/html%3E" style="border: 0px; margin: 0; padding: 0;"/>
+    </deck>
+  </stack>
+
+  <!-- resize our untrusted iframe deck -->
+  <script type="application/x-javascript">
+    var h=null;
+    var w=null;
+    function resize(e) {
+      var u = document.getElementById("untrusted");
+      u.height = window.innerHeight-105;
+      u.width = window.innerWidth-270;
+    }
+    window.addEventListener("resize",resize,false);
+  </script>
 </window>

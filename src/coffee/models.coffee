@@ -143,7 +143,7 @@ class Crow
         @logger.debug "message from jid: #{jid}"
         from = @friends[jid]
         unless from
-          @friends[jid] = new Friend({jid:jid},null,false,account.name)
+          from = @friends[jid] = new Friend({jid:jid},null,false,account.name)
         @logger.debug "message from friend: #{from.jid.jid}"
         unless @conversations[jid]
           @logger.debug "creating conversation from #{jid}"

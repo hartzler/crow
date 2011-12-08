@@ -12,21 +12,18 @@
         .container-fluid
           %a.brand{:href => "#"} Crow
           %ul.nav
-            %li.home-menu.dropdown
-              %a.dropdown-toggle{:href => "#"} Home
-              %ul.dropdown-menu
-                %li 
-                  %a{:href=>"#"}Accounts
-                %li 
-                  %a{:href=>"#"}Plugins
-                %li 
-                  %a{:href=>"#"}Settings
-                %li 
-                  %a#toggle_logs{:href=>"#"}Toggle Logs
+            %li 
+              %a{:href=>"#"}Chats
+            %li 
+              %a{:href=>"#"}Friends
+            %li 
+              %a{:href=>"#"}Accounts
+            %li 
+              %a{:href=>"#"}Settings
             %li
-              %a{:href => "#about"} About
+              %a{:href=>"#"}Log
 
-          %p.pull-right XMPP is crazy...
+          %p.pull-right Status
     
     .container-fluid.expand.hsplit
       .sidebar
@@ -65,16 +62,7 @@
       .content.expand.vsplit
         .toolbar Toolbar
         #conversations.pill-content.expand
-          #conversation-template.template.conversation.hsplit
-            .left.expand.vsplit
-              .messages.expand
-                #chatline-template.template.chatline
-                  .time
-                  .from
-                  .body
-              .command
-                %textarea
-            .room-info
+          #conversation-template.template.conversation
           #log.active
             #logline-template.logline
               .time
@@ -87,15 +75,13 @@
         .footer
     .footer
 
+  %script{:src => "io.js"}
   %script{:src => "jquery-1.7.min.js"}
   %script{:src => "bootstrap-dropdown.js"}
   %script{:src => "bootstrap-tabs.js"}
   %script{:src => "javascript/util.js"}
-  %script{:src => "javascript/split.js"}
   %script{:src => "javascript/models.js"}
+  %script{:src => "javascript/split.js"}
   %script{:src => "javascript/log.js"}
   %script{:src => "javascript/crow.js"}
-  %script{:src => "javascript/menus.js"}
-  %script{:src => "javascript/messages.js"}
-  %script{:src => "javascript/hotkeys.js"}
 

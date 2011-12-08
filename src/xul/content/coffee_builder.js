@@ -1,7 +1,9 @@
+dump("running coffee_builder.js\n");
 var CoffeeScriptBuilder = {
     log: function (message) {
-        var con = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
-        con.logStringMessage(message);
+        dump("coffee builder: "); dump(message); dump("\n");
+        //var con = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
+        //con.logStringMessage(message);
     },
     build: function () {
         Components.utils.import("resource://gre/modules/FileUtils.jsm");
@@ -16,7 +18,7 @@ var CoffeeScriptBuilder = {
 
             CoffeeScriptBuilder.log(entry.path)
             try {
-                coffee = CoffeeScriptBuilder.readFile(entry);
+                CoffeeScriptBuilder.readFile(entry);
             } catch (e) {
                 CoffeeScriptBuilder.log(e)
             }

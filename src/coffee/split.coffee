@@ -1,3 +1,5 @@
+jQuery.fn.reverse or= [].reverse
+
 splits = (node) ->
   nodes = $('.vsplit, .hsplit') unless node
   $.each nodes, (i,split) ->

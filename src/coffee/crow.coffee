@@ -2,10 +2,35 @@
 #file = require("file")
 #hotkey = require("hotkey")
 
+Components.utils.import("resource://gre/modules/FileUtils.jsm");
+
 crow = null
 logger = new Logger("UI", 'debug', CrowLog)
 log = (s) ->
+  dump(s); dump("\n")
   logger.debug s
+
+# crow api call from child window
+#crow_on = (name,handler) ->
+#  listener = (e)->
+#    msg = e.target.getUserData("crow-request")
+#    log("conv listener: #{name} -> #{msg.toSource()}")
+#    document.documentElement.removeChild(e.target)
+#    handler(msg)
+#  $(document).ready ()->
+#    window.addEventListener name, listener, false
+
+# crow api call to a child window
+api_call = (iframe,name,data,callback)->
+  log "sending api_call(#{name},#{data.toSource()}) to iframe #{iframe}"
+  doc = iframe.contentDocument
+  request = doc.createTextNode('')
+  request.setUserData("crow-request",data,null)
+  doc.documentElement.appendChild(request)
+  sender = doc.createEvent("HTMLEvents")
+  sender.initEvent(name, true, false)
+  request.dispatchEvent(sender)
+  log "dispatched event #{sender} to #{request}"
 
 # TODO: implement persistent settings
 load_defaults = ->
@@ -26,23 +51,35 @@ clone_template = (id) ->
 
 activate_conversation = (conversation) ->
   log "activate_conversation: #{conversation.attr('id')}"
+  select_xul_conversation(conversation.attr('id'))
   tabs = $('ul.tabs')
   tabs.find("li.active").removeClass('active')
   tabs.find("a[href$=\"#{conversation.attr('id')}\"]").closest('li').addClass('active')
   $("#conversations").children(".active").removeClass('active')
   conversation.addClass('active')
-  log conversation.html()
-  #Why are we checking for the class? 
-  if conversation.hasClass('conversation')
-    conversation.find('textarea').focus()
+  conversation.find('textarea').focus()
   tabs.tabs()
 
 add_conversation = (id,title,model) ->
   return if $("##{id}").length > 0
+
   log "add_conversation #{id}, #{title}"
+ 
+  # create the xul element
+  iframe = create_xul_conversation(id)
+
+  # register listener... TODO: move in the iframe on load for added security?
+  iframe.contentWindow.addEventListener 'crow:conv:send', (e)->
+    log("received: crow:conv:send!")
+    data = e.target.getUserData('crow-request')
+    log("received: crow:conv:send -> #{data.toSource()}")
+    crow.send model, data.body
+    log("sent: #{data.body}")
+    # cleanup
+    iframe.contentDocument.documentElement.removeChild(e.target)
+
   li = $("<li/>")
-  a = $("<a/>")
-  a.attr "href", "##{id}"
+  a = $("<a/>",{href: "##{id}"})
   log "href=#{a.attr("href")}"
   a.text title
   li.append a
@@ -52,34 +89,17 @@ add_conversation = (id,title,model) ->
   div = clone_template "#conversation-template"
   div.attr('id',id)
   div.data "model", model
-  div.addClass "active"
-  div.find('.messages h2').text(title)
-
+  
   $('#conversations').append div
 
   activate_conversation(div)
   
-  command = $("##{id} .command textarea")
-  command.keypress (e) ->
-    if e.keyCode == 13
-      e.preventDefault()
-      log "command model: #{model}"
-      msg = command.val()
-      log "command message: #{msg}"
-      crow.send model, msg
-      chat div.find('.messages'), {from:"me",body:msg,time:new Date()}, "self"
-      command.val '' # clear
 
-chat = (parent, msg, klazz) ->
-  log "chat: #{msg.toSource()}"
-  if msg.body
-    chatline = clone_template "#chatline-template"
-    chatline.addClass klazz  if klazz
-    chatline.find('.from').text(msg.from)
-    chatline.find('.time').text("@ #{msg.time.getHours()}:#{msg.time.getMinutes()}")
-    chatline.find('.body').text(msg.body)
-    parent.append chatline
-    parent.scrollToBottom()
+chat = (id, msg) ->
+  log "chat: #{id} - #{msg.toSource()}"
+  iframe = convsation_iframe(id)
+  api_call iframe, "crow:conv:chat", msg
+  
 
 render_friends = (friends, changed) ->
   $("#connect-panel").hide()
@@ -129,12 +149,7 @@ disconnect = (e) ->
 crow = new Crow null,
   error: (account,stanza) ->
   message: (conversation,msg) ->
-    parent = $("##{conversation.from.safeid()} .messages")
-    msg =
-      time: new Date()
-      body: msg
-      from: conversation.from.display()
-    chat parent, msg, "message"
+    chat conversation.from.safeid(), time: new Date, body:msg, from:conversation.from.display(), klazz:"message"
   friend: (account,friend) ->
     render_friends(crow.friends,friend)
   iq: (account,stanza) ->
@@ -149,16 +164,66 @@ $(document).ready ->
   $("#connect").on "click", connect
   $("#disconnect").on "click", disconnect
   $("#friends .friend").live "click", start_conversation
+
   #load_defaults()
   window.resizeTo(800,600)
   $('.tabs').tabs()
-  chat_tab_changed = (e) -> 
+  chat_tab_changed = (e) ->
     e.target #// activated tab
     e.relatedTarget #// previous tab
     if(e.target != e.reatedTarget)
       $("#"+e.target.href.split("#")[1]+" textarea").focus()
   $('.tabs').bind('change', chat_tab_changed   )
   
+
+xul_deck = ()->
+  window.top.document.getElementById("untrusted")
+
+load_chrome = (url)->
+  log("load_chrome #{url}")
+  path = FileUtils.getFile("CurProcD", "content/#{url}".split("/"))
+  log("load_chrome #{path}")
+  content = FileIO.read(path)
+  log("result: #{path} => #{content}")
+  content
+#  request = new XMLHttpRequest()
+#  request.open("GET", "chrome://crow/content/#{url}", false)
+#  request.send(null)
+#  request.responseText
+    
+convsation_iframe = (id) ->
+  window.top.document.getElementById("conv-#{id}")
+
+conversation_iframe_src_data = ()->
+  html = load_chrome "conversation.html"
+  shit = ''
+  shit += "\n<style type=\"text/css\">\n#{load_chrome('messages.css')}\n</style>"
+  shit += "\n<script>#{load_chrome('jquery-1.7.min.js')}\n</script>"
+  shit += "\n<script>#{load_chrome('javascript/split.js')}\n</script>"
+  shit += "\n<script>#{load_chrome('javascript/conversation.js')}\n</script>"
+  html = html.replace('<head></head>',"<head>#{shit}</head>")
+  log("conv html: #{html}")
+  "data:text/html,#{encodeURIComponent(html)}"
+
+create_xul_conversation = (id)->
+  deck = xul_deck()
+  iframe = window.top.document.createElement("iframe")
+  iframe.setAttribute("id","conv-#{id}")
+  iframe.setAttribute("type","content")
+  html = conversation_iframe_src_data()
+  log(html)
+  iframe.setAttribute("src",html)
+  deck.appendChild(iframe)
+  log(iframe)
+  deck.selectedPanel = iframe
+  iframe
+
+select_xul_conversation = (id)->
+  log("select_xul_conversation: conv-#{id}")
+  p = convsation_iframe(id)
+  log("panel: #{p}")
+  xul_deck().selectPanel = p
+  log("xul_deck: #{xul_deck()}")
 
 # TODO: xulrunner this
 #hotkeys = {}
