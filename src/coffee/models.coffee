@@ -16,7 +16,12 @@ class Account
 
   connect: () ->
     @logger.debug([@jid,@password,@host,@port])
-    @session = xmpp.session @jid, @password, @host, @port, [ "starttls" ],
+    security = [ "starttls" ]
+    
+    if(@port=='443')
+      security = [ "ssl" ]
+
+    @session = xmpp.session @jid, @password, @host, @port, security,
       onError: (aName, aStanza) =>
         @logger.error aStanza.convertToString()
         @callbacks.error this, aStanza
@@ -147,6 +152,7 @@ class Crow
         html = message.find('html body')[0]
         if body
           @callbacks.message(@conversations[jid],body.textContent)
+          
 
     @accounts[name].connect()
   
