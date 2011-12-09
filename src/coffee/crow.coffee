@@ -92,7 +92,8 @@ render_friends = (friends, changed) ->
     if(friend.show() not in ["unavailable"])
       div = clone_template "#friend-template"
       log "friend show: #{friend.show()}"
-      div.addClass(friend.show())
+      div.find('.state').addClass(friend.show())
+      div.find('.state').html("&ordm;")
       div.find('.name').text(friend.display())
       div.find('.status').text(friend.status())
       icon =  $('<img />')

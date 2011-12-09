@@ -30,7 +30,20 @@ body {
       float: left;
       background-color: yellow;
     }
-       .name {
+    .state{
+      height: auto;
+      width: 7px;
+      float: left;
+      .chat {
+        background-color: green;
+      }
+      .away,.dnd {
+        background-color: red;
+      }
+
+      
+    }
+    .name {
       font-size: 10pt;
       width: 125px;
       overflow: hidden;
