@@ -82,19 +82,19 @@ ul.tabs {
   margin: 0px;
   border-width: 1px 0 0 0;
   padding-bottom: 0px;
-}
-ul.tabs li {
-  margin-top: -1;
-  margin-bottom: 0;
-}
-ul.tabs li a {
-  border-radius: 0 0 4px 4px;
-  padding-top: 2px; 
-  padding-bottom: 2px; 
-  padding-left: 4px; 
-  padding-right: 4px; 
-  height: 1em;
-  line-height: 1em;
+  li {
+    margin-top: -1;
+    margin-bottom: 0;
+    a {
+      border-radius: 0 0 4px 4px;
+      padding-top: 2px; 
+      padding-bottom: 2px; 
+      padding-left: 4px; 
+      padding-right: 4px; 
+      height: 1em;
+      line-height: 1em;
+    }
+  } 
 }
 
 .container-fluid {
