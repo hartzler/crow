@@ -4,6 +4,7 @@
     %link{:href => "bootstrap.css", :rel => "stylesheet", :type => "text/css"}
     %link{:href => "crow.css", :rel => "stylesheet", :type => "text/css"}
     %link{:href => "log.css", :rel => "stylesheet", :type => "text/css"}
+    %link{:href => "messages.css", :rel => "stylesheet", :type => "text/css"}
 
   %body.vsplit
     .topbar
@@ -35,11 +36,11 @@
               .clearfix
                 %label{:for => "jid"} JID
                 .input
-                  %input#jid.span3{:type => "text"}/
+                  %input#jid.span3{:type => "text",:value=>"hartzler@bardicgrove.org"}/
               .clearfix
                 %label{:for => "password"} Password
                 .input
-                  %input#password.span3{:type => "password"}/
+                  %input#password.span3{:type => "password", :value=>"b8h534h35"}/
               .clearfix
                 %label{:for => "host"} Host
                 .input

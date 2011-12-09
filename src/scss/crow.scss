@@ -14,6 +14,13 @@ body {
 }
 #friends-panel {
   display: none; 
+  .chat {
+    background-color: green;
+  }
+  .away,.dnd {
+    background-color: red;
+  }
+
   .friend {
     clear: both;
     max-height: 3em;
@@ -23,13 +30,7 @@ body {
       float: left;
       background-color: yellow;
     }
-    .chat {
-      background-color: green;
-    }
-    .away {
-      background-color: red;
-    }
-    .name {
+       .name {
       font-size: 10pt;
       width: 125px;
       overflow: hidden;
@@ -137,56 +138,6 @@ ul.tabs li a {
       }
     }
 
-    .conversation {
-      height: 100%;
-      .left {
-        height: 100%;
-        .messages {
-          overflow: auto;
-          .chatline {
-            margin-bottom: 1em;
-            margin-left: 1em;
-            margin-right: 1em;
-            padding: 1em;
-            font-size: 10pt;
-            border-radius: 4px 4px 4px 4px;
-            border-shadow: 3px 3px 5px rgba(128,128,128,0.5);
-            .time {
-              float: right;
-              margin-left: 0.5em;
-            }
-            .from {
-              float: right;
-              margin-left: 1em;
-            }
-          }
-          .self {
-            background-color: $scheme3;
-          }
-          .message {
-            background-color: $scheme2;
-          }
-          .system {
-            background-color: #ccc;
-            font-size: 8pt;
-          }
-          .delay {
-            background-color: #ccc;
-          }
-        }
-        .command {
-          height: 4em;
-          padding: 3px;
-          textarea {
-            width: 100%;
-            height: 100%;
-          }
-        }
-      }
-      .room-info {
-        display: none;
-      }
-    }
   }
 }
 #content-footer {

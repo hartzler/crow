@@ -84,20 +84,24 @@ render_friends = (friends, changed) ->
   $("#disconnect-panel").delay("fast").show()
   $("#friends-panel").delay("slow").slideDown()
   log "render_friends..."
+  log changed
   fdiv = $("#friends")
   fdiv.empty()
   for jid,friend of friends
-    div = clone_template "#friend-template"
-    log "friend show: #{friend.show()}"
-    div.find('.show').addClass(friend.show())
-    div.find('.name').text(friend.display())
-    div.find('.status').text(friend.status())
-    icon =  $('<img />')
-    icon.attr('src',friend.icon_uri('default_friend.png'))
-    log "icon src: " + icon.attr('src').substring(0,100)
-    div.find('.icon').append(icon)
-    div.data("model",friend)
-    fdiv.append div
+    log(friend.show())
+    if(friend.show() not in ["unavailable"])
+      div = clone_template "#friend-template"
+      log "friend show: #{friend.show()}"
+      div.addClass(friend.show())
+      div.find('.name').text(friend.display())
+      div.find('.status').text(friend.status())
+      icon =  $('<img />')
+      icon.attr('src',friend.icon_uri('default_friend.png'))
+      log "icon src: " + icon.attr('src').substring(0,100)
+      div.find('.icon').append(icon)
+      div.data("model",friend)
+      log div.html()
+      fdiv.append div
   log "done render_friends."
 
 start_conversation = (e) ->
