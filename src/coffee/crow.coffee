@@ -31,8 +31,10 @@ activate_conversation = (conversation) ->
   tabs.find("a[href$=\"#{conversation.attr('id')}\"]").closest('li').addClass('active')
   $("#conversations").children(".active").removeClass('active')
   conversation.addClass('active')
+  log conversation.html()
+  #Why are we checking for the class? 
   if conversation.hasClass('conversation')
-    conversation.find('.command textarea').focus()
+    conversation.find('textarea').focus()
   tabs.tabs()
 
 add_conversation = (id,title,model) ->
@@ -150,7 +152,13 @@ $(document).ready ->
   #load_defaults()
   window.resizeTo(800,600)
   $('.tabs').tabs()
-
+  chat_tab_changed = (e) -> 
+    e.target #// activated tab
+    e.relatedTarget #// previous tab
+    if(e.target != e.reatedTarget)
+      $("#"+e.target.href.split("#")[1]+" textarea").focus()
+  $('.tabs').bind('change', chat_tab_changed   )
+  
 
 # TODO: xulrunner this
 #hotkeys = {}
