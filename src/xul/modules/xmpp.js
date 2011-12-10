@@ -1634,7 +1634,9 @@ XMPPSession.prototype = {
           this.setState(STATE.auth_success);
           this._connection.reset();
           this.startStream();
-          //this.setState(STATE.auth_waiting_results);
+        }
+        if (res.wait_results == true) {
+          this.setState(STATE.auth_waiting_results);
         }
         break;
 
@@ -1673,7 +1675,7 @@ XMPPSession.prototype = {
 
       case STATE.start_session:
         this.setState(STATE.session_started);
-        this._listener.onConnection();
+        this._listener.onConnection(this._resource);
         break;
 
       case STATE.session_started:

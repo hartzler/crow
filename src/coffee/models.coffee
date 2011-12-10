@@ -26,7 +26,9 @@ class Account
         @logger.error aStanza.convertToString()
         @callbacks.error this, aStanza
   
-      onConnection: =>
+      onConnection: (resource)=>
+        @resource = resource
+        @from = @jid + "/" + @resource
         @logger.debug "connect"
         @callbacks.connect(this)
         @presence()
@@ -64,8 +66,8 @@ class Account
 
   presence_node: (show,status) ->
     xmpp.Stanza.presence from: @from, [
-      xmpp.Stanza.node "show", {}, show
-      xmpp.Stanza.node "status", {}, status
+      xmpp.Stanza.node "show", null, {}, show
+      xmpp.Stanza.node "status", null, {}, status
     ]
 
   message_node: (to,message) ->
