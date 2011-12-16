@@ -1,13 +1,21 @@
 require 'erb'
 
 appname = 'Crow'
-platform=:mac
+if RUBY_PLATFORM.downcase.include?("darwin")
+  platform=:mac
+elsif RUBY_PLATFORM.downcase.include?("linux")
+  platform = system("sysctl hw.cpu64bit_capable > /dev/null 2>&1") ? :linux64 : :linux32
+else
+  platform=:mac
+end
+
 builddir = 'build'
 xul = "xulrunner-sdk"
 xuluri = {
   :base=>"http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/6.0.2/sdk/",
   :mac => { :file=>"xulrunner-6.0.2.en-US.mac-x86_64.sdk.tar.bz2"},
-  :linux => {:file=>"xulrunner-6.0.2.en-US.linux-x86_64.sdk.tar.bz2"},
+  :linux32 => {:file=>"xulrunner-6.0.2.en-US.linux-i686.sdk.tar.bz2"},
+  :linux64 => {:file=>"xulrunner-6.0.2.en-US.linux-x86_64.sdk.tar.bz2"},
 }
 
 task :default => [:package]
