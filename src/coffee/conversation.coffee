@@ -10,9 +10,9 @@ clone_template = (id) ->
 img_plugin = (msg)->
   re = /(http(s)?:\/\/.*?.(jpg|jpeg|png|gif|bmp|ico))/i
   if(msg.html && msg.html.match(re))
-    msg.html = msg.html.replace(re,"<img src=\"$1\">")
-  if(msg.text && msg.text.match(re))
-    msg.html = msg.text.replace(re,"<img src=\"$1\">")
+    msg.html += "<img src=\"#{msg.html.match(re)[1]}\">"
+  else if(msg.text && msg.text.match(re))
+    msg.html = msg.text + " <img src=\"#{msg.text.match(re)[1]}\">"
   msg
 
 youtube_plugin = (msg)->
@@ -20,9 +20,9 @@ youtube_plugin = (msg)->
   tubez = '<iframe width="420" height="315" src="http://www.youtube.com/embed/$2" frameborder="0" allowfullscreen></iframe>'
   re = /http(s)?:\/\/.*youtube.com\/.*?v=([^\&]+)/
   if(msg.html && msg.html.match(re))
-    msg.html = msg.html.replace(re,tubez)
-  if(msg.text && msg.text.match(re))
-    msg.html = msg.text.replace(re,tubez)
+    msg.html += tubez.replace("$2",msg.html.match(re)[2])
+  else if(msg.text && msg.text.match(re))
+    msg.html = msg.text + tubez.replace("$2",msg.text.match(re)[2])
   msg
 
 plugin = (msg)->
