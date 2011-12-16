@@ -1,231 +1,142 @@
-# TODO: xulrunner these
-#file = require("file")
-#hotkey = require("hotkey")
+# crow.coffee
+#   requires jquery, util.coffee, models.coffee, *_widget.coffee, pretty much everything else
+#
+# Main UI controller that interfaces the UI with the models.
+#
 
-Components.utils.import("resource://gre/modules/FileUtils.jsm")
+# hook up to our Log UI widget
+logger = new Util.Logger("Crow::UI", 'debug', CrowLog)
 
+# place holder for closure over main Crow Model object
+ui = null
 crow = null
-logger = new Logger("UI", 'debug', CrowLog)
-log = (s) ->
-  dump(s); dump("\n")
-  logger.debug s
 
-# crow api call from child window
-#crow_on = (name,handler) ->
-#  listener = (e)->
-#    msg = e.target.getUserData("crow-request")
-#    log("conv listener: #{name} -> #{msg.toSource()}")
-#    document.documentElement.removeChild(e.target)
-#    handler(msg)
-#  $(document).ready ()->
-#    window.addEventListener name, listener, false
+# DOM selectors
+panels_selector = "#panels"
+about_selector = "#about"
+accounts_selector = "#accounts"
+conversations_selector = "#conversations"
+friends_selector = "#friends"
+logs_selector = "#logs"
+settings_selector = "#settings"
 
-# crow api call to a child window
-api_call = (iframe,name,data,callback)->
-  log "sending api_call(#{name},#{data.toSource()}) to iframe #{iframe}"
-  doc = iframe.contentDocument
-  request = doc.createTextNode('')
-  request.setUserData("crow-request",data,null)
-  doc.documentElement.appendChild(request)
-  sender = doc.createEvent("HTMLEvents")
-  sender.initEvent(name, true, false)
-  request.dispatchEvent(sender)
-  log "dispatched event #{sender} to #{request}"
+# open a conversation with the right callback/listener
+open_conversation = (conversation)->
+  logger.debug("opening conversation: conversation=#{conversation}")
+  if conversation?
+    Conversations.open(conversation, (msg)->crow.send(conversation, msg))
+  else
+    logger.error("tried to open conversation but no conversation passed!")
 
-# TODO: implement persistent settings
-load_defaults = ->
-  try
-    log "reading local prefs..."
-    local = JSON.parse(file.read(require("app-paths").browserCodeDir + "/local.json"))
-    log "local.json: " + local.toSource()
-    $("#jid").val local.jid
-    $("#password").val local.password
-  catch e
-    log "error reading local prefs..." + e.toString()
-
-clone_template = (id) ->
-  div = $(id).clone()
-  div.attr('id',null)
-  div.show()
-  div
-
-activate_conversation = (conversation) ->
-  log "activate_conversation: #{conversation.attr('id')}"
-  select_xul_conversation(conversation.attr('id'))
-  tabs = $('ul.tabs')
-  tabs.find("li.active").removeClass('active')
-  tabs.find("a[href$=\"#{conversation.attr('id')}\"]").closest('li').addClass('active')
-  $("#conversations").children(".active").removeClass('active')
-  conversation.addClass('active')
-  conversation.find('textarea').focus()
-  tabs.tabs()
-
-add_conversation = (id,title,model) ->
-  return if $("##{id}").length > 0
-
-  log "add_conversation #{id}, #{title}"
- 
-  # create the xul element
-  iframe = create_xul_conversation(id)
-
-  # register listener... TODO: move in the iframe on load for added security?
-  iframe.contentWindow.addEventListener 'crow:conv:send', (e)->
-    log("received: crow:conv:send!")
-    data = e.target.getUserData('crow-request')
-    log("received: crow:conv:send -> #{data.toSource()}")
-    crow.send model, data.text # TODO: support html
-    log("sent: #{data.body}")
-    # cleanup
-    iframe.contentDocument.documentElement.removeChild(e.target)
-
-  li = $("<li/>")
-  a = $("<a/>",{href: "##{id}"})
-  log "href=#{a.attr("href")}"
-  a.text title
-  li.append a
-  tabs = $('.content > ul.tabs')
-  tabs.append li
-
-  div = clone_template "#conversation-template"
-  div.attr('id',id)
-  div.data "model", model
-  
-  $('#conversations').append div
-
-  activate_conversation(div)
-  
-
-chat = (id, msg) ->
-  log "chat: #{id} - #{msg.toSource()}"
-  iframe = convsation_iframe(id)
-  api_call iframe, "crow:conv:chat", msg
-  
-
-render_friends = (friends, changed) ->
-  $("#connect-panel").hide()
-  $("#disconnect-panel").delay("fast").show()
-  $("#friends-panel").delay("slow").slideDown()
-  log "render_friends..."
-  log changed
-  fdiv = $("#friends")
-  fdiv.empty()
-  for jid,friend of friends
-    log(friend.show())
-    if(friend.show() not in ["unavailable"])
-      div = clone_template "#friend-template"
-      log "friend show: #{friend.show()}"
-      div.find('.state').addClass(friend.show())
-      div.find('.state').html("&ordm;")
-      div.find('.name').text(friend.display())
-      div.find('.status').text(friend.status())
-      icon =  $('<img />')
-      icon.attr('src',friend.icon_uri('default_friend.png'))
-      log "icon src: " + icon.attr('src').substring(0,100)
-      div.find('.icon').append(icon)
-      div.data("model",friend)
-      log div.html()
-      fdiv.append div
-  log "done render_friends."
-
+# create a new conversation UI widget
 start_conversation = (e) ->
   friend = $(e.target).closest('.friend').data("model")
-  log "start conversation w/ friend: #{friend.jid.jid}"
+  logger.debug "start conversation w/ friend: #{friend.jid.jid}"
   if friend
-    c = crow.conversation(friend)
-    add_conversation(friend.safeid(), friend.display(), c)
+    open_conversation(crow.conversation(friend))
   else
     logger.error "failed to start conversation with unknown friend: #{$(e.target).text()}"
 
+# connect to configured accounts
 connect = (e) ->
-  log "connecting..."
+  logger.debug "connecting..."
   crow.account("test",$("#jid").val(), $("#password").val(),$("#host").val(),$("#port").val())
+  ui.show_conversations()
 
+# disconnect from connected accounts
 disconnect = (e) ->
-  $("#connect-panel").delay("slow").slideDown()
-  $("#disconnect-panel").hide()
-  $("#friends-panel").hide()
   account.disconnect for account in crow.accounts
 
+# controller for main UI panels
+class UI
+  show_about: ()->
+    @show_panel about_selector
+
+  show_accounts: ()->
+    @show_panel accounts_selector
+    # TODO: move accounts to own panel
+    #$("#accounts").show()
+
+  show_conversations: ()->
+    @show_panel conversations_selector, true
+    $("#friends-panel").show()
+
+  show_friends: ()->
+    @show_panel friends_selector
+
+  show_logs: ()->
+    @show_panel logs_selector
+
+  show_settings: ()->
+    @show_panel settings_selector
+
+  connect: ()->
+    @show_conversations()
+
+  disconnect: ()->
+    @show_accounts()
+
+  show_panel: (id,conv=false)->
+    $(id).show()
+    $(id).siblings(".panel").hide()
+    if conv
+      Conversations.show()
+    else
+      Conversations.hide()
+
+ui = new UI()
+
+# controller, ties UI to main Crow model object
 crow = new Crow null,
-  error: (account,stanza) ->
-  message: (conversation,text,html) ->
-    chat conversation.from.safeid(), time: new Date, text:text, html:html, from:conversation.from.display(), klazz:"message"
+  error: (account,xml) ->
+    # TODO: figure out what to do in UI on xmpp error
+    logger.error("account error: account=#{account.name} xml=#{xml}")
+  message: (conversation,jid,text,html) ->
+    # route to the conversation so it knows there is a new message
+    logger.debug("received message: account=#{conversation.account} text='#{text}' html='#{html}'")
+    Conversations.receive conversation, fromjid:jid, time: new Date, text:text, html:html, from:conversation.from.display(), klazz:"message"
   friend: (account,friend) ->
-    render_friends(crow.friends,friend)
-  iq: (account,stanza) ->
-  raw: (account,stanza) ->
-  connect: (account) -> log "conected!"
+    # route to the FriendList so it can update UI
+    # TODO: support change...
+    logger.debug("received friend: account=#{account.name} friend=#{friend}")
+    FriendList.render(crow.friends)
+  iq: (account,xml) ->
+    # just log for now.  not sure what to do UI wise.
+    logger.debug("received iq: account=#{account.name} xml=#{xml}")
+  raw: (account,xml) ->
+    # just log for now.  not sure what to do UI wise.
+    logger.debug("received raw: account=#{account.name} xml=#{xml}")
+  connect: (account) ->
+    # TODO: update UI?
+    logger.debug("received conected: account=#{account.name}")
   disconnect: (account) ->
+    # TODO: update UI?  update FriendsList?  re-query presence?
+    logger.debug("received disconnect: account=#{account.name}")
   conversation: (account,conversation) ->
-    add_conversation(conversation.from.safeid(),conversation.from.display(),conversation)
-  log: CrowLog.log
+    logger.debug("received conversation: account=#{account.name} conversation=#{conversation}")
+    open_conversation(conversation)
+  # passthru to our Log UI Widget
+  log: (args...)->CrowLog.log(args...)
 
 $(document).ready ->
   $("#connect").on "click", connect
   $("#disconnect").on "click", disconnect
-  $("#friends .friend").live "click", start_conversation
-
-  #load_defaults()
+  $("#friends-list .friend").live "click", start_conversation
   window.resizeTo(800,600)
-  $('.tabs').tabs()
-  chat_tab_changed = (e) ->
-    e.target #// activated tab
-    e.relatedTarget #// previous tab
-    if(e.target != e.reatedTarget)
-      $("#"+e.target.href.split("#")[1]+" textarea").focus()
-  $('.tabs').bind('change', chat_tab_changed   )
+  ui.show_accounts()
+  $('.topbar ul.nav a').on "click", (e)->
+    switch $(e.target).attr('href')
+      when about_selector then ui.show_about()
+      when accounts_selector then ui.show_accounts()
+      when conversations_selector then ui.show_conversations()
+      when friends_selector then ui.show_friends()
+      when logs_selector then ui.show_logs()
+      when settings_selector then ui.show_settings()
   
 
-xul_deck = ()->
-  window.top.document.getElementById("untrusted")
-
-load_chrome = (url)->
-  log("load_chrome #{url}")
-  path = FileUtils.getFile("CurProcD", "content/#{url}".split("/"))
-  log("load_chrome #{path}")
-  content = FileIO.read(path)
-  log("result: #{path} => #{content}")
-  content
-#  request = new XMLHttpRequest()
-#  request.open("GET", "chrome://crow/content/#{url}", false)
-#  request.send(null)
-#  request.responseText
-    
-convsation_iframe = (id) ->
-  window.top.document.getElementById("conv-#{id}")
-
-conversation_iframe_src_data = ()->
-  html = load_chrome "conversation.html"
-  shit = ''
-  shit += "\n<style type=\"text/css\">\n#{load_chrome('conversation.css')}\n</style>"
-  shit += "\n<script>#{load_chrome('jquery-1.7.min.js')}\n</script>"
-  shit += "\n<script>#{load_chrome('javascript/split.js')}\n</script>"
-  shit += "\n<script>#{load_chrome('javascript/conversation.js')}\n</script>"
-  html = html.replace('<head></head>',"<head>#{shit}</head>")
-  log("conv html: #{html}")
-  "data:text/html,#{encodeURIComponent(html)}"
-
-create_xul_conversation = (id)->
-  deck = xul_deck()
-  iframe = window.top.document.createElement("iframe")
-  iframe.setAttribute("id","conv-#{id}")
-  iframe.setAttribute("type","content")
-  html = conversation_iframe_src_data()
-  log(html)
-  iframe.setAttribute("src",html)
-  deck.appendChild(iframe)
-  log(iframe)
-  deck.selectedPanel = iframe
-  iframe
-
-select_xul_conversation = (id)->
-  log("select_xul_conversation: conv-#{id}")
-  p = convsation_iframe(id)
-  log("panel: #{p}")
-  xul_deck().selectPanel = p
-  log("xul_deck: #{xul_deck()}")
-
-# TODO: xulrunner this
+# TODO: xulrunner these
+#file = require("file")
+#hotkey = require("hotkey")
 #hotkeys = {}
 #hotkeys["meta-#{n}"]=(if n is 0 then -1 else n) for n in [0..9]
 #log "hotkeys: #{hotkeys.toSource()}"
@@ -233,5 +144,4 @@ select_xul_conversation = (id)->
 #  do (hot,n) -> 
 #    hotkey.register hot, ->
 #      #log "hotkey: #{n} #{hot}"
-#      c = $($('#conversations').children().get()[n])
-#      activate_conversation c if c.attr('id') && c.attr('id') != 'conversation-template'
+#      Conversations.select_by_index(n)

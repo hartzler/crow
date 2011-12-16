@@ -1,4 +1,8 @@
-#todo move xmpp stuff out of here
+# models.coffee
+#   requires jquery, util.coffee
+#
+
+# TODO: move xmpp stuff out of here
 xmpp = {}
 Components.utils.import("resource://app/modules/xmpp.js",xmpp)
 
@@ -107,6 +111,7 @@ class Friend
 
 class Conversation
   constructor: (@account,@from,@callbacks) ->
+  safeid: ()-> @from.safeid()
 
 class Crow
   constructor: (@logger,@callbacks) ->
@@ -114,10 +119,11 @@ class Crow
     @accounts = {}
     @conversations = {}
     @friends = {}
-    @logger or= new Logger("Crow",'debug',@callbacks)
+    @logger or= new Util.Logger("Crow",'debug',@callbacks)
 
   account: (name,jid,password,host,port) ->
-    @accounts[name] = new Account name,jid,password,host,port,new Logger("Account-#{name}",'debug',@logger.callbacks),
+    account_logger = new Util.Logger("Crow::Account-#{name}",'debug',@callbacks)
+    @accounts[name] = new Account name,jid,password,host,port,account_logger,
       error: @callbacks.error
       connect: @callbacks.connect
       disconnect: @callbacks.disconnect
@@ -150,10 +156,11 @@ class Crow
           @conversations[jid] = new Conversation(account.name,from)
           @logger.debug "created conversation#{@conversations[jid]}"
           @callbacks.conversation(account,@conversations[jid])
-        body = message.children('body').text()
-        html = message.find('html body').html()
-        @callbacks.message(@conversations[jid],body,html)
-          
+        text = message.children('body').text()
+        @logger.debug "message: text=#{text}"
+        html = message.find('html body').xml()
+        @logger.debug "message: html=#{html}"
+        @callbacks.message(@conversations[jid],jid,text,html)
 
     @accounts[name].connect()
   
@@ -164,12 +171,13 @@ class Crow
     @accounts[friend.account].friend(friend)
 
   send: (conversation, msg) ->
+    @logger.debug "send: conversation account=#{conversation.account} msg=#{msg.toSource()}"
     account = @accounts[conversation.account]
-    @logger.debug "conv account: #{conversation.account}"
+    @logger.debug "send: conv account: #{account.name}"
     friend = conversation.from
-    @logger.debug "conv from: #{friend.jid.jid}"
-    account.message(friend.jid.jid,msg)
+    @logger.debug "send: conv from: #{friend.jid.jid}"
+    account.message(friend.jid.jid,msg.text)
+    @logger.debug "send: message sent."
 
 # exports
-window.Logger=Logger
 window.Crow=Crow

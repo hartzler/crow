@@ -9,8 +9,7 @@
   <stack flex="1">
     <!-- crow ui -->
     <iframe id="ui" flex="1" src="chrome://crow/content/index.html"/>
-    <deck id="untrusted" top="65px" left="250px">
-      <iframe type="content" flex="1" src="data:text/html,%3Chtml%3E%3Cbody%3ETEST%3C/body%3E%3C/html%3E" style="border: 0px; margin: 0; padding: 0;"/>
+    <deck id="untrusted" top="50px" left="250px">
     </deck>
   </stack>
 
@@ -20,7 +19,7 @@
     var w=null;
     function resize(e) {
       var u = document.getElementById("untrusted");
-      u.height = window.innerHeight-105;
+      u.height = window.innerHeight-90;
       u.width = window.innerWidth-270;
     }
     window.addEventListener("resize",resize,false);

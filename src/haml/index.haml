@@ -4,84 +4,102 @@
     %link{:href => "bootstrap.css", :rel => "stylesheet", :type => "text/css"}
     %link{:href => "crow.css", :rel => "stylesheet", :type => "text/css"}
     %link{:href => "log.css", :rel => "stylesheet", :type => "text/css"}
-    %link{:href => "messages.css", :rel => "stylesheet", :type => "text/css"}
 
   %body.vsplit
     .topbar
+      / TODO: move out into partial
       .topbar-inner
         .container-fluid
           %a.brand{:href => "#"} Crow
           %ul.nav
             %li 
-              %a{:href=>"#"}Chats
+              %a{:href=>"#conversations"}Chats
             %li 
-              %a{:href=>"#"}Friends
+              %a{:href=>"#friends"}Friends
             %li 
-              %a{:href=>"#"}Accounts
+              %a{:href=>"#accounts"}Accounts
             %li 
-              %a{:href=>"#"}Settings
+              %a{:href=>"#settings"}Settings
             %li
-              %a{:href=>"#"}Log
+              %a{:href=>"#logs"}Log
 
           %p.pull-right Status
     
-    .container-fluid.expand.hsplit
-      .sidebar
-        .well
-          #connect-panel
-            %form.form-stacked{:action => "#"}
-              .clearfix
-                %label{:for => "jid"} JID
-                .input
-                  %input#jid.span3{:type => "text",:value=>"hartzler@bardicgrove.org"}/
-              .clearfix
-                %label{:for => "password"} Password
-                .input
-                  %input#password.span3{:type => "password", :value=>"b8h534h35"}/
-              .clearfix
-                %label{:for => "host"} Host
-                .input
-                  %input#host.span3{:type => "text", :value=>"bardicgrove.org"}/
-              .clearfix
-                %label{:for => "port"} Port
-                .input
-                  %input#port.span3{:type => "text", :value=>"5222"}/
-              %button#connect.btn.primary Connect
-          #disconnect-panel
-            %button#disconnect.btn.danger Disonnect
-          #friends-panel
-            %h2 Friends
-            #friend-template.template.friend
-              .state
-              .icon
-              .show
-              .name
-              .status
-            #friends
-
-      .content.expand.vsplit
-        .toolbar Toolbar
-        #conversations.pill-content.expand
-          #conversation-template.template.conversation
-          #log.active
-            #logline-template.logline
-              .time
-              .level
-              .context
-              .log
-        %ul.tabs
-          %li.active
-            %a{:href=>'#log'} Log
-        .footer
+    #panels.container-fluid.expand
+      / TODO: move out into partials
+      #about.panel
+        / TODO: build number / date
+        %h2 About Crow
+      #accounts.panel
+        %h2 Accounts
+        #connect-panel
+          %form.form-stacked{:action => "#"}
+            .clearfix
+              %label{:for => "jid"} JID
+              .input
+                %input#jid.span3{:type => "text",:value=>"hartzler@bardicgrove.org"}/
+            .clearfix
+              %label{:for => "password"} Password
+              .input
+                %input#password.span3{:type => "password", :value=>"b8h534h35"}/
+            .clearfix
+              %label{:for => "host"} Host
+              .input
+                %input#host.span3{:type => "text", :value=>"bardicgrove.org"}/
+            .clearfix
+              %label{:for => "port"} Port
+              .input
+                %input#port.span3{:type => "text", :value=>"5222"}/
+            %button#connect.btn.primary Connect
+        #disconnect-panel
+          %button#disconnect.btn.danger Disonnect
+      #conversations.panel.hsplit
+        / FriendsList widget
+        .sidebar
+          .well
+            #friends-panel
+              %h2 Friends
+              #friend-template.template.friend
+                .state
+                .icon
+                .show
+                .name
+                .status
+              #friends-list
+        / Conversations widget
+        .right.expand.vsplit
+          .pill-content.expand
+            #conversation-template.template.conversation
+          %ul.tabs
+      #friends.panel
+        %h2 Friends
+      #logline-template.logline
+        .time
+        .level
+        .context
+        .log
+      #logs.panel
+        %h2 Logs
+        #loglines
+      #settings.panel
+        %h2 Settings
     .footer
 
+  / 3rd party libs
   %script{:src => "io.js"}
   %script{:src => "jquery-1.7.min.js"}
   %script{:src => "bootstrap-dropdown.js"}
   %script{:src => "bootstrap-tabs.js"}
+  /util
   %script{:src => "javascript/util.js"}
-  %script{:src => "javascript/models.js"}
+  %script{:src => "javascript/jquery_plugins.js"}
   %script{:src => "javascript/split.js"}
-  %script{:src => "javascript/log.js"}
+  / model
+  %script{:src => "javascript/models.js"}
+  / view
+  %script{:src => "javascript/log_widget.js"}
+  %script{:src => "javascript/friends_list_widget.js"}
+  %script{:src => "javascript/conversations_widget.js"}
+  / controller
   %script{:src => "javascript/crow.js"}
 

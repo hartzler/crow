@@ -1,4 +1,14 @@
-jQuery.fn.reverse or= [].reverse
+# split.coffee
+#   requires jquery, query_plugins.coffee
+#
+# UI layout tool for doing greedy layout of horizontal and vertial split panels
+# using relative positioning and the height/width of child elements.  
+# Note: in order for vsplit to work, each child has to have height!
+#
+# uses the following css classes:
+#   .vsplit
+#   .hsplit
+#   .expand
 
 splits = (node) ->
   nodes = $('.vsplit, .hsplit') unless node

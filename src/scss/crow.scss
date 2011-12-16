@@ -12,16 +12,15 @@ html {
 body {
   height:100%; max-height:100%; overflow:hidden; padding:0; margin:0; border:0;
 }
-iframe {
-  border: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
+
+#disconnect-panel {
+  display: none;
+  margin-bottom: 1em; 
 }
+
 #friends-panel {
-  display: none; 
+  display: none;
+  overflow: auto;
   .chat {
     background-color: green;
   }
@@ -73,89 +72,93 @@ iframe {
   }
 }
 
-#disconnect-panel {
-  display: none;
-  margin-bottom: 1em; }
-
-#conversation-template {
-  display: block;
-}
 .topbar-inner {
   background-color: $scheme3_dark;
 }
+
 .footer {
   clear: both;
 }
-ul.tabs {
-  margin: 0px;
-  border-width: 1px 0 0 0;
-  padding-bottom: 0px;
-  li {
-    margin-top: -1;
-    margin-bottom: 0;
-    a {
-      border-radius: 0 0 4px 4px;
-      padding-top: 2px; 
-      padding-bottom: 2px; 
-      padding-left: 4px; 
-      padding-right: 4px; 
-      height: 1em;
-      line-height: 1em;
-    }
-  } 
-}
 
-.container-fluid {
+#panels {
   padding-right: 0px;
   margin-right: 1em;
   margin-left: 1em;
   margin-top: 0em;
   margin-bottom: 1em;
   min-width: 200px;
-
-  > .content {
-    padding: 2px;
-    background-color: $lightgray;
-    min-height: 20px;
-    min-width: 200px;
-    border: 1px solid #eee;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 0px;
-    margin-left: 1em;
-    margin-top: 0em;
-    margin-right: 0em;
-    margin-bottom: 0em;
-
-    #log {
-      height: 100%;
-      overflow: auto;
-      padding-left: 0em;
-      padding-right: 0em;
-      #logline-template {
-        display: none;
-      }
-      .logline {
-        padding-bottom: 1em;
-        padding-left: 1em;
-        padding-right: 1em;
-        clear: both;
-        .time, .level, .context {
-          float: left;
-          margin-right: 0.5em;
-        }
-        .context:before {
-          content: "["
-        }
-        .context:after {
-          content: "]"
-        }
-      }
-    }
-
+  .panel {
+    height: 100%;
+    wihth: 100%;
+    background-color: white;
   }
 }
-#content-footer {
-  height: 1em;
-  border-top: 1px solid black;
+
+#conversations {
+  .sidebar {
+    width: 220px;
+  }
+
+  .right {
+    margin-left: 1em;
+    .pill-content {
+      padding: 2px;
+      background-color: $lightgray;
+      min-height: 20px;
+      min-width: 200px;
+      border: 1px solid #eee;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 0px;
+      margin-left: 0px;
+      margin-top: 0em;
+      margin-right: 0em;
+      margin-bottom: 0em;
+    }
+
+    ul.tabs {
+      margin: 0px;
+      border-width: 1px 0 0 0;
+      padding-bottom: 0px;
+      li {
+        margin-top: -1;
+        margin-bottom: 0;
+        a {
+          border-radius: 0 0 4px 4px;
+          padding-top: 2px; 
+          padding-bottom: 2px; 
+          padding-left: 4px; 
+          padding-right: 4px; 
+          height: 1em;
+          line-height: 1em;
+        }
+      } 
+    }
+  }
+}
+
+#logs {
+  height: 100%;
+  overflow: auto;
+  padding-left: 0em;
+  padding-right: 0em;
+  #logline-template {
+    display: none;
+  }
+  .logline {
+    padding-bottom: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    clear: both;
+    .time, .level, .context {
+      float: left;
+      margin-right: 0.5em;
+    }
+    .context:before {
+      content: "["
+    }
+    .context:after {
+      content: "]"
+    }
+  }
 }
 
