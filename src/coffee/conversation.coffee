@@ -7,12 +7,38 @@ clone_template = (id) ->
   div.show()
   div
 
+img_plugin = (msg)->
+  re = /(http(s)?:\/\/.*?.(jpg|jpeg|png|gif|bmp|ico))/i
+  if(msg.html && msg.html.match(re))
+    msg.html = msg.html.replace(re,"<img src=\"$1\">")
+  if(msg.text && msg.text.match(re))
+    msg.html = msg.text.replace(re,"<img src=\"$1\">")
+  msg
+
+youtube_plugin = (msg)->
+  # http://www.youtube.com/watch?v=QH2-TGUlwu4&noredirect=1
+  tubez = '<iframe width="420" height="315" src="http://www.youtube.com/embed/$2" frameborder="0" allowfullscreen></iframe>'
+  re = /http(s)?:\/\/.*youtube.com\/.*?v=([^\&]+)/
+  if(msg.html && msg.html.match(re))
+    msg.html = msg.html.replace(re,tubez)
+  if(msg.text && msg.text.match(re))
+    msg.html = msg.text.replace(re,tubez)
+  msg
+
+plugin = (msg)->
+  img_plugin(youtube_plugin(msg))
+
 chat = (msg)->
   chatline = clone_template "#chatline-template"
   chatline.addClass(msg.klazz) if msg.klazz
   chatline.find('.from').text(msg.from)
   chatline.find('.time').text("@ #{msg.time.getHours()}:#{msg.time.getMinutes()}")
-  chatline.find('.body').text(msg.body)
+  msg = plugin(msg)
+  log("plugin msg: #{msg.toSource()}")
+  if msg.html
+    chatline.find('.body').html(msg.html)
+  else
+    chatline.find('.body').text(msg.text)
   parent = $('#messages')
   parent.append(chatline)
   #parent.scrollToBottom()
@@ -39,8 +65,7 @@ crow_on = (name,handler) ->
 
 crow_on "crow:conv:chat", (msg)->
   log("crow:conv:chat msg: #{msg.toSource()}")
-  if msg.body
-    chat(msg)
+  chat(msg)
 
 $(document).ready ()->
   log('conv-ready')
@@ -53,6 +78,6 @@ $(document).ready ()->
       e.preventDefault()
       msg = command.val()
       command.val('')
-      chat from:"me",body:msg,time:new Date(),klazz:"self"
-      api_call "crow:conv:send", body:msg
+      chat from:"me",text:msg,time:new Date(),klazz:"self"
+      api_call "crow:conv:send", text:msg
 

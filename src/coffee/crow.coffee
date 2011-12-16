@@ -2,7 +2,7 @@
 #file = require("file")
 #hotkey = require("hotkey")
 
-Components.utils.import("resource://gre/modules/FileUtils.jsm");
+Components.utils.import("resource://gre/modules/FileUtils.jsm")
 
 crow = null
 logger = new Logger("UI", 'debug', CrowLog)
@@ -73,7 +73,7 @@ add_conversation = (id,title,model) ->
     log("received: crow:conv:send!")
     data = e.target.getUserData('crow-request')
     log("received: crow:conv:send -> #{data.toSource()}")
-    crow.send model, data.body
+    crow.send model, data.text # TODO: support html
     log("sent: #{data.body}")
     # cleanup
     iframe.contentDocument.documentElement.removeChild(e.target)
@@ -148,8 +148,8 @@ disconnect = (e) ->
 
 crow = new Crow null,
   error: (account,stanza) ->
-  message: (conversation,msg) ->
-    chat conversation.from.safeid(), time: new Date, body:msg, from:conversation.from.display(), klazz:"message"
+  message: (conversation,text,html) ->
+    chat conversation.from.safeid(), time: new Date, text:text, html:html, from:conversation.from.display(), klazz:"message"
   friend: (account,friend) ->
     render_friends(crow.friends,friend)
   iq: (account,stanza) ->
@@ -197,7 +197,7 @@ convsation_iframe = (id) ->
 conversation_iframe_src_data = ()->
   html = load_chrome "conversation.html"
   shit = ''
-  shit += "\n<style type=\"text/css\">\n#{load_chrome('messages.css')}\n</style>"
+  shit += "\n<style type=\"text/css\">\n#{load_chrome('conversation.css')}\n</style>"
   shit += "\n<script>#{load_chrome('jquery-1.7.min.js')}\n</script>"
   shit += "\n<script>#{load_chrome('javascript/split.js')}\n</script>"
   shit += "\n<script>#{load_chrome('javascript/conversation.js')}\n</script>"

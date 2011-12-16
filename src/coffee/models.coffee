@@ -150,10 +150,9 @@ class Crow
           @conversations[jid] = new Conversation(account.name,from)
           @logger.debug "created conversation#{@conversations[jid]}"
           @callbacks.conversation(account,@conversations[jid])
-        body = message.children('body')[0]
-        html = message.find('html body')[0]
-        if body
-          @callbacks.message(@conversations[jid],body.textContent)
+        body = message.children('body').text()
+        html = message.find('html body').html()
+        @callbacks.message(@conversations[jid],body,html)
           
 
     @accounts[name].connect()
