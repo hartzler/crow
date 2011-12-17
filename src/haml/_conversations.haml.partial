@@ -1,0 +1,18 @@
+/ FriendsList widget
+.sidebar
+  .well
+    #friends-panel
+      %h2 Friends
+      #friend-template.template.friend
+        .state
+        .icon
+        .show
+        .name
+        .status
+      #friends-list
+/ Conversations widget
+.right.expand.vsplit
+  .pill-content.expand
+    #conversation-template.template.conversation
+  %ul.tabs
+

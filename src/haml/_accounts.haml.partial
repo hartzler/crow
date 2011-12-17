@@ -1,0 +1,23 @@
+%h2 Accounts
+#connect-panel
+  %form.form-stacked{:action => "#"}
+    .clearfix
+      %label{:for => "jid"} JID 
+      .input
+        %input#jid.span3{:type => "text",:value=>"hartzler@bardicgrove.org"}/
+    .clearfix
+      %label{:for => "password"} Password
+      .input
+        %input#password.span3{:type => "password", :value=>"b8h534h35"}/
+    .clearfix
+      %label{:for => "host"} Host
+      .input
+        %input#host.span3{:type => "text", :value=>"bardicgrove.org"}/
+    .clearfix
+      %label{:for => "port"} Port
+      .input
+        %input#port.span3{:type => "text", :value=>"5222"}/
+    %button#connect.btn.primary Connect
+#disconnect-panel
+  %button#disconnect.btn.danger Disonnect
+

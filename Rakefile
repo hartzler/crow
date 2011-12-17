@@ -46,7 +46,8 @@ task :build do
   ["#{builddir}/xul/content/local","#{builddir}/xul/content/coffee "," #{builddir}/xul/content/javascript"].each{|dir|`mkdir -p #{dir}`}
 
   ` cp -R src/coffee/* #{builddir}/xul/content/coffee`
-  Dir["src/haml/*.haml"].each{|haml|`haml #{haml} #{builddir}/xul/content/#{File.basename(haml,".haml")}.html`}
+  Dir["src/haml/*.haml"].each{|haml|`haml -r haml_helper.rb #{haml} #{builddir}/xul/content/#{File.basename(haml,".haml")}.html`}
+  #Dir["src/haml/*.haml"].each{|haml|`haml #{haml} #{builddir}/xul/content/#{File.basename(haml,".haml")}.html`}
   Dir["src/scss/*.scss"].each{|scss|`sass #{scss} #{builddir}/xul/content/#{File.basename(scss,".scss")}.css`}
 end
 

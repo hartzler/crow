@@ -1,0 +1,17 @@
+.topbar-inner
+  .container-fluid
+    %a.brand{:href => "#"} Crow
+    %ul.nav
+      %li 
+        %a{:href=>"#conversations"}Chats
+      %li 
+        %a{:href=>"#friends"}Friends
+      %li 
+        %a{:href=>"#accounts"}Accounts
+      %li 
+        %a{:href=>"#settings"}Settings
+      %li 
+        %a{:href=>"#logs"}Log
+
+    %p.pull-right Status
+
