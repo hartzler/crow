@@ -42,11 +42,11 @@ task :build do
     open(erb,"w"){|f| f.puts ERB.new(File.read("#{erb}.erb")).result()}
   end
   #`coffee -o #{builddir}/xul/content/ src/coffee`
-  `rm -Rf #{builddir}/xul/content/coffee && rm -Rf #{builddir}/xul/content/javascript  && rm -Rf #{builddir}/xul/content/local`
+  `rm -Rf #{builddir}/xul/content/coffee && rm -Rf #{File.join(builddir,"xul","content","javascript")}  && rm -Rf #{builddir}/xul/content/local`
   ["#{builddir}/xul/content/local","#{builddir}/xul/content/coffee "," #{builddir}/xul/content/javascript"].each{|dir|`mkdir -p #{dir}`}
 
   ` cp -R src/coffee/* #{builddir}/xul/content/coffee`
-  Dir["src/haml/*.haml"].each{|haml|`haml -r haml_helper.rb #{haml} #{builddir}/xul/content/#{File.basename(haml,".haml")}.html`}
+  Dir["src/haml/*.haml"].each{|haml|`haml -r #{File.join(Dir.pwd,"haml_helper.rb")} #{haml} #{builddir}/xul/content/#{File.basename(haml,".haml")}.html`}
   #Dir["src/haml/*.haml"].each{|haml|`haml #{haml} #{builddir}/xul/content/#{File.basename(haml,".haml")}.html`}
   Dir["src/scss/*.scss"].each{|scss|`sass #{scss} #{builddir}/xul/content/#{File.basename(scss,".scss")}.css`}
 end
