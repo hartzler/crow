@@ -7,14 +7,16 @@ log_template_selector = "#logline-template"
 logs_selector = "#loglines"
 
 class CrowLog
-  constructor: ()->
+  constructor: (@level_name)->
     @logs = []
+    @level_name or= 'info'
 
   log: (date,level,context,message) ->
-    @logs.push [date,level,context,message]
-    console.log "#{date.toISOString()} #{Util.Logger.level_names[level]} [#{context}] #{message}"
-    $(logs_selector).append @format([date,level,context,message])
-    $(logs_selector).scrollToBottom()
+    if level  <= Util.Logger.levels[@level_name]
+      @logs.push [date,level,context,message]
+      console.log "#{date.toISOString()} #{Util.Logger.level_names[level]} [#{context}] #{message}"
+      $(logs_selector).append @format([date,level,context,message])
+      $(logs_selector).scrollToBottom()
 
   # render all the logs
   render: ->

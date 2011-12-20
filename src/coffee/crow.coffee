@@ -39,12 +39,12 @@ start_conversation = (e) ->
 
 # connect to configured accounts
 connect = (e) ->
-  logger.debug "connecting..."
+  logger.info "connecting..."
   crow.account("test",$("#jid").val(), $("#password").val(),$("#host").val(),$("#port").val())
-  ui.show_conversations()
 
 # disconnect from connected accounts
 disconnect = (e) ->
+  logger.info "disconnecting..."
   account.disconnect for account in crow.accounts
 
 # controller for main UI panels
@@ -107,11 +107,11 @@ crow = new Crow null,
     # just log for now.  not sure what to do UI wise.
     logger.debug("received raw: account=#{account.name} xml=#{xml}")
   connect: (account) ->
-    # TODO: update UI?
-    logger.debug("received conected: account=#{account.name}")
+    logger.info("Connected account: #{account.name}")
+    ui.show_conversations()
   disconnect: (account) ->
     # TODO: update UI?  update FriendsList?  re-query presence?
-    logger.debug("received disconnect: account=#{account.name}")
+    logger.info("Disconnected account: #{account.name}")
   conversation: (account,conversation) ->
     logger.debug("received conversation: account=#{account.name} conversation=#{conversation}")
     open_conversation(conversation)
