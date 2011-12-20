@@ -138,7 +138,7 @@ conversation_iframe_src_data = ()->
   # java scripts 
   for url in ['jquery-1.7.min.js', 'javascript/util.js', 'javascript/jquery_plugins.js', 'javascript/split.js', 'javascript/conversation.js']
     logger.debug("adding script: #{url}...")
-    shit += "\n<script>#{load_chrome(url)}\n</script>"
+    shit += "\n<script type=\"application/x-javascript\">#{load_chrome(url)}\n</script>"
 
   # inline to head
   html = html.replace('<head></head>',"<head>#{shit}</head>")
