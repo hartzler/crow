@@ -33,7 +33,7 @@ Cfg[:appname] = 'Crow'
 Cfg[:platform]= platform()
 Cfg[:builddir] = 'build'
 Cfg[:xulsdkdir] = "xulrunner-sdk"
-Cfg[:xulversion] = "6.0.2"
+Cfg[:xulversion] = "8.0.1"
 Cfg[:xuluri] = {
   :base=>"http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/#{Cfg[:xulversion]}/sdk/",
   :mac64 => { :file=>"xulrunner-#{Cfg[:xulversion]}.en-US.mac-x86_64.sdk.tar.bz2"},
