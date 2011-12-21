@@ -12,10 +12,6 @@
         %a{:href=>"#settings"}Settings
       %li.logs
         %a{:href=>"#logs"}Log
-      %li 
-        %a{:href=>"#debug"}Debugger
-
-
 
     %p.pull-right Status
 

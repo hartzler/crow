@@ -19,7 +19,6 @@ conversations_selector = "#conversations"
 friends_selector = "#friends"
 logs_selector = "#logs"
 settings_selector = "#settings"
-debug_selector = "#debug"
 
 # open a conversation with the right callback/listener
 open_conversation = (conversation)->
@@ -147,13 +146,6 @@ class UI
 
   show_settings: ()->
     @show_panel settings_selector
-  show_debug: ()->
-    #frame = $("#fbIframe")
-    #frame.height('250px')
-    #frame.width('100%')
-    #frame.show()
-    
-
 
   connect: ()->
     @show_conversations()
