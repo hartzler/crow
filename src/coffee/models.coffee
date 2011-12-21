@@ -13,19 +13,46 @@ class XmppStanza
 #class XmppIq
 #class XmppPresence
 
+# TODO: factor out
+passwordManager = Components.classes["@mozilla.org/login-manager;1"].
+                                getService(Components.interfaces.nsILoginManager)
+nsLoginInfo = new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
+                                             Components.interfaces.nsILoginInfo,
+                                             "init")
+#login = new nsLoginInfo(hostname, formSubmitURL, httprealm, username, password
+#                                usernameField, passwordField)
+
 class Account
-  constructor: (@name, @jid, @password, @host, @port, @logger, @callbacks) ->
+  @find = (logger)->
+    accounts =  []
+    for login in passwordManager.getAllLogins({})
+      name = login.httpRealm
+      host = login.usernameField
+      port = login.passwordField
+      logger.debug("Account.find() -> name=#{name} host=#{host} port=#{port}")
+      accounts.push(new Account(name, login.username, login.password, host, port))
+    accounts
+
+  constructor: (@name, @jid, @password, @host, @port, @logger, @callbacks)->
     @resource = "Crow"
     @from = @jid + "/" + @resource
+    @security = [ "starttls" ]
+    if(@port=='443')
+      @security = [ "ssl" ]
+
+  save: ()->
+    # hack for now, to store host/port info in the form Fields.  Prob use prefs long term for config options.
+    login = new nsLoginInfo("chrome://crow/accounts", null, @name, @jid, @password, @host, @port)
+    passwordManager.addLogin(login)
+
+  remove: ()->
+    login = new nsLoginInfo("chrome://crow/accounts", null, @name, @jid, @password, @host, @port)
+    passwordManager.removeLogin(login)
+    @session = null
 
   connect: () ->
     @logger.debug([@jid,@password,@host,@port])
-    security = [ "starttls" ]
-    
-    if(@port=='443')
-      security = [ "ssl" ]
-
-    @session = xmpp.session @jid, @password, @host, @port, security,
+    @session = xmpp.session @jid, @password, @host, @port, @security,
       onError: (aName, aStanza) =>
         @logger.error aStanza.convertToString()
         @callbacks.error this, aStanza
@@ -62,8 +89,9 @@ class Account
     @session.connect()
 
   disconnect: () ->
-    @session.disconnect()
-    @callbacks.disconnect(this)
+    if @session?
+      @session.disconnect()
+      @callbacks.disconnect(this)
 
   send: (stanza) ->
     @session.sendStanza stanza
@@ -113,6 +141,9 @@ class Conversation
   constructor: (@account,@from,@callbacks) ->
   safeid: ()-> @from.safeid()
 
+# 
+# Main interface to manage accounts / conversations
+# 
 class Crow
   constructor: (@logger,@callbacks) ->
     @settings = {}
@@ -121,55 +152,98 @@ class Crow
     @friends = {}
     @logger or= new Util.Logger("Crow",'debug',@callbacks)
 
-  account: (name,jid,password,host,port) ->
-    account_logger = new Util.Logger("Crow::Account-#{name}",'debug',@callbacks)
-    @accounts[name] = new Account name,jid,password,host,port,account_logger,
-      error: @callbacks.error
-      connect: @callbacks.connect
-      disconnect: @callbacks.disconnect
-      vcard: (account,jid,vcard) =>
-        if @friends[jid.jid]
-          @friends[jid.jid].vcard = vcard
-          @callbacks.friend(account,@friends[jid.jid])
-      friend: (account,friend) =>
-        existing = @friends[friend.jid.jid]
-        if existing
-          existing.presence = friend.presence
-          friend = existing
-        else
-          @friends[friend.jid.jid] = friend
-          account.vcard(friend)
-        @callbacks.friend(account,friend)
-      iq: @callbacks.iq
-      raw: @callbacks.raw
-      message: (account,message) =>
-        @logger.debug "message xml: #{message.xml()}"
-        @logger.debug "message from: #{message.attr("from")}"
-        jid = message.attr("from").replace(/\/.*/,'')
-        @logger.debug "message from jid: #{jid}"
-        from = @friends[jid]
-        unless from
-          from = @friends[jid] = new Friend({jid:jid},null,false,account.name)
-        @logger.debug "message from friend: #{from.jid.jid}"
-        unless @conversations[jid]
-          @logger.debug "creating conversation from #{jid}"
-          @conversations[jid] = new Conversation(account.name,from)
-          @logger.debug "created conversation#{@conversations[jid]}"
-          @callbacks.conversation(account,@conversations[jid])
-        text = message.children('body').text()
-        @logger.debug "message: text=#{text}"
-        html = message.find('html body').xml()
-        @logger.debug "message: html=#{html}"
-        @callbacks.message(@conversations[jid],jid,text,html)
+  # wait till UI is ready as might need user intervention
+  load: ()->
+    @logger.info("Loading configured accounts...")
+    @_add(a) for a in Account.find(@logger)
 
+  # get list of configured accounts
+  list: ()->
+    {name:a.name, jid:a.jid, host:a.host, port:a.port} for name,a of @accounts
+
+  # add account
+  add: (name, jid, password, host, port)->
+    @logger.debug("adding account: name=#{name} jid=#{jid} password=#{password} host=#{host} port=#{port}")
+    account = new Account(name,jid,password,host,port)
+    account.save()
+    @_add(account)
+
+  # private?
+  _add: (account)->
+    @logger.debug("_add account: name=#{account.name}")
+    account.logger = new Util.Logger("Crow::Account-#{name}",'debug',@callbacks)
+    account.callbacks = @_account_listener()
+    @accounts[account.name] = account
+
+  # remove account by name
+  remove: (name)->
+    @logger.debug("Removing account: #{name}...")
+    account = @accounts[name]
+    account.disconnect()
+    account.remove()
+    delete @accounts[name]
+
+  # connect an account by name
+  connect: (name)->
     @accounts[name].connect()
+
+  # private?
+  # listener for account callbacks
+  _account_listener: ()->
+    error: @callbacks.error
+    connect: @callbacks.connect
+    disconnect: @callbacks.disconnect
+    vcard: (account,jid,vcard) =>
+      if @friends[jid.jid]
+        @friends[jid.jid].vcard = vcard
+        @callbacks.friend(account,@friends[jid.jid])
+    friend: (account,friend) =>
+      existing = @friends[friend.jid.jid]
+      if existing
+        existing.presence = friend.presence
+        friend = existing
+      else
+        @friends[friend.jid.jid] = friend
+        account.vcard(friend)
+      @callbacks.friend(account,friend)
+    iq: @callbacks.iq
+    raw: @callbacks.raw
+    message: (account,message) =>
+      @logger.debug "message xml: #{message.xml()}"
+      @logger.debug "message from: #{message.attr("from")}"
+      jid = message.attr("from").replace(/\/.*/,'')
+      @logger.debug "message from jid: #{jid}"
+      from = @friends[jid]
+      unless from
+        from = @friends[jid] = new Friend({jid:jid},null,false,account.name)
+      @logger.debug "message from friend: #{from.jid.jid}"
+      unless @conversations[jid]
+        @logger.debug "creating conversation from #{jid}"
+        @conversations[jid] = new Conversation(account.name,from)
+        @logger.debug "created conversation#{@conversations[jid]}"
+        @callbacks.conversation(account,@conversations[jid])
+      text = message.children('body').text()
+      @logger.debug "message: text=#{text}"
+      html = message.find('html body').xml()
+      @logger.debug "message: html=#{html}"
+      @callbacks.message(@conversations[jid],jid,text,html)
+
+  # disconnect an account by name
+  disconnect: (name)->
+    account = @accounts[name]
+    account.disconnect
+    account.callbacks = null
   
+  # start a new conversation given a friend object
   conversation: (friend) ->
     @conversations[friend.jid.jid] or= new Conversation(friend.account,friend)
 
+  # sub a friend
+  # TODO: implement :)
   friend: (friend) ->
     @accounts[friend.account].friend(friend)
 
+  # send a chat message
   send: (conversation, msg) ->
     @logger.debug "send: conversation account=#{conversation.account} msg=#{msg.toSource()}"
     account = @accounts[conversation.account]

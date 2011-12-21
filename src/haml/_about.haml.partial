@@ -1,1 +1,2 @@
-%h2 About Crow
+#about.panel
+  %h2 About Crow

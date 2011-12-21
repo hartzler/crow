@@ -46,6 +46,7 @@ Util.Logger = Logger
 clone_template = (id) ->
   div = $(id).clone()
   div.attr('id',null)
+  div.removeClass('template')
   div.show()
   div
 

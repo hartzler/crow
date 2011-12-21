@@ -37,25 +37,96 @@ start_conversation = (e) ->
   else
     logger.error "failed to start conversation with unknown friend: #{$(e.target).text()}"
 
-# connect to configured accounts
-connect = (e) ->
-  logger.info "connecting..."
-  crow.account("test",$("#jid").val(), $("#password").val(),$("#host").val(),$("#port").val())
+class TopLinksWidget
+  constructor: ()->
+    $('.topbar ul.nav a').on "click", (e)->
+      switch $(e.target).attr('href')
+        when about_selector then ui.show_about()
+        when accounts_selector then ui.show_accounts()
+        when conversations_selector then ui.show_conversations()
+        when friends_selector then ui.show_friends()
+        when logs_selector then ui.show_logs()
+        when settings_selector then ui.show_settings()
 
-# disconnect from connected accounts
-disconnect = (e) ->
-  logger.info "disconnecting..."
-  account.disconnect for account in crow.accounts
+class AccountsWidget
+  account_template_selector = "#account-template"
+
+  constructor: ()->
+    $("#connect").on "click", (e)=> @connect(e)
+    $("#disconnect").on "click", (e)=> @disconnect(e)
+    $("#save").on "click", (e)=> @save(e)
+    @render()
+    
+  # render config'd accounts
+  render: ()->
+    @clear_notify()
+    $(account_template_selector).siblings().remove()
+    at = $(account_template_selector)
+    logger.debug("render account widget: #{crow.list().toSource()}")
+    for account in crow.list()
+      logger.debug("render account widget: name=#{account.name}")
+      a=Util.clone_template at
+      a.find('.name').text(account.name)
+      a.find('.jid').text(account.jid)
+      a.find('.status').text('?')
+      a.find('.delete').on('click', (e)=>@remove(account.name))
+      a.find('.connect').on('click', (e)->crow.connect(account.name))
+      a.find('.disconnect').on('click', (e)->crow.disconnect(account.name))
+      $('#accounts .summary tbody').append(a)
+
+  # connect to configured accounts
+  connect: (e) ->
+    logger.info "connecting..."
+    for account in crow.list()
+      crow.connect(account.name)
+
+  # save the account
+  save: (e)->
+    try
+      crow.add($("#account_name").val(),$("#account_jid").val(), $("#account_password").val(),$("#account_host").val(),$("#account_port").val())
+      @render()
+      @notify('success',"Added account #{$("#account_name").val()}.")
+    catch e
+      logger.error(e.toString())
+      @notify('error',e.toString())
+
+  remove: (name)->
+    try
+      crow.remove(name)
+      @render()
+    catch e
+      logger.error(e.toString())
+      @notify('error',e.toString())
+
+  # disconnect from connected accounts
+  disconnect: (e) ->
+    logger.info "disconnecting..."
+    crow.disconnect(account.name) for account in crow.list()
+
+  notify: (type,msg) ->
+    $("#accounts .notification").empty()
+    $("#accounts .notification").append($('<div/>',{'class':"alert-message #{type}"}).text(msg))
+ 
+  clear_notify: ()->
+    $("#accounts .notification").empty()
+
 
 # controller for main UI panels
 class UI
+  init: ()->
+    # load accounts
+    crow.load()
+    $("#friends-list .friend").live "click", start_conversation
+    @top_links = new TopLinksWidget()
+    @accounts = new AccountsWidget()
+    @show_accounts()
+
   show_about: ()->
     @show_panel about_selector
 
   show_accounts: ()->
     @show_panel accounts_selector
-    # TODO: move accounts to own panel
-    #$("#accounts").show()
+    @accounts.render()
 
   show_conversations: ()->
     @show_panel conversations_selector, true
@@ -119,20 +190,8 @@ crow = new Crow null,
   log: (args...)->CrowLog.log(args...)
 
 $(document).ready ->
-  $("#connect").on "click", connect
-  $("#disconnect").on "click", disconnect
-  $("#friends-list .friend").live "click", start_conversation
   window.resizeTo(800,600)
-  ui.show_accounts()
-  $('.topbar ul.nav a').on "click", (e)->
-    switch $(e.target).attr('href')
-      when about_selector then ui.show_about()
-      when accounts_selector then ui.show_accounts()
-      when conversations_selector then ui.show_conversations()
-      when friends_selector then ui.show_friends()
-      when logs_selector then ui.show_logs()
-      when settings_selector then ui.show_settings()
-  
+  ui.init()
 
 # TODO: xulrunner these
 #file = require("file")

@@ -13,63 +13,8 @@ body {
   height:100%; max-height:100%; overflow:hidden; padding:0; margin:0; border:0;
 }
 
-#disconnect-panel {
+.template {
   display: none;
-  margin-bottom: 1em; 
-}
-
-#friends-panel {
-  display: none;
-  overflow: auto;
-  .chat {
-    background-color: green;
-  }
-  .away,.dnd {
-    background-color: red;
-  }
-
-  .friend {
-    clear: both;
-    max-height: 3em;
-    overflow: hidden;
-    .show {
-      width: 24px;
-      float: left;
-      background-color: yellow;
-    }
-    .state{
-      height: auto;
-      width: 7px;
-      float: left;
-      .chat {
-        background-color: green;
-      }
-      .away,.dnd {
-        background-color: red;
-      }
-
-      
-    }
-    .name {
-      font-size: 10pt;
-      width: 125px;
-      overflow: hidden;
-    }
-    .status {
-      width: 100px;
-      font-size: 8pt;
-      color: #888;
-      overflow: hidden;
-    }
-    .icon {
-      float: right;
-      img {
-        width: 32;
-        height: 32;
-        padding-left: 5px;
-      }
-    }
-  }
 }
 
 .topbar-inner {
@@ -94,71 +39,9 @@ body {
   }
 }
 
-#conversations {
-  .sidebar {
-    width: 220px;
-  }
-
-  .right {
-    margin-left: 1em;
-    .pill-content {
-      padding: 2px;
-      background-color: $lightgray;
-      min-height: 20px;
-      min-width: 200px;
-      border: 1px solid #eee;
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      border-radius: 0px;
-      margin-left: 0px;
-      margin-top: 0em;
-      margin-right: 0em;
-      margin-bottom: 0em;
-    }
-
-    ul.tabs {
-      margin: 0px;
-      border-width: 1px 0 0 0;
-      padding-bottom: 0px;
-      li {
-        margin-top: -1;
-        margin-bottom: 0;
-        a {
-          border-radius: 0 0 4px 4px;
-          padding-top: 2px; 
-          padding-bottom: 2px; 
-          padding-left: 4px; 
-          padding-right: 4px; 
-          height: 1em;
-          line-height: 1em;
-        }
-      } 
-    }
-  }
-}
-
-#logs {
-  height: 100%;
-  overflow: auto;
-  padding-left: 0em;
-  padding-right: 0em;
-  #logline-template {
-    display: none;
-  }
-  .logline {
-    padding-bottom: 1em;
-    padding-left: 1em;
-    padding-right: 1em;
-    clear: both;
-    .time, .level, .context {
-      float: left;
-      margin-right: 0.5em;
-    }
-    .context:before {
-      content: "["
-    }
-    .context:after {
-      content: "]"
-    }
-  }
-}
+/* panels */
+@import "accounts";
+@import "conversations";
+@import "friends";
+@import "logs";
 
