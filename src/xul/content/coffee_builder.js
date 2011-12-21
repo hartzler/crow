@@ -1,63 +1,37 @@
 dump("running coffee_builder.js\n");
 var CoffeeScriptBuilder = {
     log: function (message) {
-        dump("coffee builder: "); dump(message); dump("\n");
-        //var con = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
-        //con.logStringMessage(message);
+        dump("coffee builder: ");
+        dump(message);
+        dump("\n");
     },
     build: function () {
         Components.utils.import("resource://gre/modules/FileUtils.jsm");
-        var file = FileUtils.getDir("CurProcD", ["content", "coffee"]);
-        // file is the given directory (nsIFile)  
-        var entries = file.directoryEntries;
-        var array = [];
-        while (entries.hasMoreElements()) {
-            var entry = entries.getNext();
-            CoffeeScriptBuilder.log("in next")
-            entry.QueryInterface(Components.interfaces.nsIFile);
-
-            CoffeeScriptBuilder.log(entry.path)
-            try {
-                CoffeeScriptBuilder.readFile(entry);
-            } catch (e) {
-                CoffeeScriptBuilder.log(e)
+        var dir = FileUtils.getDir("CurProcD", ["content", "coffee"]);
+        var arr = DirIO.read(dir, true);
+        var i;
+        if (arr) {
+            for (i = 0; i < arr.length; i++) {
+                try {
+                    file_path = arr[i].path
+                    CoffeeScriptBuilder.log("Reading:"+file_path);
+                    CoffeeScriptBuilder.readFile(file_path);
+                } catch (e) {
+                    CoffeeScriptBuilder.log(e)
+                }
             }
         }
 
     },
     readFile: function (file) {
-        Components.utils.import("resource://gre/modules/NetUtil.jsm");
         var str = null;
-        var v = NetUtil.asyncFetch(file, function (inputStream, status) {
-            if (!Components.isSuccessCode(status)) {
-                return;
-            }
-            // The file data is contained within inputStream.
-            // You can read it into a string with
-            var coffee = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-            ofile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-            out_path = file.path.replace("/coffee", "/javascript").replace(".coffee", ".js")
-            ofile.initWithPath(out_path);
-            CoffeeScriptBuilder.saveToFile(ofile, CoffeeScript.compile(coffee));
-        });
-
-    },
-    saveToFile: function (file, data) {
-        //direct from mozzila's doc
-        var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"].
-        createInstance(Components.interfaces.nsIFileOutputStream);
-        // use 0x02 | 0x10 to open file for appending.
-        foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0);
-        // write, create, truncate
-        // In a c file operation, we have no need to set file mode with or operation,
-        // directly using "r" or "w" usually.
-        // if you are sure there will never ever be any non-ascii text in data you can
-        // also call foStream.writeData directly
-        var converter = Components.classes["@mozilla.org/intl/converter-output-stream;1"].
-        createInstance(Components.interfaces.nsIConverterOutputStream);
-        converter.init(foStream, "UTF-8", 0, 0);
-        converter.writeString(data);
-        converter.close(); // this closes foStream
+        var fileIn = FileIO.open(file);
+        str = FileIO.read(fileIn);
+        var out_path = file.replace("/coffee", "/javascript").replace(".coffee", ".js");
+        CoffeeScriptBuilder.log("Writing"+out_path)
+        var coffee_str = CoffeeScript.compile(str);
+        var outfile = FileIO.open(out_path);
+        FileIO.write(outfile, coffee_str, 'w');
     },
 };
 CoffeeScriptBuilder.build();

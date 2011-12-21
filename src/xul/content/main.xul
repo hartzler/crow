@@ -2,6 +2,7 @@
 <!--<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>-->
 <window id="main" title="Crow" width="800" height="600" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <!-- coffee script -->
+  <script type="application/x-javascript" src="chrome://crow/content/io.js"/>
   <script type="application/x-javascript" src="chrome://crow/content/coffee-script.js"/>
   <script type="application/x-javascript" src="chrome://crow/content/coffee_builder.js"/>
 
