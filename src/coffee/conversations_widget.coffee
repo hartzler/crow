@@ -119,7 +119,7 @@ show_xul_deck = ()->
   $(xul_deck()).show()
 
 load_chrome = (url)->
-  path = FileUtils.getFile("CurProcD", "content/#{url}".split("/"))
+  path = FileUtils.getFile("CurProcD", url)
   logger.debug("load_chrome #{path}")
   FileIO.read(path)
     
@@ -127,18 +127,18 @@ conversation_iframe = (model) ->
   window.top.document.getElementById(model2id(model))
 
 conversation_iframe_src_data = ()->
-  html = load_chrome "conversation.html"
+  html = load_chrome ['content',"conversation.html"]
   shit = ''
 
   # style sheets
   for url in ['conversation.css']
     logger.debug("adding stylesheet: #{url}...")
-    shit += "\n<style type=\"text/css\">\n#{load_chrome(url)}\n</style>"
+    shit += "\n<style type=\"text/css\">\n#{load_chrome(['content','css',url])}\n</style>"
 
   # java scripts 
-  for url in ['jquery-1.7.min.js', 'javascript/util.js', 'javascript/jquery_plugins.js', 'javascript/split.js', 'javascript/conversation.js']
+  for url in ['jquery-1.7.min.js', 'util.js', 'jquery_plugins.js', 'split.js', 'conversation.js']
     logger.debug("adding script: #{url}...")
-    shit += "\n<script type=\"application/x-javascript\">#{load_chrome(url)}\n</script>"
+    shit += "\n<script type=\"application/x-javascript\">#{load_chrome(['content','javascript',url])}\n</script>"
 
   # inline to head
   html = html.replace('<head></head>',"<head>#{shit}</head>")

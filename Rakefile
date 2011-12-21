@@ -64,19 +64,24 @@ task :build do
   ["#{Cfg[:builddir]}/xul/application.ini"].each do |erb|
     open(erb,"w"){|f| f.puts ERB.new(File.read("#{erb}.erb")).result()}
   end
-  #`coffee -o #{Cfg[:builddir]}/xul/content/ src/coffee`
-  `rm -Rf #{Cfg[:builddir]}/xul/content/coffee && rm -Rf #{File.join(Cfg[:builddir],"xul","content","javascript")}  && rm -Rf #{Cfg[:builddir]}/xul/content/local`
-  ["#{Cfg[:builddir]}/xul/content/local","#{Cfg[:builddir]}/xul/content/coffee "," #{Cfg[:builddir]}/xul/content/javascript"].each{|dir|`mkdir -p #{dir}`}
+  
+  # mkdirs
+  ["javascript", "css"].map{|d| File.join(Cfg[:builddir],'xul','content',d)}.each {|d| `mkdir -p #{d}`}
 
-  ` cp -R src/coffee/* #{Cfg[:builddir]}/xul/content/coffee`
+  # copy libs
+  ['javascript','css'].each{|d| `cp -R lib/#{d}/* #{File.join(Cfg[:builddir],'xul','content',d)}`}
 
-  # haml
+  # build haml
   Dir["src/haml/*.haml"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|haml|
-    `haml -r #{File.join(Dir.pwd,"haml_helper.rb")} #{haml} #{Cfg[:builddir]}/xul/content/#{File.basename(haml,".haml")}.html`}
+    `haml -r #{File.join(Dir.pwd,'lib',"haml_helper.rb")} #{haml} #{Cfg[:builddir]}/xul/content/#{File.basename(haml,".haml")}.html`}
 
-  # sass
+  # build coffee
+  Dir["src/coffee/*.coffee"].each {|f|
+    `./xulrunner-sdk/bin/js -f lib/javascript/coffee-script.js -e "print(CoffeeScript.compile(read('#{f}')));" > #{Cfg[:builddir]}/xul/content/javascript/#{File.basename(f,'.coffee')}.js`}
+
+  # build sass
   Dir["src/scss/*.scss"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|scss|
-    `sass #{scss} #{Cfg[:builddir]}/xul/content/#{File.basename(scss,".scss")}.css`}
+    `sass #{scss} #{Cfg[:builddir]}/xul/content/css/#{File.basename(scss,".scss")}.css`}
 end
 
 task :package => [:xul,:clean,:build] do
