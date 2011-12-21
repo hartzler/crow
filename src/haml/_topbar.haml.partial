@@ -2,15 +2,15 @@
   .container-fluid
     %a.brand{:href => "#"} Crow
     %ul.nav
-      %li 
+      %li.conversations
         %a{:href=>"#conversations"}Chats
-      %li 
+      %li.friends
         %a{:href=>"#friends"}Friends
-      %li 
+      %li.accounts
         %a{:href=>"#accounts"}Accounts
-      %li 
+      %li.settings 
         %a{:href=>"#settings"}Settings
-      %li 
+      %li.logs
         %a{:href=>"#logs"}Log
 
     %p.pull-right Status

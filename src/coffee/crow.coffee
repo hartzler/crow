@@ -39,14 +39,20 @@ start_conversation = (e) ->
 
 class TopLinksWidget
   constructor: ()->
-    $('.topbar ul.nav a').on "click", (e)->
+    @activate('about')
+    $('.topbar ul.nav a').on "click", (e)=>
       switch $(e.target).attr('href')
-        when about_selector then ui.show_about()
-        when accounts_selector then ui.show_accounts()
-        when conversations_selector then ui.show_conversations()
-        when friends_selector then ui.show_friends()
-        when logs_selector then ui.show_logs()
-        when settings_selector then ui.show_settings()
+        when about_selector then ui.show_about(); @activate('about')
+        when accounts_selector then ui.show_accounts(); @activate('accounts')
+        when conversations_selector then ui.show_conversations(); @activate('conversations')
+        when friends_selector then ui.show_friends(); @activate('friends')
+        when logs_selector then ui.show_logs(); @activate('logs')
+        when settings_selector then ui.show_settings(); @activate('settings')
+
+  activate: (tab)->
+    li=$(".topbar ul.nav .#{tab}")
+    li.addClass("active")
+    li.siblings().removeClass("active")
 
 class AccountsWidget
   account_template_selector = "#account-template"
