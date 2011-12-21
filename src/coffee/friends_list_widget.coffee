@@ -6,7 +6,7 @@
 friends_selector = "#friends-list"
 friend_template_selector = "#friend-template"
 
-logger = new Util.Logger("UI::FriendList", 'debug', CrowLog)
+logger = new Util.Logger("Crow::UI::FriendList", 'debug', CrowLog)
 
 # render model Friend to template and return top level div
 friend_div = (friend) ->

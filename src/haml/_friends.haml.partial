@@ -1,1 +1,2 @@
-%h2 Friends
+#friends.panel
+  %h2 Friends

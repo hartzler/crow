@@ -1,1 +1,2 @@
-%h2 Settings
+#settings.panel
+  %h2 Settings

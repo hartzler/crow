@@ -1,0 +1,26 @@
+#logs {
+  height: 100%;
+  overflow: auto;
+  padding-left: 0em;
+  padding-right: 0em;
+  #logline-template {
+    display: none;
+  }
+  .logline {
+    padding-bottom: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    clear: both;
+    .time, .level, .context {
+      float: left;
+      margin-right: 0.5em;
+    }
+    .context:before {
+      content: "["
+    }
+    .context:after {
+      content: "]"
+    }
+  }
+}
+

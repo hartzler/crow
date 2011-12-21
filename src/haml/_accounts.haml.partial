@@ -1,23 +1,50 @@
-%h2 Accounts
-#connect-panel
-  %form.form-stacked{:action => "#"}
-    .clearfix
-      %label{:for => "jid"} JID 
-      .input
-        %input#jid.span3{:type => "text",:value=>"hartzler@bardicgrove.org"}/
-    .clearfix
-      %label{:for => "password"} Password
-      .input
-        %input#password.span3{:type => "password", :value=>"b8h534h35"}/
-    .clearfix
-      %label{:for => "host"} Host
-      .input
-        %input#host.span3{:type => "text", :value=>"bardicgrove.org"}/
-    .clearfix
-      %label{:for => "port"} Port
-      .input
-        %input#port.span3{:type => "text", :value=>"5222"}/
-    %button#connect.btn.primary Connect
-#disconnect-panel
-  %button#disconnect.btn.danger Disonnect
+#accounts.panel
+  .notification
 
+  .summary
+    %h2 Accounts
+    %button#connect.btn.success Connect
+    %button#disconnect.btn.primary Disonnect
+
+    %table
+      %thead
+        %tr
+          %th Name
+          %th Username
+          %th Status
+          %th Action
+      %tbody
+        %tr#account-template.template
+          %td.name
+          %td.jid
+          %td.status
+          %td.action
+            %button.btn.success.connect Connect
+            %button.btn.primary.disconnect Disonnect
+            %button.btn.danger.delete Remove
+
+  .add
+    %form{:action => "#"}
+      .clearfix
+        %label{:for => "name"} Name
+        .input
+          %input#account_name.xlarge{:name=>'name', :type => "text"}
+      .clearfix
+        %label{:for => "jid"} JID 
+        .input
+          %input#account_jid.xlarge{:name=>'jid', :type => "text"}
+      .clearfix
+        %label{:for => "password"} Password
+        .input
+          %input#account_password.xlarge{:type => "password"}
+      .clearfix
+        %label{:for => "host"} Host
+        .input
+          %input#account_host.xlarge{:type => "text"}
+      .clearfix
+        %label{:for => "port"} Port
+        .input
+          %input#account_port.xlarge{:type => "text"}
+
+      .actions
+        %button#save.btn.primary Save

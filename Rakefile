@@ -69,9 +69,14 @@ task :build do
   ["#{Cfg[:builddir]}/xul/content/local","#{Cfg[:builddir]}/xul/content/coffee "," #{Cfg[:builddir]}/xul/content/javascript"].each{|dir|`mkdir -p #{dir}`}
 
   ` cp -R src/coffee/* #{Cfg[:builddir]}/xul/content/coffee`
-  Dir["src/haml/*.haml"].each{|haml|`haml -r #{File.join(Dir.pwd,"haml_helper.rb")} #{haml} #{Cfg[:builddir]}/xul/content/#{File.basename(haml,".haml")}.html`}
-  #Dir["src/haml/*.haml"].each{|haml|`haml #{haml} #{Cfg[:builddir]}/xul/content/#{File.basename(haml,".haml")}.html`}
-  Dir["src/scss/*.scss"].each{|scss|`sass #{scss} #{Cfg[:builddir]}/xul/content/#{File.basename(scss,".scss")}.css`}
+
+  # haml
+  Dir["src/haml/*.haml"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|haml|
+    `haml -r #{File.join(Dir.pwd,"haml_helper.rb")} #{haml} #{Cfg[:builddir]}/xul/content/#{File.basename(haml,".haml")}.html`}
+
+  # sass
+  Dir["src/scss/*.scss"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|scss|
+    `sass #{scss} #{Cfg[:builddir]}/xul/content/#{File.basename(scss,".scss")}.css`}
 end
 
 task :package => [:xul,:clean,:build] do

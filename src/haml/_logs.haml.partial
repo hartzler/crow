@@ -1,8 +1,9 @@
-%h2 Logs
-#logline-template.logline.template
-  .time
-  .level
-  .context
-  .log
-#loglines
+#logs.panel
+  %h2 Logs
+  #logline-template.logline.template
+    .time
+    .level
+    .context
+    .log
+  #loglines
 
