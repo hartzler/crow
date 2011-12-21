@@ -7,6 +7,7 @@
     %link{:href => "log.css", :rel => "stylesheet", :type => "text/css"}
 
   %body.vsplit
+       
     .topbar
       = partial :topbar
 
@@ -19,6 +20,7 @@
       = partial :settings
 
     .footer
+    //%iframe{:id=>"fbIframe",:src=>"debug.html",:style=>"height:150px;width:100%;"}
 
   / 3rd party libs
   %script{:type=>"application/x-javascript", :src => "io.js"}
@@ -37,5 +39,4 @@
   %script{:type=>"application/x-javascript", :src => "javascript/conversations_widget.js"}
   / controller
   %script{:type=>"application/x-javascript", :src => "javascript/crow.js"}
-  %script{:type=>"application/x-javascript", :src => "https://getfirebug.com/firebug-lite.js"}
 
