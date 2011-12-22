@@ -53,28 +53,28 @@ class Account
   connect: () ->
     @logger.debug([@jid,@password,@host,@port])
     @session = xmpp.session @jid, @password, @host, @port, @security,
-      onError: (aName, aStanza) =>
+      onError: (aName, aStanza) => @handle_errors =>
         @logger.error aStanza.convertToString()
         @callbacks.error this, aStanza
   
-      onConnection: (resource)=>
+      onConnection: (resource)=> @handle_errors =>
         @resource = resource
         @from = @jid + "/" + @resource
         @logger.debug "connect"
         @callbacks.connect(this)
         @presence()
   
-      onPresenceStanza: (stanza) =>
+      onPresenceStanza: (stanza) => @handle_errors =>
         @logger.debug "onPresenceStanza: " + stanza.convertToString()
         jid = xmpp.Stanza.parseFromJID(stanza)
         presence = xmpp.Stanza.parsePresence(stanza)
         @callbacks.friend(this, new Friend(jid,presence,false,this.name)) if jid
 
-      onMessageStanza: (stanza) =>
+      onMessageStanza: (stanza) => @handle_errors =>
         @logger.debug "onMessageStanza: " + stanza.convertToString()
         @callbacks.message this, $($.parseXML(stanza.convertToString())).children(':first')
   
-      onIQStanza: (aName, stanza) =>
+      onIQStanza: (aName, stanza) => @handle_errors =>
         @logger.debug "onIQStanza: " + stanza.convertToString()
         if stanza.getChildren('vCard').length > 0
           jid = xmpp.Stanza.parseFromJID(stanza)
@@ -82,7 +82,7 @@ class Account
           @callbacks.vcard(this, jid, vcard) if jid && vcard
         @callbacks.iq this, $($.parseXML(stanza.convertToString())).children(':first')
 
-      onXmppStanza: (aName, stanza) =>
+      onXmppStanza: (aName, stanza) => @handle_errors =>
         @logger.debug "onXmppStanza: " + stanza.convertToString()
         @callbacks.raw this, $($.parseXML(stanza.convertToString())).children(':first')
 
@@ -120,6 +120,12 @@ class Account
       
   friend: (friend) ->
     # TODO: implement
+
+  handle_errors: (f)->
+    try
+      f.call()
+    catch e
+      @logger.error('error in xmpp callback:',e)
 
 class Friend
   constructor: (@jid,@presence,@is_room,@account,@vcard={}) ->

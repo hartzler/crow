@@ -24,8 +24,8 @@ class Logger
       text = @stringify(message)
       dump "#{date.toISOString()} #{Logger.level_names[level]} [#{@context}] #{text}\n" if @dump
       @callbacks.log date,level,@context,text if @callbacks?.log?
-  error: (message) ->
-    @log 0,message
+  error: (message,e=null) ->
+    @log 0,"#{message}#{if e? then e.toString() else ''}"
   warn: (message) ->
     @log 1,message
   info: (message) ->
