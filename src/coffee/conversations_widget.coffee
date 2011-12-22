@@ -74,7 +74,9 @@ add_conversation = (model,send_callback) ->
   selector = "#" + id
   title = model.from.display()
   # do nothing if we already have this conversation open
-  return if $(selector).length > 0
+  if $(selector).length > 0
+    activate_conversation(model)
+    return
  
   logger.debug "add_conversation: id=#{id}, title=#{title} conversation=#{model}"
 
@@ -166,7 +168,7 @@ select_xul_conversation = (model)->
   logger.debug("selected id: #{xul_deck().selectedPanel.getAttribute('id')}")
   xul_deck().selectedPanel = p
   logger.debug("selected id: #{xul_deck().selectedPanel.getAttribute('id')}")
-  #p.contentDocument.getElementById('txt').focus() # safe?
+  p.contentDocument.getElementById('txt').focus() # safe?
 
 find_model_by_index= (n)->
   $(conversations_pill_selector).children().get(n-1)
