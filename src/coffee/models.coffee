@@ -1,17 +1,34 @@
 # models.coffee
-#   requires jquery, util.coffee
+#   requires xmpp.js, jquery.js, util.coffee
 #
 
 # TODO: move xmpp stuff out of here
-xmpp = {}
-Components.utils.import("resource://app/modules/xmpp.js",xmpp)
+class XmppJID
+  constructor: (@jid)->
+  toString: ()->@jid
+  full: ()->@jid
+  base: ()-> @jid.match(/(.*)\/.*/)[1]
+  resource: ()->@jid.match(/.*\/(.*)/)[1]
+  user: ()-> @jid.match(/(.*)@.*/)[1]
+  host: ()-> @jid.match(/.*@(.*)\/.*/)[1]
 
 class XmppStanza
   constructor: (@xml) ->
-    @stanza = $($.parseXML(stanza.convertToString())).children(':first')
-#class XmppMessage
-#class XmppIq
-#class XmppPresence
+    @dom = $($.parseXML(@xml)).children(':first')
+  toString: ()->
+    @xml
+  from: ()->
+    @dom.attr("from")
+
+class XmppError extends XmppStanza
+class XmppMessage extends XmppStanza
+  body: ()->
+    @dom.children('body').text()
+  html: ()->
+    @dom.find('html body').xml()
+class XmppIq extends XmppStanza
+class XmppPresence extends XmppStanza
+
 
 # TODO: factor out
 passwordManager = Components.classes["@mozilla.org/login-manager;1"].
@@ -53,9 +70,10 @@ class Account
   connect: () ->
     @logger.debug([@jid,@password,@host,@port])
     @session = xmpp.session @jid, @password, @host, @port, @security,
-      onError: (aName, aStanza) => @handle_errors =>
-        @logger.error aStanza.convertToString()
-        @callbacks.error this, aStanza
+      onError: (name, stanza) => @handle_errors =>
+        x = new XmppError(stanza.convertToString())
+        @logger.error x.toString()
+        @callbacks.error this, x
   
       onConnection: (resource)=> @handle_errors =>
         @resource = resource
@@ -65,26 +83,32 @@ class Account
         @presence()
   
       onPresenceStanza: (stanza) => @handle_errors =>
-        @logger.debug "onPresenceStanza: " + stanza.convertToString()
+        x = new XmppPresence(stanza.convertToString())
         jid = xmpp.Stanza.parseFromJID(stanza)
         presence = xmpp.Stanza.parsePresence(stanza)
         @callbacks.friend(this, new Friend(jid,presence,false,this.name)) if jid
 
       onMessageStanza: (stanza) => @handle_errors =>
-        @logger.debug "onMessageStanza: " + stanza.convertToString()
-        @callbacks.message this, $($.parseXML(stanza.convertToString())).children(':first')
+        x = new XmppMessage(stanza.convertToString())
+        @callbacks.message this, x
   
-      onIQStanza: (aName, stanza) => @handle_errors =>
-        @logger.debug "onIQStanza: " + stanza.convertToString()
+      onIQStanza: (name, stanza) => @handle_errors =>
+        x = new XmppMessage(stanza.convertToString())
         if stanza.getChildren('vCard').length > 0
           jid = xmpp.Stanza.parseFromJID(stanza)
           vcard = xmpp.Stanza.parseVCard(stanza)
           @callbacks.vcard(this, jid, vcard) if jid && vcard
-        @callbacks.iq this, $($.parseXML(stanza.convertToString())).children(':first')
+        @callbacks.iq this, x
 
       onXmppStanza: (aName, stanza) => @handle_errors =>
-        @logger.debug "onXmppStanza: " + stanza.convertToString()
-        @callbacks.raw this, $($.parseXML(stanza.convertToString())).children(':first')
+        x = new XmppStanza(stanza.convertToString())
+        @callbacks.raw this, x
+
+      onSendTrace: (xml)=>
+        @callbacks.send_trace(this,xml)
+
+      onReceiveTrace: (xml)=>
+        @callbacks.receive_trace(this,xml)
 
     @session.connect()
 
@@ -125,7 +149,7 @@ class Account
     try
       f.call()
     catch e
-      @logger.error('error in xmpp callback:',e)
+      @logger.error('[HANDLE_ERRORS]: ',e)
 
 class Friend
   constructor: (@jid,@presence,@is_room,@account,@vcard={}) ->
@@ -142,10 +166,12 @@ class Friend
     else
       # other stuff, not handled yet...
       dfault
+  toString: ()->"<Friend jid=#{@jid.jid}>"
 
 class Conversation
   constructor: (@account,@from,@callbacks) ->
   safeid: ()-> @from.safeid()
+  toString: ()-> "<Conversation account=#{@account} from=#{@from}>"
 
 # 
 # Main interface to manage accounts / conversations
@@ -199,6 +225,10 @@ class Crow
     error: @callbacks.error
     connect: @callbacks.connect
     disconnect: @callbacks.disconnect
+    send_trace: (account,xml)=>
+      @callbacks.send_trace(account.name,xml)
+    receive_trace: (account,xml)=>
+      @callbacks.receive_trace(account.name,xml)
     vcard: (account,jid,vcard) =>
       if @friends[jid.jid]
         @friends[jid.jid].vcard = vcard
@@ -215,9 +245,8 @@ class Crow
     iq: @callbacks.iq
     raw: @callbacks.raw
     message: (account,message) =>
-      @logger.debug "message xml: #{message.xml()}"
-      @logger.debug "message from: #{message.attr("from")}"
-      jid = message.attr("from").replace(/\/.*/,'')
+      @logger.debug "message from: #{message.from()}"
+      jid = message.from().replace(/\/.*/,'')
       @logger.debug "message from jid: #{jid}"
       from = @friends[jid]
       unless from
@@ -228,9 +257,9 @@ class Crow
         @conversations[jid] = new Conversation(account.name,from)
         @logger.debug "created conversation#{@conversations[jid]}"
         @callbacks.conversation(account,@conversations[jid])
-      text = message.children('body').text()
+      text = message.body()
       @logger.debug "message: text=#{text}"
-      html = message.find('html body').xml()
+      html = message.html()
       @logger.debug "message: html=#{html}"
       @callbacks.message(@conversations[jid],jid,text,html)
 

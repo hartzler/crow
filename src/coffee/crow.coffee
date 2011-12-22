@@ -115,6 +115,8 @@ class AccountsWidget
 
 # controller for main UI panels
 class UI
+  constructor: (@xmpp_loggers={})->
+    
   init: ()->
     # load accounts
     crow.load()
@@ -157,6 +159,11 @@ class UI
     else
       Conversations.hide()
 
+  xmpp_logger: (name)->
+    unless @xmpp_loggers[name]
+      @xmpp_loggers[name] = new XmppLog(name)
+    @xmpp_loggers[name]
+
 ui = new UI()
 
 # controller, ties UI to main Crow model object
@@ -166,28 +173,35 @@ crow = new Crow null,
     logger.error("account error: account=#{account.name} xml=#{xml}")
   message: (conversation,jid,text,html) ->
     # route to the conversation so it knows there is a new message
-    logger.debug("received message: account=#{conversation.account} text='#{text}' html='#{html}'")
+    #logger.debug("received message: account=#{conversation.account} text='#{text}' html='#{html}'")
     Conversations.receive conversation, fromjid:jid, time: new Date, text:text, html:html, from:conversation.from.display(), klazz:"message"
   friend: (account,friend) ->
     # route to the FriendList so it can update UI
     # TODO: support change...
-    logger.debug("received friend: account=#{account.name} friend=#{friend}")
+    #logger.debug("received friend: account=#{account.name} friend=#{friend}")
     FriendList.render(crow.friends)
   iq: (account,xml) ->
     # just log for now.  not sure what to do UI wise.
-    logger.debug("received iq: account=#{account.name} xml=#{xml}")
+    #logger.debug("received iq: account=#{account.name} xml=#{xml}")
   raw: (account,xml) ->
     # just log for now.  not sure what to do UI wise.
-    logger.debug("received raw: account=#{account.name} xml=#{xml}")
+    #logger.debug("received raw: account=#{account.name} xml=#{xml}")
   connect: (account) ->
     logger.info("Connected account: #{account.name}")
     ui.show_conversations()
+    # make sure log exists
+    #$('#logs .pill-content')
   disconnect: (account) ->
     # TODO: update UI?  update FriendsList?  re-query presence?
     logger.info("Disconnected account: #{account.name}")
   conversation: (account,conversation) ->
     logger.debug("received conversation: account=#{account.name} conversation=#{conversation}")
     open_conversation(conversation)
+  send_trace: (account,xml)->
+    ui.xmpp_logger(account).send(xml)
+  receive_trace: (account,xml)->
+    ui.xmpp_logger(account).receive(xml)
+ 
   # passthru to our Log UI Widget
   log: (args...)->CrowLog.log(args...)
 

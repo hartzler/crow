@@ -20,7 +20,7 @@ class CrowLog
 
   # render all the logs
   render: ->
-    log = $('#log')
+    log = $(logs_selector)
     log.empty()
     for l in @logs
       log.append @format(l)
@@ -38,4 +38,38 @@ class CrowLog
   toggle: ->
     # TODO
     
+class XmppLog
+  constructor: (@name)->
+    @logger = new Util.Logger("Crow::XMPP::#{@name}",'debug')
+    @logger.debug("Starting xmpp logging...")
+
+    # tab
+    tabs = $("#logs ul.tabs")
+    a = $('<a/>',href:@xmpp_selector()).text("Account #{name}")
+    li = $('<li/>')
+    li.append(a)
+    tabs.append(li)
+
+    # content
+    p = Util.clone_template "#xmpplog-template"
+    p.attr('id',@xmpp_id())
+    $('#logs .pill-content').append(p)
+
+    tabs.tabs()
+
+  xmpp_id: ()->
+    "xmpp-#{Util.h(@name)}"
+  xmpp_selector: ()->
+    "##{@xmpp_id()}"
+  send: (xml)->
+    $(@xmpp_selector()).append($('<pre/>',class:'sent').text(xml))
+    @logger.debug("<-- #{xml}")
+  receive: (xml)->
+    $(@xmpp_selector()).append($('<pre/>',class:'received').text(xml))
+    @logger.debug("--> #{xml}")
+
+    
+# exports
 window.CrowLog = new CrowLog()
+window.XmppLog = XmppLog
+

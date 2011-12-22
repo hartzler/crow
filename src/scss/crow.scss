@@ -26,16 +26,18 @@ body {
 }
 
 #panels {
-  padding-right: 0px;
-  margin-right: 1em;
-  margin-left: 1em;
-  margin-top: 0em;
-  margin-bottom: 1em;
   min-width: 200px;
+  overflow: hidden;
+  padding: 0px;
+  margin: 0px;
+
   .panel {
     height: 100%;
-    wihth: 100%;
+    width: 100%;
+    overflow: hidden;
     background-color: white;
+    margin: 0px;
+    padding: 0px;
   }
 }
 

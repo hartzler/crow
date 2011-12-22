@@ -1,9 +1,18 @@
 #logs.panel
-  %h2 Logs
-  #logline-template.logline.template
-    .time
-    .level
-    .context
-    .log
-  #loglines
+
+  %ul.tabs
+    %li.active
+      %a{:href=>"#crowlog"} Crow Log
+
+  #xmpplog-template.template.xmpplog
+    %h2 XMPP
+
+  .pill-content
+    #crowlog.active
+      #logline-template.logline.template
+        .time
+        .level
+        .context
+        .log
+      #loglines
 

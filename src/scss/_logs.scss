@@ -1,11 +1,30 @@
 #logs {
-  height: 100%;
-  overflow: auto;
-  padding-left: 0em;
-  padding-right: 0em;
-  #logline-template {
-    display: none;
+  .container {
+    height: 100%;
+    overflow: auto;
   }
+
+  ul.tabs {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .pill-content {
+    padding-top: 0em;
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+
+  .xmpplog {
+    .sent {
+      color: #ccc;
+    }
+    .received {
+    }
+  }
+}
+
+#crowlog  {
   .logline {
     padding-bottom: 1em;
     padding-left: 1em;
