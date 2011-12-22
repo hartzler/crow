@@ -128,6 +128,7 @@ conversation_iframe = (model) ->
 
 conversation_iframe_src_data = ()->
   html = load_chrome ['content',"conversation.html"]
+  #TODO: Cache the shit values 
   shit = ''
 
   # style sheets
@@ -136,13 +137,12 @@ conversation_iframe_src_data = ()->
     shit += "\n<style type=\"text/css\">\n#{load_chrome(['content','css',url])}\n</style>"
 
   # java scripts 
-  for url in ['jquery-1.7.min.js', 'util.js', 'jquery_plugins.js', 'split.js', 'conversation.js']
+  for url in ['jquery-1.7.min.js', 'util.js', 'jquery_plugins.js', 'split.js', 'conversation.js', 'conversations_init.js']
     logger.debug("adding script: #{url}...")
     shit += "\n<script type=\"application/x-javascript\">#{load_chrome(['content','javascript',url])}\n</script>"
 
   # inline to head
   html = html.replace('<head></head>',"<head>#{shit}</head>")
-
   # return escaped data url
   "data:text/html,#{encodeURIComponent(html)}"
 
