@@ -7,10 +7,6 @@
 # hook up to our Log UI widget
 logger = new Util.Logger("Crow::UI", 'debug', CrowLog)
 
-# place holder for closure over main Crow Model object
-ui = null
-crow = null
-
 # DOM selectors
 panels_selector = "#panels"
 about_selector = "#about"
