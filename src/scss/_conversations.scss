@@ -1,6 +1,8 @@
 #conversations {
   .sidebar {
+    overflow: auto;
     width: 220px;
+    height: 100%;
   }
 
   .right {
