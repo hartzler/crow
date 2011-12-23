@@ -21,7 +21,6 @@ friend_div = (friend) ->
   logger.debug "icon src: " + icon.attr('src').substring(0,100)
   div.find('.icon').append(icon)
   div.data("model",friend)
-  logger.debug div.html()
   div
 
 # re-render the list, blows away current

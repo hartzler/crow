@@ -6,7 +6,7 @@
         %h2 Friends
         #friend-template.template.friend
           .state
-            .icon
+          .icon
           .show
           .name
           .status
