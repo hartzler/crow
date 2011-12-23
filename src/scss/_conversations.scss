@@ -46,10 +46,13 @@
   display: none;
   overflow: auto;
   .chat {
-    background-color: green;
+    color: green;
   }
-  .away,.dnd {
-    background-color: red;
+  .away{
+    color: #aaa;
+  }
+  .dnd {
+    color: red;
   }
 
   .friend {
@@ -65,14 +68,6 @@
       height: auto;
       width: 7px;
       float: left;
-      .chat {
-        background-color: green;
-      }
-      .away,.dnd {
-        background-color: red;
-      }
-
-      
     }
     .name {
       font-size: 10pt;
