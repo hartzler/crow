@@ -150,7 +150,7 @@ class UI
   show_firebug: ()->
     frame = $("#fbIframe")
     if(frame.height()<100 )
-      frame.height("150px")
+      frame.height("200px")
       frame.width("100%")
     else
       frame.height("0px")
