@@ -93,3 +93,13 @@ Borrows from / uses:
 * http://haml-lang.com/
 * http://sass-lang.com/
 * http://jashkenas.github.com/coffee-script/
+* firebug lite
+
+### Debugging
+
+We are using firebug lite for quick easy debugging. We load firebug lite
+in to an iframe in the main html file. To access the main code you need
+to use window.parent.document. I have added a crow jQuery object to short hand
+this.
+
+We also have lots of logging.
