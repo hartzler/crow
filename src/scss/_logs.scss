@@ -1,8 +1,4 @@
 #logs {
-  .container {
-    height: 100%;
-    overflow: auto;
-  }
 
   ul.tabs {
     margin: 0px;
@@ -13,6 +9,8 @@
     padding-top: 0em;
     padding-left: 1em;
     padding-right: 1em;
+    height: 100%;
+    overflow: auto;
   }
 
   .xmpplog {
