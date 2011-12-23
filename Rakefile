@@ -76,8 +76,11 @@ task :build do
     `haml -r #{File.join(Dir.pwd,'lib',"haml_helper.rb")} #{haml} #{Cfg[:builddir]}/xul/content/#{File.basename(haml,".haml")}.html`}
 
   # build coffee
-  Dir["src/coffee/*.coffee"].each {|f|
-    `./xulrunner-sdk/bin/js -f lib/javascript/coffee-script.js -e "print(CoffeeScript.compile(read('#{f}')));" > #{Cfg[:builddir]}/xul/content/javascript/#{File.basename(f,'.coffee')}.js`}
+#  Dir["src/coffee/*.coffee"].each {|f|
+#    `./xulrunner-sdk/bin/xpcshell -f lib/javascript/coffee-script.js -e "print(CoffeeScript.compile(read('#{f}')));" > #{Cfg[:builddir]}/xul/content/javascript/#{File.basename(f,'.coffee')}.js`}
+  
+  # copy coffee for on the fly loading...
+  `cp -R src/coffee #{Cfg[:builddir]}/xul/content`
 
   # build sass
   Dir["src/scss/*.scss"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|scss|
