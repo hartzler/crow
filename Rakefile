@@ -1,6 +1,7 @@
 require 'erb'
 
 # not used, but alert user its required :) better way?
+require 'rubygems'
 require 'haml' 
 require 'sass'
 
@@ -17,9 +18,10 @@ end
 # TODO: support mac 32 bit
 def platform
   case platform_name()
-  when /darwin/i then :mac64
+  when /darwin/i
+    system("sysctl hw.cpu64bit_capable > /dev/null 2>&1") ? :mac64 : :mac32
   when /linux/i
-    `"sysctl hw.cpu64bit_capable > /dev/null 2>&1"` ? :linux64 : :linux32
+    system("sysctl hw.cpu64bit_capable > /dev/null 2>&1") ? :linux64 : :linux32
   else
     raise "Unsupported platform #{RUBY_PLATFORM}!"
   end
@@ -36,6 +38,7 @@ Cfg[:xulsdkdir] = "xulrunner-sdk"
 Cfg[:xulversion] = "8.0.1"
 Cfg[:xuluri] = {
   :base=>"http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/#{Cfg[:xulversion]}/sdk/",
+  :mac32 => { :file=>"xulrunner-#{Cfg[:xulversion]}.en-US.mac-i386.sdk.tar.bz2"},
   :mac64 => { :file=>"xulrunner-#{Cfg[:xulversion]}.en-US.mac-x86_64.sdk.tar.bz2"},
   :linux32 => {:file=>"xulrunner-#{Cfg[:xulversion]}.en-US.linux-i686.sdk.tar.bz2"},
   :linux64 => {:file=>"xulrunner-#{Cfg[:xulversion]}.en-US.linux-x86_64.sdk.tar.bz2"},
