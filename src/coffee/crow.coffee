@@ -15,6 +15,7 @@ conversations_selector = "#conversations"
 friends_selector = "#friends"
 logs_selector = "#logs"
 settings_selector = "#settings"
+firebug_selector = "#firebug"
 
 # open a conversation with the right callback/listener
 open_conversation = (conversation)->
@@ -44,6 +45,7 @@ class TopLinksWidget
         when friends_selector then ui.show_friends(); @activate('friends')
         when logs_selector then ui.show_logs(); @activate('logs')
         when settings_selector then ui.show_settings(); @activate('settings')
+        when firebug_selector then ui.show_firebug()
 
   activate: (tab)->
     li=$(".topbar ul.nav .#{tab}")
@@ -144,6 +146,15 @@ class UI
 
   show_settings: ()->
     @show_panel settings_selector
+
+  show_firebug: ()->
+    frame = $("#fbIframe")
+    if(frame.height()<100 )
+      frame.height("150px")
+      frame.width("100%")
+    else
+      frame.height("0px")
+      frame.width("0px")
 
   connect: ()->
     @show_conversations()

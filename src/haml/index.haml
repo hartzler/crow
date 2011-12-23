@@ -20,7 +20,9 @@
       = partial :settings
 
     .footer
-    //%iframe{:id=>"fbIframe",:src=>"debug.html",:style=>"height:150px;width:100%;"}
+    .debug_frame{:style=>"clear:both"}
+      %iframe{:id=>"fbIframe",:src=>"debug.html",:style=>"height:0px;width:0%;"}
+
 
   / 3rd party libs
   %script{:type=>"application/x-javascript", :src => "javascript/io.js"}

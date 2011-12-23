@@ -12,6 +12,8 @@
         %a{:href=>"#settings"}Settings
       %li.logs
         %a{:href=>"#logs"}Log
+      %li.firebug
+        %a{:href=>"#firebug"}Firebug
 
     %p.pull-right Status
 
