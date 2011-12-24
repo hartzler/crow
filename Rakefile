@@ -61,6 +61,21 @@ task :clean do
   `rm -rf #{Cfg[:builddir]}/`
 end
 
+task :build_font_scss do
+  lib_base =File.join(Dir.pwd,"lib")
+  scss_base =File.join(Dir.pwd,"src","scss")
+  scss = ""
+  Dir.glob(File.join(lib_base,"fonts","**","*.ttf")){|file|
+    puts file
+    file.sub!(lib_base,"..")
+    scss+= "\n@font-face {\n font-family: '#{file.split("/").last.split(".")[0].downcase}'; font-weight: normal; font-style: normal;\n src: url('#{file}') format('truetype')\n} "
+  }
+  puts scss
+  File.open(File.join(scss_base,"fonts.scss"),"w+"){|f|
+    f << scss
+  }
+end
+
 task :build do
   `mkdir -p #{Cfg[:builddir]}`
   `cp -r src/xul #{Cfg[:builddir]}`
@@ -69,10 +84,10 @@ task :build do
   end
   
   # mkdirs
-  ["javascript", "css"].map{|d| File.join(Cfg[:builddir],'xul','content',d)}.each {|d| `mkdir -p #{d}`}
+  ["javascript", "css","fonts"].map{|d| File.join(Cfg[:builddir],'xul','content',d)}.each {|d| `mkdir -p #{d}`}
 
   # copy libs
-  ['javascript','css'].each{|d| `cp -R lib/#{d}/* #{File.join(Cfg[:builddir],'xul','content',d)}`}
+  ['javascript','css','fonts'].each{|d| `cp -R lib/#{d}/* #{File.join(Cfg[:builddir],'xul','content',d)}`}
 
   # build haml
   Dir["src/haml/*.haml"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|haml|

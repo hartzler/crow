@@ -1,0 +1,27 @@
+payment: DESIGNER
+
+license: OFL
+category: sans-serif
+subsets: menu,latin
+
+family: Quattrocento Sans
+
+designer: Pablo Impallari
+
+profiledescriptionlicense: Creative Commons Attribution-ShareAlike 3.0
+profiledescriptionlicenseurl: http://creativecommons.org/licenses/by-sa/3.0/
+approved: true
+description: <p>The Quattrocento Sans typeface is \
+  a Classic, Elegant, Sober and Strong typeface.</p> \
+  <p>Their wide and open letterforms, and the great \
+  x-height, make it very legible for body text at \
+  small sizes. And their tiny details that only \
+  shows up at bigger sizes make it also great \
+  for display use.</p>
+
+# cd ~/src/font-optimizer;
+# ./subset.pl -v --licensesubst="SIL OFL 1.1" \
+#    --exclude="c2sc,smcp,aalt,ordn,sups,sinf,subs,dlig,frac" \
+#    --chars="Quattrocento Sans" \
+#   ~/googlefontdirectory/quattrocentosans/QuattrocentoSans-Regular.{ttf,menu};
+# cd ~/googlefontdirectory/quattrocentosans/; 

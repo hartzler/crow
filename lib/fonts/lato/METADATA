@@ -1,0 +1,79 @@
+license: OFL
+payment: DESIGNER
+category: sans-serif
+subsets: menu,latin
+
+family: Lato
+
+designer: Łukasz Dziedzic
+
+profiledescriptionlicense: Creative Commons Attribution-ShareAlike 3.0
+profiledescriptionlicenseurl: http://creativecommons.org/licenses/by-sa/3.0/
+approved: true
+description: <p>Lato is a sanserif typeface family \
+  designed in the Summer 2010 by Warsaw-based \
+  designer Łukasz Dziedzic (“Lato” means “Summer” \
+  in Polish). In December 2010 the Lato family \
+  was published under the open-source Open Font \
+  License by his foundry tyPoland, with support \
+  from Google.</p> \
+  <p>In the last ten or so years, during which \
+  Łukasz has been designing type, most of his \
+  projects were rooted in a particular design \
+  task that he needed to solve. With Lato, it \
+  was no different. Originally, the family was \
+  conceived as a set of corporate fonts for a \
+  large client — who in the end decided to go \
+  in different stylistic direction, so the \
+  family became available for a public \
+  release.</p> \
+  <p>When working on Lato, Łukasz tried to \
+  carefully balance some potentially \
+  conflicting priorities. He wanted to create \
+  a typeface that would seem quite “transparent” \
+  when used in body text but would display some \
+  original traits when used in larger sizes. He \
+  used classical proportions (particularly visible \
+  in the uppercase) to give the letterforms familiar \
+  harmony and elegance. At the same time, he created \
+  a sleek sanserif look, which makes evident the \
+  fact that Lato was designed in 2010 — even though \
+  it does not follow any current trend.</p> \
+  <p>The semi-rounded details of the letters give \
+  Lato a feeling of warmth, while the strong \
+  structure provides stability and seriousness. \
+  “Male and female, serious but friendly. With \
+  the feeling of the Summer,” says Łukasz.</p> \
+  <p>Lato consists of five weights (plus corresponding \
+  italics), including a beautiful hairline style.</p> \
+  <p>Learn more at <a href="http://www.latofonts.com">www.latofonts.com</a>
+
+font.Lato-HairlineItalic.ttf.style: italic
+font.Lato-LightItalic.ttf.style: italic
+font.Lato-Italic.ttf.style: italic
+font.Lato-BoldItalic.ttf.style: italic
+font.Lato-BlackItalic.ttf.style: italic
+
+font.Lato-Hairline.ttf.weight: 100
+font.Lato-HairlineItalic.ttf.weight: 100
+font.Lato-Light.ttf.weight: 300
+font.Lato-LightItalic.ttf.weight: 300
+font.Lato-Regular.ttf.weight: 400
+font.Lato-Italic.ttf.weight: 400
+font.Lato-Bold.ttf.weight: 700
+font.Lato-BoldItalic.ttf.weight: 700
+font.Lato-Black.ttf.weight: 900
+font.Lato-BlackItalic.ttf.weight: 900
+
+description.de: <p>Lato ist ein serifenlose Schriftfamilie, die im Sommer 2010 vom Warschauer Designer Łukasz Dziedzic entworfen wurde (der Sommer heißt auf Polnisch „Lato“). Im Dezember 2010 veröffentlichte sein Studio tyPoland, mit Unterstützung von Google, die Lato-Familie unter der OpenSource-OFL-Lizenz.</p><p>In den letzten zehn Jahren, in den Łukasz Schriften entwarf, sind seine meisten Projekte auf Basis von einer existierenden Designaufgabe entstandnen. Mit Lato war es nicht anders. Ursprünglich war die Familie als eine Corporate-Schrift für einen großen Kunden konzipiert. Dieser entschied sich am Ende, eine andere Stilrichtung zu verfolgen — somit stand die Familie für eine breite Veröffentlichung zur Verfügung.</p><p>Bei der Arbeit an Lato versuchte Łukasz, einige potentiell gegenläufige Prioritäten sorgfältig abzuwägen. Er wollte eine Schrift gestalten, die einerseits ziemlich „durchsichtig“ im Fließtext wirken würde, in Displaygrößen sollte sie aber einige originelle Züge aufweisen. Durch klassische Proportionen (besonders sichtbar in den Großbuchstaben) verlieh er der Schrift Harmonie und Eleganz. Zugleich schuf er schlichte serifenlose Formen, durch die offensichtlich wird, dass die Schrift im Jahre 2010 entstand — obwohl sie keinem aktuellen Trend folgt.</p><p>Die halbrunden Details verleihen der Lato ein Wärmegefühl während die starke Struktur für Stabilität und Seriosität sorgt. „Männlich und weiblich, ernst aber freundlich. Mit dem Gefühl des Sommers“ — sagt Łukasz.</p><p>Lato besteht aus fünf Strichstärken, plus Kursiven, darunter ein schöner ultradünner Schnitt. Die Erstauflage enthält lediglich den Westeuropa-Zeichensatz. Das paneuropäische Lateinalphabet, das Kyrillische, das Griechische, sowie Kapitälchen und andere typografische Feinheiten sollen 2011 folgen.</p>
+
+
+
+# cd ~/src/font-optimizer; \
+# ./subset.pl -v --licensesubst="SIL OFL 1.1" \
+#  --exclude="c2sc,smcp,ordn,sups,sinf,subs,dlig,frac" \
+#  --chars="Lato" \
+# ~/googlefontdirectory/lato/Lato-Regular.{ttf,menu}; \
+# cd ~/googlefontdirectory/lato/; \
+# ~/googlefontdirectory/tools/chars/showchars.py \
+#  Lato-Regular.menu; \
