@@ -1,4 +1,5 @@
 require 'erb'
+require 'ostruct'
 
 # not used, but alert user its required :) better way?
 require 'rubygems'
@@ -29,36 +30,39 @@ end
 
 # Cfg options: (Config is a rake constant? BS)
 # constant for easy global access in helper functions
-Cfg = {}
-Cfg[:appname] = 'Crow'
+Cfg = OpenStruct.new
+Cfg.appname = 'Crow'
 
-Cfg[:platform]= platform()
-Cfg[:builddir] = 'build'
-Cfg[:xulsdkdir] = "xulrunner-sdk"
-Cfg[:xulversion] = "8.0.1"
-Cfg[:xuluri] = {
-  :base=>"http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/#{Cfg[:xulversion]}/sdk/",
-  :mac32 => { :file=>"xulrunner-#{Cfg[:xulversion]}.en-US.mac-i386.sdk.tar.bz2"},
-  :mac64 => { :file=>"xulrunner-#{Cfg[:xulversion]}.en-US.mac-x86_64.sdk.tar.bz2"},
-  :linux32 => {:file=>"xulrunner-#{Cfg[:xulversion]}.en-US.linux-i686.sdk.tar.bz2"},
-  :linux64 => {:file=>"xulrunner-#{Cfg[:xulversion]}.en-US.linux-x86_64.sdk.tar.bz2"},
+Cfg.platform = platform()
+Cfg.builddir = 'build'
+#Cfg.cachedir = '.cache'
+#Cfg.xulsdkdir = File.join(Cfg.cachedir,"xulrunner-sdk")
+Cfg.cachedir = 'cache'
+Cfg.xulsdkdir = "xulrunner-sdk"
+Cfg.xulversion = "8.0.1"
+Cfg.xuluri = {
+  :base=>"http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/#{Cfg.xulversion}/sdk/",
+  :mac32 => "xulrunner-#{Cfg.xulversion}.en-US.mac-i386.sdk.tar.bz2",
+  :mac64 => "xulrunner-#{Cfg.xulversion}.en-US.mac-x86_64.sdk.tar.bz2",
+  :linux32 => "xulrunner-#{Cfg.xulversion}.en-US.linux-i686.sdk.tar.bz2",
+  :linux64 => "xulrunner-#{Cfg.xulversion}.en-US.linux-x86_64.sdk.tar.bz2",
 }
+Cfg.xulsdkfile = File.join(Cfg.cachedir,Cfg.xuluri[Cfg.platform])
 
 task :default => [:package]
 
 task :xul do
-  uri=Cfg[:xuluri][platform]
-  unless File.exist?(Cfg[:xulsdkdir])
-    unless File.exist?("cache/#{uri[:file]}")
-      `mkdir -p cache`
-      `curl "#{Cfg[:xuluri][:base]}/#{uri[:file]}" > cache/#{uri[:file]}`
+  unless File.exist?(Cfg.xulsdkdir)
+    unless File.exist?(Cfg.xulsdkfile)
+      `mkdir -p #{Cfg.cachedir}`
+      `curl "#{Cfg.xuluri[:base]}/#{Cfg.xulsdkfile}" > #{Cfg.xulsdkfile}`
     end
     `tar -xjf cache/#{uri[:file]}`
   end
 end
 
 task :clean do 
-  `rm -rf #{Cfg[:builddir]}/`
+  `rm -rf #{Cfg.builddir}/`
 end
 
 task :build_font_scss do
@@ -77,36 +81,36 @@ task :build_font_scss do
 end
 
 task :build do
-  `mkdir -p #{Cfg[:builddir]}`
-  `cp -r src/xul #{Cfg[:builddir]}`
-  ["#{Cfg[:builddir]}/xul/application.ini"].each do |erb|
+  `mkdir -p #{Cfg.builddir}`
+  `cp -r src/xul #{Cfg.builddir}`
+  ["#{Cfg.builddir}/xul/application.ini"].each do |erb|
     open(erb,"w"){|f| f.puts ERB.new(File.read("#{erb}.erb")).result()}
   end
   
   # mkdirs
-  ["javascript", "css","fonts"].map{|d| File.join(Cfg[:builddir],'xul','content',d)}.each {|d| `mkdir -p #{d}`}
+  ["javascript", "css", "fonts"].map{|d| File.join(Cfg.builddir,'xul','content',d)}.each {|d| `mkdir -p #{d}`}
 
   # copy libs
-  ['javascript','css','fonts'].each{|d| `cp -R lib/#{d}/* #{File.join(Cfg[:builddir],'xul','content',d)}`}
+  ['javascript','css', "fonts"].each{|d| `cp -R lib/#{d}/* #{File.join(Cfg.builddir,'xul','content',d)}`}
 
   # build haml
   Dir["src/haml/*.haml"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|haml|
-    `haml -r #{File.join(Dir.pwd,'lib',"haml_helper.rb")} #{haml} #{Cfg[:builddir]}/xul/content/#{File.basename(haml,".haml")}.html`}
+    `haml -r #{File.join(Dir.pwd,'lib',"haml_helper.rb")} #{haml} #{Cfg.builddir}/xul/content/#{File.basename(haml,".haml")}.html`}
 
   # build coffee
 #  Dir["src/coffee/*.coffee"].each {|f|
-#    `./xulrunner-sdk/bin/xpcshell -f lib/javascript/coffee-script.js -e "print(CoffeeScript.compile(read('#{f}')));" > #{Cfg[:builddir]}/xul/content/javascript/#{File.basename(f,'.coffee')}.js`}
+#    `./xulrunner-sdk/bin/xpcshell -f lib/javascript/coffee-script.js -e "print(CoffeeScript.compile(read('#{f}')));" > #{Cfg.builddir}/xul/content/javascript/#{File.basename(f,'.coffee')}.js`}
   
   # copy coffee for on the fly loading...
-  `cp -R src/coffee #{Cfg[:builddir]}/xul/content`
+  `cp -R src/coffee #{Cfg.builddir}/xul/content`
 
   # build sass
   Dir["src/scss/*.scss"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|scss|
-    `sass #{scss} #{Cfg[:builddir]}/xul/content/css/#{File.basename(scss,".scss")}.css`}
+    `sass #{scss} #{Cfg.builddir}/xul/content/css/#{File.basename(scss,".scss")}.css`}
 end
 
 task :package => [:xul,:clean,:build] do
-  case Cfg[:platform]
+  case Cfg.platform
   when :mac32, :mac64
     package_mac
   when :linux32, :linux64
@@ -120,18 +124,18 @@ def package_linux
 end
 
 def package_mac
-  basedir = "#{Cfg[:builddir]}/#{Cfg[:appname]}.app/Contents"
+  basedir = "#{Cfg.builddir}/#{Cfg.appname}.app/Contents"
   xulframework = "Frameworks/XUL.framework"
   xulversions = "#{xulframework}/Versions"
   [xulversions,"Resources","MacOS"].each{|dir|`mkdir -p #{basedir}/#{dir}`}
-  `ln -s $PWD/#{Cfg[:xulsdkdir]}/bin #{basedir}/#{xulversions}/Current`
+  `ln -s $PWD/#{Cfg.xulsdkdir}/bin #{basedir}/#{xulversions}/Current`
   `cd #{basedir}/#{xulframework} && ln -s Versions/Current/XUL XUL`
   `cd #{basedir}/#{xulframework} && ln -s Versions/Current/libxpcom.dylib libxpcom.dylib`
   `cd #{basedir}/#{xulframework} && ln -s Versions/Current/xulrunner-bin xulrunner-bin`
-  `cp -r #{Cfg[:builddir]}/xul/* #{basedir}/Resources`
-  `cp #{Cfg[:xulsdkdir]}/bin/xulrunner #{basedir}/MacOS`
+  `cp -r #{Cfg.builddir}/xul/* #{basedir}/Resources`
+  `cp #{Cfg.xulsdkdir}/bin/xulrunner #{basedir}/MacOS`
   `cp platform/mac/Info.plist #{basedir}`
   `cp platform/mac/crow.icns #{basedir}/Resources`
-  `chmod -R 755 #{Cfg[:builddir]}/#{Cfg[:appname]}.app`
+  `chmod -R 755 #{Cfg.builddir}/#{Cfg.appname}.app`
 end
 
