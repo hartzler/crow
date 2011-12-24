@@ -5,20 +5,20 @@ Crow
 
 A budding rich media chat client for xmpp/muc.
 
-###project layout
+### Project Layout
 
-* chromeless/ - submodule for the chromeless fork
-* modules/ - custom chromeless javascript modules
-* src/ - the chromeless application
+* Rakefile - the rake build file
+* build/ - where the xul app gets assembled, can be removed anytime
+* lib - 3rd party libs
+* lib/css
+* lib/javascript
+* resources/ - for dist and other fun
+* src/ - the source
 * src/haml - the haml files that will be html
 * src/coffee - the coffee script files that will be javascript 
 * src/scss - the scss files that will be stylesheets
-* resources/ - for the xulrunner package
-# build/ - where the chromeless app gets assembled, can be removed anytime
+* src/xul - the xul application
 
-when cloning, you will need to 
-
-`git submodule init && git submodule update`
 
 To run Crow, 
 
@@ -32,64 +32,15 @@ friend -> jid + meta info
 conversation -> a collection of messages with a jid
 message -> a specific xmpp stanza, aka a blob of text/html
 
+### Technology ###
 
-Model:
-
-Account
-  @session    # XMPPSession
-  @jid
-  @passwd
-  connect()
-  disconnect()
-  send(stanza)
-  presence(show,status)
-  _connect
-  _friend
-  _message
-  _iq
-  _raw
-  _error
-
-Friend
-  @jid
-  @presence
-  @is_room
-  @account    # Account
-
-Conversation
-  @account
-  @to         # Friend
-  _message(msg)
-  send_plain(txt)
-  send_rich(html)
-  
-Logger
-  @level
-  error
-  warn
-  info
-  debug
-  _log(time,level,txt)
-  
-Crow
-  @settings      # local stored; keeps account and friend settings
-  @accounts      # Account []
-  @conversations # Conversation []
-  @friends       # Friend []
-  @logger        # Logger
-  _friend(alias, friends)
-  _message(conversation, msg) # maybe not, since Conversation already provides event
-  _connect(account)
-  _conversation(account,conversation)
-  presence(show,status)
-  conversation(friend)
+ruby / rake / haml / sass / javascript / coffee / jquery / xulrunner / git / functional programming / html / css / xml / xmpp
 
 ### Credits
 
-Borrows from / uses:
+Borrows from / uses the following projects:
 
 * https://github.com/vpj/xmpp-js
-* https://github.com/mozilla/chromeless
 * http://haml-lang.com/
 * http://sass-lang.com/
 * http://jashkenas.github.com/coffee-script/
