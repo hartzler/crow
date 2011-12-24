@@ -70,10 +70,8 @@ class Account
   connect: () ->
     @logger.debug([@jid,@password,@host,@port])
     @session = xmpp.session @jid, @password, @host, @port, @security,
-      onError: (name, stanza) => @handle_errors =>
-        x = new XmppError(stanza.convertToString())
-        @logger.error x.toString()
-        @callbacks.error this, x
+      onError: (name, e) => @handle_errors =>
+        @callbacks.error this, e
   
       onConnection: (resource)=> @handle_errors =>
         @resource = resource
@@ -119,6 +117,9 @@ class Account
 
   send: (stanza) ->
     @session.sendStanza stanza
+
+  send_raw: (xml)->
+    @session.send(xml)
 
   presence_node: (show,status) ->
     xmpp.Stanza.presence from: @from, [
@@ -287,6 +288,10 @@ class Crow
     @logger.debug "send: conv from: #{friend.jid.jid}"
     account.message(friend.jid.jid,msg.text)
     @logger.debug "send: message sent."
+
+  # send raw xml
+  send_raw: (name, xml)->
+    @accounts[name].send_raw(xml)
 
 # exports
 window.Crow=Crow

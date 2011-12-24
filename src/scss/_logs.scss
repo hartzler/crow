@@ -6,27 +6,37 @@
   }
 
   .pill-content {
-    padding-top: 0em;
-    padding-left: 1em;
-    padding-right: 1em;
-    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
     overflow: auto;
-  }
 
-  .xmpplog {
-    .sent {
-      color: #ccc;
-    }
-    .received {
+    .xmpplog {
+      padding: 1em;
+      .logs {
+      }
+      .sent {
+        color: #ccc;
+      }
+      .received {
+      }
+      .command {
+        height: 6em; 
+        padding-right: 1em;
+        padding-bottom: 1em;
+        textarea {
+          height: 100%;
+          width: 100%;
+        }
+      }
     }
   }
 }
 
 #crowlog  {
+  padding: 1em;
   .logline {
     padding-bottom: 1em;
-    padding-left: 1em;
-    padding-right: 1em;
     clear: both;
     .time, .level, .context {
       float: left;

@@ -148,13 +148,17 @@ class UI
     @show_panel settings_selector
 
   show_firebug: ()->
-    frame = $("#fbIframe")
-    if(frame.height()<100 )
-      frame.height("200px")
-      frame.width("100%")
-    else
-      frame.height("0px")
-      frame.width("0px")
+    try
+      page = $(".page")
+      iframe = $("#fbIframe")
+      if iframe.length > 0
+        iframe.remove()
+      else
+        iframe = $('<iframe/>',id:"fbIframe",src:"debug.html",style:"height:200px;width:100%;")
+        page.append(iframe)
+      splits($(".page"))
+    catch e
+      logger.error("fuck you firebug! ",e)
 
   connect: ()->
     @show_conversations()
@@ -172,16 +176,16 @@ class UI
 
   xmpp_logger: (name)->
     unless @xmpp_loggers[name]
-      @xmpp_loggers[name] = new XmppLog(name)
+      @xmpp_loggers[name] = new XmppLog(name,send:(xml)->crow.send_raw(name,xml))
     @xmpp_loggers[name]
 
 ui = new UI()
 
 # controller, ties UI to main Crow model object
 crow = new Crow null,
-  error: (account,xml) ->
+  error: (account,e) ->
     # TODO: figure out what to do in UI on xmpp error
-    logger.error("account error: account=#{account.name} xml=#{xml}")
+    logger.error("account error: account=#{account.name}",e)
   message: (conversation,jid,text,html) ->
     # route to the conversation so it knows there is a new message
     #logger.debug("received message: account=#{conversation.account} text='#{text}' html='#{html}'")

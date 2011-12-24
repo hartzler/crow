@@ -1,0 +1,17 @@
+.topbar {
+  margin: 0px;
+  padding: 0px;
+
+  .topbar-inner {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .container-fluid {
+    background-color: $scheme3_dark;
+    min-width: 500px;
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+  }
+}

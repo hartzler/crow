@@ -39,7 +39,7 @@ class CrowLog
     # TODO
     
 class XmppLog
-  constructor: (@name)->
+  constructor: (@name,@callbacks)->
     @logger = new Util.Logger("Crow::XMPP::#{@name}",'debug')
     @logger.debug("Starting xmpp logging...")
 
@@ -55,6 +55,13 @@ class XmppLog
     p.attr('id',@xmpp_id())
     $('#logs .pill-content').append(p)
 
+    $('#logs .xmpplog textarea').on 'keypress', (e)=>
+      if e.keyCode == 13 and ! e.shiftKey
+        e.preventDefault()
+        xml = $(e.target).val()
+        @callbacks.send(xml)
+        $(e.target).val('')
+
     tabs.tabs()
 
   xmpp_id: ()->
@@ -62,10 +69,10 @@ class XmppLog
   xmpp_selector: ()->
     "##{@xmpp_id()}"
   send: (xml)->
-    $(@xmpp_selector()).append($('<pre/>',class:'sent').text(xml))
+    $("#{@xmpp_selector()} .logs").append($('<pre/>',class:'sent').text(xml))
     @logger.debug("<-- #{xml}")
   receive: (xml)->
-    $(@xmpp_selector()).append($('<pre/>',class:'received').text(xml))
+    $("#{@xmpp_selector()} .logs").append($('<pre/>',class:'received').text(xml))
     @logger.debug("--> #{xml}")
 
     

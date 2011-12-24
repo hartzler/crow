@@ -11,8 +11,8 @@
 #   .expand
 
 splits = (node) ->
-  nodes = $('.vsplit, .hsplit') unless node
-  $.each nodes, (i,split) ->
+  node = $('.vsplit, .hsplit') unless node?
+  node.each (i,split) ->
     split = $(split)
     expand = split.children('.expand:first')
     before = ($(e) for e in expand.siblings() when $(e).index() < expand.index())
@@ -21,10 +21,10 @@ splits = (node) ->
 
     if split.hasClass("vsplit")
       fields = {zeros:["left","right"],pre:"top",post:"bottom"}
-      size=(e) -> e.height()
+      size=(e) -> e.outerHeight()
     else
       fields = {zeros:["top","bottom"],pre:"left",post:"right"}
-      size=(e) -> e.width()
+      size=(e) -> e.outerWidth()
 
     init = (e)->
       e.css("position","absolute")

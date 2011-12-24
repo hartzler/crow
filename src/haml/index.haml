@@ -6,23 +6,20 @@
     %link{:href => "css/crow.css", :rel => "stylesheet", :type => "text/css"}
     %link{:href => "css/log.css", :rel => "stylesheet", :type => "text/css"}
 
-  %body.vsplit
+  %body
+    .page.vsplit
        
-    .topbar
       = partial :topbar
+  
+      #panels.expand
+        = partial :about
+        = partial :accounts
+        = partial :conversations
+        = partial :friends
+        = partial :logs
+        = partial :settings
 
-    #panels.container-fluid.expand
-      = partial :about
-      = partial :accounts
-      = partial :conversations
-      = partial :friends
-      = partial :logs
-      = partial :settings
-
-    .footer
-    .debug_frame{:style=>"clear:both"}
-      %iframe{:id=>"fbIframe",:src=>"debug.html",:style=>"height:0px;width:0%;"}
-
+      .footer
 
   / 3rd party libs
   %script{:type=>"application/x-javascript", :src => "javascript/io.js"}

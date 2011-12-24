@@ -1,13 +1,10 @@
-#logs.panel
+#logs.panel.vsplit
 
   %ul.tabs
     %li.active
       %a{:href=>"#crowlog"} Crow Log
 
-  #xmpplog-template.template.xmpplog
-    %h2 XMPP
-
-  .pill-content
+  .pill-content.expand
     #crowlog.active
       #logline-template.logline.template
         .time
@@ -15,4 +12,9 @@
         .context
         .log
       #loglines
+    #xmpplog-template.template.xmpplog
+      %h2 XMPP
+      .logs
+      .command
+        %textarea
 

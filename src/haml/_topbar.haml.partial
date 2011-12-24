@@ -1,19 +1,20 @@
-.topbar-inner
-  .container-fluid
-    %a.brand{:href => "#"} Crow
-    %ul.nav
-      %li.conversations
-        %a{:href=>"#conversations"}Chats
-      %li.friends
-        %a{:href=>"#friends"}Friends
-      %li.accounts
-        %a{:href=>"#accounts"}Accounts
-      %li.settings 
-        %a{:href=>"#settings"}Settings
-      %li.logs
-        %a{:href=>"#logs"}Log
-      %li.firebug
-        %a{:href=>"#firebug"}Firebug
+.topbar
+  .topbar-inner
+    .container-fluid
+      %a.brand{:href => "#"} Crow
+      %ul.nav
+        %li.conversations
+          %a{:href=>"#conversations"}Chats
+        %li.friends
+          %a{:href=>"#friends"}Friends
+        %li.accounts
+          %a{:href=>"#accounts"}Accounts
+        %li.settings 
+          %a{:href=>"#settings"}Settings
+        %li.logs
+          %a{:href=>"#logs"}Log
+        %li.firebug
+          %a{:href=>"#firebug"}Firebug
 
-    %p.pull-right Status
+      %p.pull-right Status
 
