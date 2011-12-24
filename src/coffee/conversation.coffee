@@ -122,7 +122,7 @@ $(document).ready ()->
   logger.debug('conv-ready')
   command = $(command_selector)
   command.on 'keypress', (e) ->
-    if e.keyCode == 13
+    if e.keyCode == 13 and ! e.shiftKey
       e.preventDefault()
       msg = command.val()
       command.val('')
