@@ -134,7 +134,7 @@ conversation_iframe_src_data = ()->
   shit = ''
 
   # style sheets
-  for url in ['conversation.css']
+  for url in ['conversation.css','fonts.css','emoticons.css']
     logger.debug("adding stylesheet: #{url}...")
     shit += "\n<style type=\"text/css\">\n#{load_chrome(['content','css',url])}\n</style>"
 
@@ -168,7 +168,7 @@ select_xul_conversation = (model)->
   logger.debug("selected id: #{xul_deck().selectedPanel.getAttribute('id')}")
   xul_deck().selectedPanel = p
   logger.debug("selected id: #{xul_deck().selectedPanel.getAttribute('id')}")
-  p.contentDocument.getElementById('txt').focus() # safe?
+  p.contentDocument.getElementById('txt').focus() if p.contentDocument.getElementById('txt') # safe?
 
 find_model_by_index= (n)->
   $(conversations_pill_selector).children().get(n-1)

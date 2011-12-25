@@ -5,7 +5,7 @@ require 'ostruct'
 require 'rubygems'
 require 'haml' 
 require 'sass'
-
+require "base64"
 # HELPERS: move to file?
 def platform_name
   if RUBY_PLATFORM == 'java'
@@ -64,6 +64,23 @@ end
 task :clean do 
   `rm -rf #{Cfg.builddir}/`
 end
+task :build_emoticon_scss do
+  lib_base =File.join(Dir.pwd,"lib")
+  scss_base =File.join(Dir.pwd,"src","scss")
+  scss = ""
+  Dir.glob(File.join(lib_base,"images","emoticon","**","*.*")){|file|
+    puts file
+    ofile = file.clone
+    filetype = ofile.split(".").last
+    file.sub!(lib_base,"..")
+    name = file.split(/\/|\./)[-4..-2].join("-").downcase
+    scss+= "\n.#{name} {\n width:15px;\n height:15px;\n background-image: url(data:image/#{filetype};base64,#{Base64.encode64(File.read(ofile)).split("\n").join});\n} "
+  }
+  puts scss
+  File.open(File.join(scss_base,"emoticons.scss"),"w+"){|f|
+    f << scss
+  }
+end
 
 task :build_font_scss do
   lib_base =File.join(Dir.pwd,"lib")
@@ -88,10 +105,10 @@ task :build do
   end
   
   # mkdirs
-  ["javascript", "css", "fonts"].map{|d| File.join(Cfg.builddir,'xul','content',d)}.each {|d| `mkdir -p #{d}`}
+  ["javascript", "css", "fonts", "images"].map{|d| File.join(Cfg.builddir,'xul','content',d)}.each {|d| `mkdir -p #{d}`}
 
   # copy libs
-  ['javascript','css', "fonts"].each{|d| `cp -R lib/#{d}/* #{File.join(Cfg.builddir,'xul','content',d)}`}
+  ['javascript','css', "fonts", "images"].each{|d| `cp -R lib/#{d}/* #{File.join(Cfg.builddir,'xul','content',d)}`}
 
   # build haml
   Dir["src/haml/*.haml"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|haml|

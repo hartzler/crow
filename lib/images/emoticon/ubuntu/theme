@@ -1,0 +1,19 @@
+Name=Ubuntu
+Description=Pidgin smileys
+Icon=icon_smile.png
+Author=Otto Greenslade
+
+
+# Default smileys
+[default]
+icon_smile.png           :)      :-)
+icon_biggrin.png         :-D     :-d     :D      :d
+icon_sad.png             :-(     :(      :*(
+icon_wink.png            ;-)     ;)
+icon_razz.png          :P      :p      :-P     :-p
+icon_suprised.png         =-O     =-o     :o
+icon_cool.png    8-)    8)
+icon_neutral.png     :|
+icon_mad.png          >:-(     >:(     >(  
+icon_confused.png        :-/     :-\\     :/
+icon_eek.png   :-!  !!

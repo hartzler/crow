@@ -61,6 +61,29 @@ plugins.push(
       @append_html tubez.replace("YTID",captures[2])
   ]]
 )
+emotes = {"smile":[":)",":-)",":)",">:]",":o)",":]",":3",":c)",":>","=]","8)","=)",":}",":^)"],"grin":[">:D",":-D",":P",":D","8-D","8D","x-D","xD","X-D","XD","=-D","=D","=-3","=3"],"sad":[">:[",":-(",":(",":-c",":c",":-<",":<",":-[",":[",">.>","<.<",">.<",":{"],"wink":[">;]",";-)",";)","*-)","*)",";-]",";]",";D"],"shock":[">:o",">:O",":-O",":O","°o°","°O°",":O","o_O","o.O"],"annoyed":[">:\\",">:/",":-/",":-.",":/",":\\","=/","=\\",":S"],"meh":[":|"],"sealed":[">:X",":-X",":x",":X",":-#",":#",":$"],"angle":["O:-)","0:-3","0:3","O:-)","O:)"],"evil":[">:)",">;)",">:-)"]}
+plugins.push(
+  name: "emoticons",
+  description: "Apply emoticon themes to the html",
+  match:[[
+    /(\S*:\S+)/,
+    (captures)->
+      smile_type = text_to_emote(captures[0])
+      @append_html "<div class='emoticon-ubuntu-"+smile_type+"'>&nbsp;</div>" if smile_type
+
+
+  ]],
+)
+# puts %W{}.map{|x| '    when "'+x+'" then ""'}
+#ruby puts %W{>:D :-D :D 8-D 8D x-D xD X-D XD =-D =D =-3 =3}.map{|x| '    when "'+x+'" then "grin"'}
+#http://en.wikipedia.org/wiki/List_of_emoticons
+text_to_emote = (text)->
+  for types,faces of emotes
+    return types if $.trim(text) in faces
+  return null
+
+  
+
 
 # let each plugin do its thing!
 apply_plugins = (msg)->
