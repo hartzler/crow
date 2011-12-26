@@ -4,6 +4,8 @@
     .well
       #friends-panel
         %h2 Friends
+        .input
+          %input#friend-filter{:type=>"text"}
         #friend-template.template.friend
           .state
           .icon
