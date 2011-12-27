@@ -61,12 +61,29 @@ plugins.push(
       @append_html tubez.replace("YTID",captures[2])
   ]]
 )
+#Credit where its due
+#Simon Willison’s Weblog
+#http://80.68.89.23/2006/Jan/20/escape/
+#Had to change the \\$& to \\$1 for some strange reason its current the head tag.  I think this is due crazy deamons.
+Util.regexp_escape = (text) ->
+  text.replace(/([-[\]{}()*+?.,\\^$|#\s])/g, "\\$1")
+
 emotes = {"smile":[":)",":-)",":)",">:]",":o)",":]",":3",":c)",":>","=]","8)","=)",":}",":^)"],"grin":[">:D",":-D",":P",":D","8-D","8D","x-D","xD","X-D","XD","=-D","=D","=-3","=3"],"sad":[">:[",":-(",":(",":-c",":c",":-<",":<",":-[",":[",">.>","<.<",">.<",":{"],"wink":[">;]",";-)",";)","*-)","*)",";-]",";]",";D"],"shock":[">:o",">:O",":-O",":O","°o°","°O°",":O","o_O","o.O"],"annoyed":[">:\\",">:/",":-/",":-.",":/",":\\","=/","=\\",":S"],"meh":[":|"],"sealed":[">:X",":-X",":x",":X",":-#",":#",":$"],"angle":["O:-)","0:-3","0:3","O:-)","O:)"],"evil":[">:)",">;)",">:-)"]}
+
+face_string = ""
+face_array = []
+for types,faces of emotes
+  (face_array.push(Util.regexp_escape(face)) for face in faces)
+face_string=face_array.join("|")
+face_array=null
+logger.error("(\S*"+face_string+"\S*)")
+FACE_REGEX = new RegExp("(\S+"+face_string+"\S+)", "gim")
+face_string=null
 plugins.push(
   name: "emoticons",
   description: "Apply emoticon themes to the html",
   match:[[
-    /(\S*:\S+)/,
+    FACE_REGEX,
     (captures)->
       smile_type = text_to_emote(captures[0])
       @append_html "<div class='emoticon-ubuntu-"+smile_type+"'>&nbsp;</div>" if smile_type
