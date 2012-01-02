@@ -156,11 +156,17 @@ class Friend
   constructor: (@jid,@presence,@is_room,@account,@vcard={}) ->
     @presence or= {show: "chat", status: null}
   safeid: () -> @jid.jid.replace(/[^a-zA-Z 0-9]+/g,'')
+  email: () -> @jid.jid
   display: () -> if @vcard.fullname then @vcard.fullname else @jid.jid
   resource: () -> @jid.resource
   node: () -> @jid.node
   status: () -> @presence.status
   show: () -> @presence.show || "chat"
+  has_icon: ()=>
+    if @vcard.icon && @vcard.icon.type && @vcard.icon.binval
+      true
+    else 
+      false
   icon_uri: (dfault) =>
     if @vcard.icon && @vcard.icon.type && @vcard.icon.binval
       "data:#{@vcard.icon.type};base64,#{@vcard.icon.binval}"

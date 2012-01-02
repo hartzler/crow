@@ -45,6 +45,7 @@ Borrows from / uses the following projects:
 * http://sass-lang.com/
 * http://jashkenas.github.com/coffee-script/
 * firebug lite
+* http://pajhome.org.uk/crypt/md5/
 
 ### Debugging
 

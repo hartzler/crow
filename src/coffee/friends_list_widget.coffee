@@ -17,7 +17,13 @@ friend_div = (friend) ->
   div.find('.name').text(friend.display())
   div.find('.status').text(friend.status())
   icon =  $('<img />')
-  icon.attr('src',friend.icon_uri('default_friend.png'))
+  src = friend.icon_uri('default_friend.png')
+  if(!friend.has_icon())
+    clean_jid = friend.email()
+    clean_jid = $.trim(clean_jid)
+    md5 = hex_md5(clean_jid)
+    src="http://www.gravatar.com/avatar/"+md5+"?d=https://raw.github.com/hartzler/crow/master/resources/crow.gif"
+  icon.attr('src',src)
   div.find('.icon').append(icon)
   div.data("model",friend)
   div
