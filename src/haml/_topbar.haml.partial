@@ -7,7 +7,7 @@
           %a{:href=>"#conversations"}Chats
         %li.friends
           %a{:href=>"#friends"}Friends
-        %li.accounts
+        %li.accounts.active
           %a{:href=>"#accounts"}Accounts
         %li.settings 
           %a{:href=>"#settings"}Settings
