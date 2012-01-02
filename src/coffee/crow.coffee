@@ -64,7 +64,8 @@ class AccountsWidget
   # render config'd accounts
   render: ()->
     @clear_notify()
-    $(account_template_selector).siblings().remove()
+
+    #$(account_template_selector).siblings().remove()
     at = $(account_template_selector)
     logger.debug("render account widget: #{crow.list().toSource()}")
     for account in crow.list()
@@ -72,11 +73,16 @@ class AccountsWidget
       a=Util.clone_template at
       a.find('.name').text(account.name)
       a.find('.jid').text(account.jid)
-      a.find('.status').text('?')
+      a.find('.jid').attr("jid",account.jid)
+      a.find('.status').text('disconnected')
       a.find('.delete').on('click', (e)=>@remove(account.name))
       a.find('.connect').on('click', (e)->crow.connect(account.name))
       a.find('.disconnect').on('click', (e)->crow.disconnect(account.name))
-      $('#accounts .summary tbody').append(a)
+      if(! $("#accounts td.jid[jid='"+account.jid+"']")[0])
+        $('#accounts .summary tbody').append(a) 
+      else
+        logger.info "already have #accounts td.jid[jid='"+account.jid+"']"
+
 
   # connect to configured accounts
   connect: (e) ->
@@ -204,11 +210,15 @@ crow = new Crow null,
   connect: (account) ->
     logger.info("Connected account: #{account.name}")
     ui.show_conversations()
+    status = $("#accounts td.jid[jid='"+account.jid+"']").siblings(".status")
+    status.text("connected")
     # make sure log exists
     #$('#logs .pill-content')
   disconnect: (account) ->
     # TODO: update UI?  update FriendsList?  re-query presence?
     logger.info("Disconnected account: #{account.name}")
+    status = $("#accounts td.jid[jid='"+account.jid+"']").siblings(".status")
+    status.text("disconnected")
   conversation: (account,conversation) ->
     logger.debug("received conversation: account=#{account.name} conversation=#{conversation}")
     open_conversation(conversation)
