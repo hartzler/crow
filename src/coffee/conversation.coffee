@@ -76,8 +76,8 @@ for types,faces of emotes
   (face_array.push(Util.regexp_escape(face)) for face in faces)
 face_string=face_array.join("|")
 face_array=null
-logger.error("(\S*"+face_string+"\S*)")
-FACE_REGEX = new RegExp("(\S+"+face_string+"\S+)", "gim")
+logger.error("[\s+|^]("+face_string+")[\s+|$]")
+FACE_REGEX = new RegExp("(^|\\s+)("+face_string+")(\\s+|$)", "gim")
 face_string=null
 plugins.push(
   name: "emoticons",
@@ -85,6 +85,7 @@ plugins.push(
   match:[[
     FACE_REGEX,
     (captures)->
+      logger.info("In face plugin #{captures[0]}") 
       smile_type = text_to_emote(captures[0])
       @append_html "<div class='emoticon-ubuntu-"+smile_type+"'>&nbsp;</div>" if smile_type
 
