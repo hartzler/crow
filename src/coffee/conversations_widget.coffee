@@ -124,7 +124,12 @@ add_conversation = (model,send_callback) ->
   
   $(conversations_pill_selector).append div
 
-  a.on 'click',(e)-> activate_conversation(model)
+  a.on 'click',(e)-> 
+    activate_conversation(model)
+    tab = $("#conversations ul.tabs li a[href='##{model2id(model)}']")
+    #TODO: FIGURE OUT HOW TO DO THIS IN CSS
+    tab.css("background-color","white")
+
   activate_conversation(model)
 
 xul_deck = ()->
@@ -216,6 +221,11 @@ class Conversations
     @close(find_model_by_index(n))
   receive: (model, msg)->
     api_call conversation_iframe(model), receive_event, msg
+    tab = $("#conversations ul.tabs li a[href='##{model2id(model)}']")
+    #TODO: FIGURE OUT HOW TO DO THIS IN CSS
+    if(!tab.parent().hasClass("active"))
+      tab.css("background-color","#FFCCCC")
+
 
 $(document).ready ()->
   $('.tabs').tabs()
