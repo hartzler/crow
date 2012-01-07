@@ -26,6 +26,7 @@ friend_div = (friend) ->
   icon.attr('src',src)
   div.find('.icon').append(icon)
   div.data("model",friend)
+  div.attr("friend-id",friend.safeid())
   div
 
 # re-render the list, blows away current
@@ -60,6 +61,8 @@ class FriendList
   filter: (filter_string)->
     filter_friends(filter)
   update: (friend)-># todo
+  get_model: (id)->
+    $("#{friends_selector} .friend[friend-id='#{id}']").data("model")
     
     
 

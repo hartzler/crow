@@ -33,12 +33,15 @@ logger = new Util.Logger("Crow::UI::Conversations", 'debug', CrowLog)
 # events
 send_event = 'crow:conv:send'
 receive_event = 'crow:conv:receive'
+conv_move_event= 'crow:conv:activate_conversation'
 
 # DOM ids
 xul_deck_id = "untrusted"
 conversations_pill_selector = "#conversations .pill-content"
 conversation_template_selector = "#conversation-template"
-
+id2model = (id) ->
+  window.FriendList.get_model(id)
+  
 model2id = (model)->
   "conv-#{model.safeid()}"
 
@@ -92,6 +95,19 @@ add_conversation = (model,send_callback) ->
     logger.debug("sent: #{data.body}")
     # cleanup
     iframe.contentDocument.documentElement.removeChild(e.target)
+
+  iframe.contentWindow.addEventListener conv_move_event, (e)->
+    data = e.target.getUserData('crow-request')
+    logger.debug("received: #{conv_move_event}! Data:#{data}")
+    current = $('#conversations ul.tabs li.active')
+    if(data=="left")
+      next_tab = current.prev()
+    else
+      next_tab = current.next()
+    if(next_tab)
+      next_id = next_tab.find("a").attr("href").replace("#conv-","")
+      next_model = id2model(next_id)
+      activate_conversation(next_model)
 
   logger.debug("add_conversation: hooking up tab li.a")
 

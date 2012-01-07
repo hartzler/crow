@@ -169,4 +169,12 @@ $(document).ready ()->
       command.val('')
       chat from:"me",text:msg,time:new Date(),klazz:"self"
       api_call "crow:conv:send", text:msg
-
+    if e.shiftKey && e.keyCode== 39 #right arrow 
+      e.preventDefault()
+      logger.debug("Moving Chat Right")
+      api_call "crow:conv:activate_conversation", "right"
+      #switch chats
+    if e.shiftKey && e.keyCode== 37 #left arrow 
+      e.preventDefault()
+      logger.debug("Moving Chat Left")
+      api_call "crow:conv:activate_conversation", "left"
