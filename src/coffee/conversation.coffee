@@ -125,7 +125,7 @@ chat = (msg)->
   chatline.addClass(msg.klazz) if msg.klazz
   chatline.find('.from').text(msg.from)
   chatline.find('.time').text("#{msg.time.toString()}")
-  chatline.find('.time').attr("title","#{msg.time.toUTCString()}")
+  chatline.find('.time').attr("datetime","#{msg.time.toUTCString()}")
   chatline.find('.time').attr("tooltip","#{msg.time.toLocaleTimeString()} on #{msg.time.toLocaleDateString()}")
 
   msg = apply_plugins(msg)
