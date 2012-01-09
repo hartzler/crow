@@ -69,6 +69,9 @@ activate_conversation = (model) ->
   tabs.find("li.active").removeClass('active')
   tabs.find("a[href$=\"#{id}\"]").closest('li').addClass('active')
   $(conversations_pill_selector).children(".active").removeClass('active')
+  tab = $("#conversations ul.tabs li a[href='##{model2id(model)}']")
+  #TODO: FIGURE OUT HOW TO DO THIS IN CSS
+  tab.css("background-color","white")
   $(id).addClass('active')
   tabs.tabs()
 
@@ -102,10 +105,25 @@ add_conversation = (model,send_callback) ->
     current = $('#conversations ul.tabs li.active')
     if(data=="left")
       next_tab = current.prev()
+      prev_tab = current.next()
     else
       next_tab = current.next()
-    if(next_tab)
+      prev_tab = current.prev()
+
+    logger.debug("next tab:#{next_tab}")
+    logger.debug("next tab:#{next_tab.length}")
+    logger.debug("prev tab:#{prev_tab.length}")
+    # we should loop around the tabs
+    if(next_tab and next_tab.length==0 and prev_tab and prev_tab.length!=0)
+      if(data=="right")
+        next_tab = current.parent().find("li:first")
+      else
+        next_tab = current.parent().find("li:last")
+    logger.debug("next tab:#{next_tab}")
+    logger.debug("next tab:#{next_tab.length}")
+    if(next_tab and next_tab.length!=0)
       next_id = next_tab.find("a").attr("href").replace("#conv-","")
+      logger.debug("next tab id:#{next_id}")
       next_model = id2model(next_id)
       activate_conversation(next_model)
 
@@ -126,10 +144,7 @@ add_conversation = (model,send_callback) ->
 
   a.on 'click',(e)-> 
     activate_conversation(model)
-    tab = $("#conversations ul.tabs li a[href='##{model2id(model)}']")
-    #TODO: FIGURE OUT HOW TO DO THIS IN CSS
-    tab.css("background-color","white")
-
+  
   activate_conversation(model)
 
 xul_deck = ()->
