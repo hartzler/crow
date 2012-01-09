@@ -124,7 +124,10 @@ chat = (msg)->
   chatline = Util.clone_template "#chatline-template"
   chatline.addClass(msg.klazz) if msg.klazz
   chatline.find('.from').text(msg.from)
-  chatline.find('.time').text("@ #{msg.time.getHours()}:#{msg.time.getMinutes()}")
+  chatline.find('.time').text("#{msg.time.toString()}")
+  chatline.find('.time').attr("title","#{msg.time.toUTCString()}")
+  chatline.find('.time').attr("tooltip","#{msg.time.toLocaleTimeString()} on #{msg.time.toLocaleDateString()}")
+
   msg = apply_plugins(msg)
   logger.debug("after plugins msg: #{msg.toSource()}")
   if msg.html
@@ -133,6 +136,8 @@ chat = (msg)->
     chatline.find('.body').text(msg.text)
   parent = $('#messages')
   parent.append(chatline)
+  humanize_time()
+  parent.find(".time:last").twipsy({'title':'tooltip','offset':5})
   parent.scrollToBottom()
 
 api_call = (name,data,callback)->
