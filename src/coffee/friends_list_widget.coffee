@@ -34,9 +34,20 @@ render_friends = (friends) ->
   logger.debug "render_friends..."
   fdiv = $(friends_selector)
   fdiv.empty()
+  chat=[]
+  away=[]
+  unaval=[]
+
   for jid,friend of friends 
+    state = friend.show()
+    chat.push(jid) if(state=="chat")
+    away.push(jid) if(state=="away")
+    unaval.push(jid) if(state=="unavailable")
+  for index,jid of chat.concat(away,unaval)
+    logger.debug(jid)
+    friend = friends[jid]
     logger.debug(friend.show())
-    if(friend.show() not in ["unavailable"])
+    if(friend)
       fdiv.append friend_div(friend)
   logger.debug "done render_friends."
 
