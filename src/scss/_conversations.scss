@@ -45,6 +45,7 @@
 #friends-panel {
   display: none;
   overflow: auto;
+  overflow-x: hidden;
   .chat {
     color: green;
   }
@@ -71,7 +72,7 @@
     }
     .name {
       font-size: 10pt;
-      width: 125px;
+      width: 120px;
       overflow: hidden;
     }
     .status {
