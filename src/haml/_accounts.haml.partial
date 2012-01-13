@@ -24,27 +24,27 @@
             %button.btn.danger.delete Remove
 
   .add
-    %form{:action => "#"}
+    %form{'action':"#"}
       .clearfix
-        %label{:for => "name"} Name
+        %label{'for':"name"} Name
         .input
-          %input#account_name.xlarge{:name=>'name', :type => "text"}
+          %input#account_name.xlarge{'name':"name" 'type':"text"}
       .clearfix
-        %label{:for => "jid"} JID 
+        %label{'for':"jid"} JID 
         .input
-          %input#account_jid.xlarge{:name=>'jid', :type => "text"}
+          %input#account_jid.xlarge{'name':"jid", 'type':"text"}
       .clearfix
-        %label{:for => "password"} Password
+        %label{'for':"password"} Password
         .input
-          %input#account_password.xlarge{:type => "password"}
+          %input#account_password.xlarge{'type':"password"}
       .clearfix
-        %label{:for => "host"} Host
+        %label{'for':"host"} Host
         .input
-          %input#account_host.xlarge{:type => "text"}
+          %input#account_host.xlarge{'type':"text"}
       .clearfix
-        %label{:for => "port"} Port
+        %label{'for':"port"} Port
         .input
-          %input#account_port.xlarge{:type => "text"}
+          %input#account_port.xlarge{'type':"text"}
 
       .actions
         %button#save.btn.primary Save

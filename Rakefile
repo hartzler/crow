@@ -120,6 +120,7 @@ task :build do
   
   # copy coffee for on the fly loading...
   `cp -R src/coffee #{Cfg.builddir}/xul/content`
+  `cp -R src/haml #{Cfg.builddir}/xul/content`
 
   # build sass
   Dir["src/scss/*.scss"].reject{|f| File.basename(f).match(/^[_.]/)}.each{|scss|

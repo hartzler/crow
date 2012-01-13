@@ -2,8 +2,12 @@
 <window id="main" title="Crow" width="800" height="600" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <script src="javascript/io.js"/>
+  <script src="javascript/jquery-1.7.min.js"/>
+  <script src="javascript/underscore.js"/>
   <script src="javascript/coffee-script.js"/>
   <script src="javascript/coffee_builder.js"/>
+  <script src="javascript/haml.js"/>
+  <script src="javascript/haml_builder.js"/>
 
   <!-- deck of untrusted iframes floated over ui iframe to allow secure rish media conversations -->
   <stack flex="1">
