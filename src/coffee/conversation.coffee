@@ -153,26 +153,35 @@ api_call = (name,data,callback)->
 
 history_chat = () ->
   last_history = $(command_selector).attr("data-history-chat-index")
-  current_text =  $(command_selector).text()
+  orignal_text = $(command_selector).attr("data-history-chat-text")
+  current_text =  $(command_selector).val()
+  logger.debug("got values: #{last_history}::#{orignal_text}::#{current_text}::")
+  if not orignal_text
+    $(command_selector).attr("data-history-chat-text",current_text)
   parent = $('#messages')
-  logger.debug("got values: #{last_history}")
+  text = null
+  if last_history < 1 && last_history > -1# why does ==0 or is 0 not work? 
+    $(command_selector).attr("data-history-chat-index",last_history-1)    
+    text = orignal_text
+  else 
+    if not last_history or last_history<0
+      history = parent.find(".body:last")
+      history_length = parent.find(".body").length-1
+      $(command_selector).attr("data-history-chat-index",history_length)
+      text = history.text()
+    else 
+      history = $(parent.find(".body")[last_history-1])
+      $(command_selector).attr("data-history-chat-index",last_history-1)
+      text = history.text()
+  logger.debug("History index:#{last_history}, #{history} ::#{text}::") 
+  $(command_selector).val(text) if text
 
-  if not last_history or last_history<1
-    logger.debug("in not state")
-    history = parent.find(".body:last")
-    history_length = parent.find(".body").length
-    logger.debug("index:#{history.index()+2}, #{history_length+1}")
-    #damn i am catching the freaking blank template need to plus two the shit
-    $(command_selector).attr("data-history-chat-index",history_length+1)
-  else
-    history = $(parent.find(".body")[last_history-1])
-    $(command_selector).attr("data-history-chat-index",last_history-1)
-    logger.debug(history.html())
-  logger.debug("History index:#{last_history}, #{history.index()}, #{history} ::#{history.text()}::")
-  $(command_selector).val(history.text()) if history
-  
-    
-
+reset_history_chat = () ->
+  $(command_selector).attr("data-history-chat-index",null)
+  old_text = $(command_selector).attr("data-history-chat-text")
+  $(command_selector).attr("data-history-chat-text",null)
+  $(command_selector).val(old_text) if old_text
+   
 
 crow_on = (name,handler) ->
   listener = (e)->
@@ -196,6 +205,8 @@ $(document).ready ()->
       msg = command.val()
       command.val('')
       chat from:"me",text:msg,time:new Date(),klazz:"self"
+      $(command_selector).attr("data-history-chat-index",null)
+      $(command_selector).attr("data-history-chat-text",null)
       api_call "crow:conv:send", text:msg
     if e.shiftKey && e.keyCode== 39 #right arrow 
       e.preventDefault()
@@ -210,3 +221,6 @@ $(document).ready ()->
       e.preventDefault()
       logger.debug("History Chat ")
       history_chat()
+    if e.keyCode== 27 && $(command_selector).attr("data-history-chat-index") #escape
+      e.preventDefault()
+      reset_history_chat()
