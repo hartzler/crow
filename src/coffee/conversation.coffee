@@ -151,6 +151,29 @@ api_call = (name,data,callback)->
   request.dispatchEvent(sender)
   logger.debug "dispatched event #{sender} to #{request}"
 
+history_chat = () ->
+  last_history = $(command_selector).attr("data-history-chat-index")
+  current_text =  $(command_selector).text()
+  parent = $('#messages')
+  logger.debug("got values: #{last_history}")
+
+  if not last_history or last_history<1
+    logger.debug("in not state")
+    history = parent.find(".body:last")
+    history_length = parent.find(".body").length
+    logger.debug("index:#{history.index()+2}, #{history_length+1}")
+    #damn i am catching the freaking blank template need to plus two the shit
+    $(command_selector).attr("data-history-chat-index",history_length+1)
+  else
+    history = $(parent.find(".body")[last_history-1])
+    $(command_selector).attr("data-history-chat-index",last_history-1)
+    logger.debug(history.html())
+  logger.debug("History index:#{last_history}, #{history.index()}, #{history} ::#{history.text()}::")
+  $(command_selector).val(history.text()) if history
+  
+    
+
+
 crow_on = (name,handler) ->
   listener = (e)->
     msg = e.target.getUserData("crow-request")
@@ -183,3 +206,7 @@ $(document).ready ()->
       e.preventDefault()
       logger.debug("Moving Chat Left")
       api_call "crow:conv:activate_conversation", "left"
+    if e.shiftKey && e.keyCode== 38 #left arrow 
+      e.preventDefault()
+      logger.debug("History Chat ")
+      history_chat()
