@@ -156,7 +156,8 @@ history_chat = () ->
   orignal_text = $(command_selector).attr("data-history-chat-text")
   current_text =  $(command_selector).val()
   logger.debug("got values: #{last_history}::#{orignal_text}::#{current_text}::")
-  if not orignal_text
+  if  orignal_text is undefined or orignal_text is null
+    logger.debug("setting values: #{last_history}::#{orignal_text}::#{current_text}::")
     $(command_selector).attr("data-history-chat-text",current_text)
   parent = $('#messages')
   text = null
@@ -180,7 +181,7 @@ reset_history_chat = () ->
   $(command_selector).attr("data-history-chat-index",null)
   old_text = $(command_selector).attr("data-history-chat-text")
   $(command_selector).attr("data-history-chat-text",null)
-  $(command_selector).val(old_text) if old_text
+  $(command_selector).val(old_text) 
    
 
 crow_on = (name,handler) ->
