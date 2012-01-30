@@ -42,7 +42,7 @@ plugins.push(
   name: "Inline Images Plugin"
   description: "Creates an img tag for image urls so you can see the image inline"
   match: [[
-    /http(s)?:\/\/.*?.(jpg|jpeg|png|gif|bmp|ico)/i,
+    /http(s)?:\/\/.+.(jpg|jpeg|png|gif|bmp|ico)/i,
     (captures)->
       @append_html "<img src=\"#{captures[0]}\">"
   ]]
