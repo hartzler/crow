@@ -34,7 +34,19 @@ class Plugin
 
 # plugin list
 plugins = []
-
+plugins.push(
+  name: "Inline Images Plugin"
+  description: "Creates an img tag for image urls so you can see the image inline"
+  match: [[
+    /http(s)?:\/\/.+/i,
+    (captures)-> 
+      iframe = "<div style='width: 100px; height: 50px; padding: 0; overflow: hidden;'>
+        <iframe style=' width: 800px; height: 520px; border: 1px solid black; zoom: 0.1; -moz-transform: scale(0.1); -moz-transform-origin: 0 0; -o-transform: scale(0.1); -o-transform-origin: 0 0; -webkit-transform: scale(0.1); -webkit-transform-origin: 0 0;  overflow:hidden; ' src=\"#{captures[0]}\" type=\"content\">
+        </div>"
+      logger.info(iframe) 
+      @append_html iframe
+  ]]
+)
 # example: inline image links plugin
 # http://urbandud.files.wordpress.com/2011/12/lindsay-lohan-pb-usa-2012-13.jpg
 # <img src="http://urbandud.files.wordpress.com/2011/12/lindsay-lohan-pb-usa-2012-13.jpg">

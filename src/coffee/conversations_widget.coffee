@@ -175,7 +175,7 @@ conversation_iframe_src_data = ()->
     shit += "\n<style type=\"text/css\">\n#{load_chrome(['content','css',url])}\n</style>"
 
   # java scripts 
-  for url in ['jquery-1.7.min.js', 'util.js', 'jquery_plugins.js', 'bootstrap-twipsy.js', 'humane.js', 'split.js', 'conversation.js', 'conversations_init.js']
+  for url in ['jquery-1.7.min.js', 'util.js', 'jquery_plugins.js', 'bootstrap-twipsy.js', 'humane.js', 'split.js', 'conversation.js', 'conversations_init.js','html2canvas.js','jquery.plugin.html2canvas.js']
     logger.debug("adding script: #{url}...")
     shit += "\n<script type=\"application/x-javascript\">#{load_chrome(['content','javascript',url])}\n</script>"
 
