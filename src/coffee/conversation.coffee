@@ -37,14 +37,15 @@ plugins = []
 plugins.push(
   name: "Inline Images Plugin"
   description: "Creates an img tag for image urls so you can see the image inline"
+  text_only: true
   match: [[
-    /http(s)?:\/\/.+/i,
+    /http(s)?:\/\/.+/gi,
     (captures)-> 
-      iframe = "<div style='width: 100px; height: 50px; padding: 0; overflow: hidden;'>
-        <iframe style=' width: 800px; height: 520px; border: 1px solid black; zoom: 0.1; -moz-transform: scale(0.1); -moz-transform-origin: 0 0; -o-transform: scale(0.1); -o-transform-origin: 0 0; -webkit-transform: scale(0.1); -webkit-transform-origin: 0 0;  overflow:hidden; ' src=\"#{captures[0]}\" type=\"content\">
-        </div>"
-      logger.info(iframe) 
-      @append_html iframe
+      iframes = ""
+      for url in captures
+        iframes += "<div style='width: 100px; height: 50px; padding: 0; overflow: hidden; clear:both'>#{url} <iframe style=' width: 800px; height: 520px; border: 1px solid red; zoom: 0.1; -moz-transform: scale(0.1); -moz-transform-origin: 0 0; -o-transform: scale(0.1); -o-transform-origin: 0 0; -webkit-transform: scale(0.1); -webkit-transform-origin: 0 0;  overflow:hidden; ' src=\"#{url}\" type=\"content\"> </div>" 
+      logger.info(iframes)
+      @append_html iframes
   ]]
 )
 # example: inline image links plugin
@@ -127,7 +128,12 @@ apply_plugins = (msg)->
       # TODO: support if plugin.match is just [/re/,f] for common case
       for meta in plugin.match when plugin.match
         [re, callback] = meta
-        captures = copy.html?.match(re) || copy.text?.match(re)
+        if plugin.text_only?
+          captures = copy.text?.match(re)
+        else if plugin.html_only?
+          captures = copy.html?.match(re) 
+        else
+          captures = copy.html?.match(re) || copy.text?.match(re)
         logger.debug("plugin match: re: #{re} captures: #{captures.toSource()}") if captures?
         callback.call(instance,captures) if captures?
   copy
