@@ -78,6 +78,14 @@ class Account
         @from = @jid + "/" + @resource
         @logger.debug "connect"
         @callbacks.connect(this)
+        n = new XMLNode(null, null, "iq", "iq", null)
+        n.attributes["id"]="roster_1"
+        n.attributes["type"]="get"
+        n.attributes["from"]=@from
+        c=new XMLNode(null, null, "query", "query")
+        c.attributes["xmlns"] = $NS.roster
+        Stanza._addChildren(n,c)
+        @session.sendStanza n
         @presence()
   
       onPresenceStanza: (stanza) => @handle_errors =>
@@ -96,6 +104,11 @@ class Account
           jid = xmpp.Stanza.parseFromJID(stanza)
           vcard = xmpp.Stanza.parseVCard(stanza)
           @callbacks.vcard(this, jid, vcard) if jid && vcard
+        if stanza.getChildren('query')
+          q = stanza.getChildren('query')[0]
+          if q and q.uri is 'jabber:iq:roster'
+            @logger.debug("jabber:iq:roster")
+            @callbacks.roster(@,stanza)
         @callbacks.iq this, x
 
       onXmppStanza: (aName, stanza) => @handle_errors =>
@@ -240,6 +253,8 @@ class Crow
         friend = window.roster.find(jid.jid)
         friend.vcard = vcard
         @callbacks.friend(account,friend)
+    roster: (account,stanza) =>
+      window.roster.load_roster(account,stanza)
     friend: (account,friend) =>
       @logger.error(friend)
       existing = window.roster.find(friend.jid)

@@ -96,6 +96,7 @@ add_conversation = (model,send_callback) ->
     logger.debug("received: #{send_event} -> #{data.toSource()}")
     send_callback(data)
     logger.debug("sent: #{data.body}")
+    #TODO: if data.body is undef there was an error and we should tell the user. maybe test connection. I can repo by shutting off the internet.
     # cleanup
     iframe.contentDocument.documentElement.removeChild(e.target)
 

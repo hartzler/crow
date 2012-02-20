@@ -24,6 +24,15 @@ class RosterList
     contact = new window.Friend(jid,presence,is_room,account,vcard)
     @contacts_by_jid[jid.jid] = contact
     contact
+  load_roster: (account,roster)->
+    try
+      for item in roster.getChildren('query')[0].children
+        jid = item.attributes["jid"]
+        subscription = item.attributes["subscription"]
+        name = item.attributes["name"]
+        groups = (group.innerXML() for group in item.children)
+    catch e
+      @logger.error("error load_roster")
+      @logger.error(e)
 
 window.roster = new RosterList
-

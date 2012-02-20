@@ -43,7 +43,7 @@ plugins.push(
     (captures)-> 
       iframes = ""
       for url in captures
-        iframes += "<div style='width: 100px; height: 50px; padding: 0; overflow: hidden; clear:both'>#{url} <iframe style=' width: 800px; height: 520px; border: 1px solid red; zoom: 0.1; -moz-transform: scale(0.1); -moz-transform-origin: 0 0; -o-transform: scale(0.1); -o-transform-origin: 0 0; -webkit-transform: scale(0.1); -webkit-transform-origin: 0 0;  overflow:hidden; ' src=\"#{url}\" type=\"content\"> </div>" 
+        iframes += "<div style='width: 100px; height: 50px; padding: 0; overflow: hidden; ><iframe style=' width: 800px; height: 520px; border: 1px solid red; zoom: 0.1; -moz-transform: scale(0.1); -moz-transform-origin: 0 0; -o-transform: scale(0.1); -o-transform-origin: 0 0; -webkit-transform: scale(0.1); -webkit-transform-origin: 0 0;  overflow:hidden; ' src=\"#{url}\" type=\"content\">&nbsp; </div>" 
       logger.info(iframes)
       @append_html iframes
   ]]
