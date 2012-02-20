@@ -33,7 +33,6 @@ class RosterList
         name = item.attributes["name"]
         groups = (group.innerXML() for group in item.children)
         @find_or_create {jid:jid},null,false,account.name
-
     catch e
       @logger.error("error load_roster")
       @logger.error(e)

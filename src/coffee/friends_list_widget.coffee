@@ -11,7 +11,6 @@ logger = new Util.Logger("Crow::UI::FriendList", 'debug', CrowLog)
 # render model Friend to template and return top level div
 friend_div = (friend) ->
   div = Util.clone_template(friend_template_selector)
-  logger.debug "friend show: #{friend.show()}"
   div.find('.state').addClass(friend.show())
   div.find('.state').html("&ordm;")
   div.find('.name').text(friend.display())
@@ -44,9 +43,7 @@ render_friends = (friends) ->
     away.push(jid) if(state=="away")
     unaval.push(jid) if(state=="unavailable")
   for index,jid of chat.concat(away,unaval)
-    logger.debug(jid)
     friend = friends[jid]
-    logger.debug(friend.show())
     if(friend)
       fdiv.append friend_div(friend)
   logger.debug "done render_friends."

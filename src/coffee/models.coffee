@@ -256,7 +256,6 @@ class Crow
     roster: (account,stanza) =>
       window.roster.load_roster(account,stanza)
     friend: (account,friend) =>
-      @logger.error(friend)
       existing = window.roster.find(friend.jid)
       if existing
         existing.presence = friend.presence
