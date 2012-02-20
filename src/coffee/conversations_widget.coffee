@@ -40,7 +40,7 @@ xul_deck_id = "untrusted"
 conversations_pill_selector = "#conversations .pill-content"
 conversation_template_selector = "#conversation-template"
 id2model = (id) ->
-  window.FriendList.get_model(id)
+  window.roster.find_by_safe_id(id)
   
 model2id = (model)->
   "conv-#{model.safeid()}"
@@ -124,7 +124,6 @@ add_conversation = (model,send_callback) ->
     logger.debug("next tab:#{next_tab.length}")
     if(next_tab and next_tab.length!=0)
       next_id = next_tab.find("a").attr("href").replace("#conv-","")
-      logger.debug("next tab id:#{next_id}")
       next_model = id2model(next_id)
       activate_conversation(next_model)
 
