@@ -84,7 +84,7 @@ class Account
         x = new XmppPresence(stanza.convertToString())
         jid = xmpp.Stanza.parseFromJID(stanza)
         presence = xmpp.Stanza.parsePresence(stanza)
-        @callbacks.friend(this, new Friend(jid,presence,false,this.name)) if jid
+        @callbacks.friend(this, window.roster.find_or_create(jid,presence,false,this.name) ) if jid
 
       onMessageStanza: (stanza) => @handle_errors =>
         x = new XmppMessage(stanza.convertToString())
@@ -188,7 +188,6 @@ class Crow
     @settings = {}
     @accounts = {}
     @conversations = {}
-    @friends = {}
     @logger or= new Util.Logger("Crow",'debug',@callbacks)
 
   # wait till UI is ready as might need user intervention
@@ -237,16 +236,18 @@ class Crow
     receive_trace: (account,xml)=>
       @callbacks.receive_trace(account.name,xml)
     vcard: (account,jid,vcard) =>
-      if @friends[jid.jid]
-        @friends[jid.jid].vcard = vcard
-        @callbacks.friend(account,@friends[jid.jid])
+      if window.roster.find(jid.jid)
+        friend = window.roster.find(jid.jid)
+        friend.vcard = vcard
+        @callbacks.friend(account,friend)
     friend: (account,friend) =>
-      existing = @friends[friend.jid.jid]
+      @logger.error(friend)
+      existing = window.roster.find(friend.jid)
       if existing
         existing.presence = friend.presence
         friend = existing
       else
-        @friends[friend.jid.jid] = friend
+        window.roster.add_friend(friend.jid,friend)
         account.vcard(friend)
       @callbacks.friend(account,friend)
     iq: @callbacks.iq
@@ -255,9 +256,7 @@ class Crow
       @logger.debug "message from: #{message.from()}"
       jid = message.from().replace(/\/.*/,'')
       @logger.debug "message from jid: #{jid}"
-      from = @friends[jid]
-      unless from
-        from = @friends[jid] = new Friend({jid:jid},null,false,account.name)
+      from = window.roster.find_or_create {jid:jid},null,false,account.name
       @logger.debug "message from friend: #{from.jid.jid}"
       unless @conversations[jid]
         @logger.debug "creating conversation from #{jid}"
@@ -301,3 +300,4 @@ class Crow
 
 # exports
 window.Crow=Crow
+window.Friend=Friend

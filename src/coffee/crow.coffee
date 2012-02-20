@@ -200,7 +200,7 @@ crow = new Crow null,
     # route to the FriendList so it can update UI
     # TODO: support change...
     #logger.debug("received friend: account=#{account.name} friend=#{friend}")
-    FriendList.render(crow.friends)
+    FriendList.render(window.roster.friend_list())
   iq: (account,xml) ->
     # just log for now.  not sure what to do UI wise.
     #logger.debug("received iq: account=#{account.name} xml=#{xml}")

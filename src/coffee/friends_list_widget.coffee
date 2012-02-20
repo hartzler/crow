@@ -73,7 +73,7 @@ class FriendList
     filter_friends(filter)
   update: (friend)-># todo
   get_model: (id)->
-    $("#{friends_selector} .friend[friend-id='#{id}']").data("model")
+    window.roster.find(id)#$("#{friends_selector} .friend[friend-id='#{id}']").data("model")
     
     
 
