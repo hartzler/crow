@@ -51,7 +51,9 @@ class FriendTab
           $('#friends .contacts').append(a) 
       catch e
         logger.error(e)
-
+  refresh:()->
+    $('#friends .contacts').empty()
+    @render()
 class TopLinksWidget
   constructor: ()->
     @activate('about')

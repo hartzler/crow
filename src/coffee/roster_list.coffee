@@ -37,6 +37,14 @@ class RosterList
         subscription = item.attributes["subscription"]
         name = item.attributes["name"]
         groups = (group.innerXML() for group in item.children)
+        n = new XMLNode(null, null, "iq", "iq", null)
+        n.attributes["id"]="roster_1"
+        n.attributes["type"]="get"
+        n.attributes["to"]= jid
+        c=new XMLNode(null, null, "vCard", "vCard")
+        c.attributes["xmlns"] = $NS.vcard
+        Stanza._addChildren(n,c)
+        account.session.sendStanza n
         @find_or_create {jid:jid},null,false,account.name
     catch e
       @logger.error("error load_roster")

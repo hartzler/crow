@@ -101,9 +101,14 @@ class Account
       onIQStanza: (name, stanza) => @handle_errors =>
         x = new XmppMessage(stanza.convertToString())
         if stanza.getChildren('vCard').length > 0
-          jid = xmpp.Stanza.parseFromJID(stanza)
-          vcard = xmpp.Stanza.parseVCard(stanza)
-          @callbacks.vcard(this, jid, vcard) if jid && vcard
+          jid=null
+          try
+            jid = xmpp.Stanza.parseFromJID(stanza)
+            vcard = xmpp.Stanza.parseVCard(stanza)
+            @callbacks.vcard(this, jid, vcard) if jid && vcard
+          catch e
+            @logger.error "VCard parse errror: #{jid}"
+            @logger.error e
         if stanza.getChildren('query')
           q = stanza.getChildren('query')[0]
           if q and q.uri is 'jabber:iq:roster'
@@ -253,6 +258,7 @@ class Crow
       if window.roster.find(jid.jid)
         friend = window.roster.find(jid.jid)
         friend.vcard = vcard
+        window.FriendTab.refresh()
         @callbacks.friend(account,friend)
     roster: (account,stanza) =>
       window.roster.load_roster(account,stanza)
