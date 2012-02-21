@@ -5,10 +5,11 @@
     %h2 Friends
     #contact-template.template
       .row
+        .icon.span2
         .name.span3
         .jid.span3
-        .status.span3
-        .action.span3
+        .status.span2
+        .action.span2
           %button.btn.danger.delete Remove
     .contacts
 

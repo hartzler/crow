@@ -47,6 +47,17 @@ class FriendTab
         a.find('.jid').attr("jid",contact.safeid())
         a.find('.status').text('disconnected')
         a.find('.delete').on('click', (e)=>@remove(contact.jid.jid))
+        icon =  $('<img />')
+        src = contact.icon_uri('default_friend.png')
+        if(!contact.has_icon())
+          clean_jid = contact.email()
+          clean_jid = $.trim(clean_jid)
+          md5 = hex_md5(clean_jid)
+          src="http://www.gravatar.com/avatar/"+md5+"?d=https://raw.github.com/hartzler/crow/master/resources/crow.gif"
+        icon.attr('src',src) 
+        icon.attr('style',"height:50px;width:50px")
+        a.find('.icon').append(icon)
+
         if(! $("#friends .jid[jid='"+contact.safeid()+"']")[0])
           $('#friends .contacts').append(a) 
       catch e
