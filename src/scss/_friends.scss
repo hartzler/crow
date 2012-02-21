@@ -1,2 +1,10 @@
 #friends {
+  .summary{
+    overflow: auto;
+    overflow-x: hidden;
+    .contacts{
+      overflow: auto;
+      height: 800px;
+    }
+  }
 }

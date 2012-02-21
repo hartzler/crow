@@ -1,2 +1,15 @@
 #friends.panel
-  %h2 Friends
+  .notification
+
+  .summary
+    %h2 Friends
+    #contact-template.template
+      .row
+        .name.span3
+        .jid.span3
+        .status.span3
+        .action.span3
+          %button.btn.danger.delete Remove
+    .contacts
+
+ 

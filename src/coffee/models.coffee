@@ -171,6 +171,7 @@ class Friend
   safeid: () -> @jid.jid.replace(/[^a-zA-Z 0-9]+/g,'')
   email: () -> @jid.jid
   display: () -> if @vcard.fullname then @vcard.fullname else @jid.jid
+  name: () -> if @vcard and @vcard.fullname then @vcard.fullname else null
   resource: () -> @jid.resource
   node: () -> @jid.node
   status: () -> @presence.status

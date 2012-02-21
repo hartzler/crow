@@ -3,7 +3,7 @@ class RosterList
     @contacts_by_jid = {}
     @contacts_safe_jid_to_jid = {}
     @logger = new Util.Logger("Crow::RosterList", 'debug')
-  contacts_by_state: ()->
+  friends_by_state: ()->
     states = {}
     for jid,contact of @contacts_by_jid
       states[contact.status] or= {}
@@ -19,10 +19,9 @@ class RosterList
     @contacts_by_jid[jid]
   find_by_safe_id: (safe_id)->
     @contacts_by_jid[@contacts_safe_jid_to_jid[safe_id]]
-
-
   find_or_create: (jid,presence,is_room,account,vcard={}) ->
     presence or= {show: "unavailable", status: null}
+    @logger.debug "Looking for jid: #{jid.jid}"
     if @contacts_by_jid[jid.jid]?
       @contacts_by_jid[jid.jid].presence = presence
       return @contacts_by_jid[jid.jid]

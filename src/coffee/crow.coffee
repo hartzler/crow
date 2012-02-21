@@ -33,6 +33,27 @@ start_conversation = (e) ->
     open_conversation(crow.conversation(friend))
   else
     logger.error "failed to start conversation with unknown friend: #{$(e.target).text()}"
+class FriendTab
+  contact_template_selector = "#contact-template"
+  render:()->
+    contact_temlpate = $(contact_template_selector)
+    list = window.roster.friend_list()
+    at = $(contact_template_selector)
+    for contact in list
+      try
+        a=Util.clone_template at
+        if contact.name()
+          a.find('.name').text(contact.name())
+        else
+          a.find('.name').html("&nbsp;")
+        a.find('.jid').text(contact.jid.jid)
+        a.find('.jid').attr("jid",contact.jid.jid)
+        a.find('.status').text('disconnected')
+        a.find('.delete').on('click', (e)=>@remove(contact.jid.jid))
+        if(! $("#friends .jid[jid='"+contact.jid.jid+"']")[0])
+          $('#friends .contacts').append(a) 
+      catch e
+        logger.error(e)
 
 class TopLinksWidget
   constructor: ()->
@@ -201,6 +222,7 @@ crow = new Crow null,
     # TODO: support change...
     #logger.debug("received friend: account=#{account.name} friend=#{friend}")
     FriendList.render(window.roster.friend_list())
+    window.FriendTab.render()
   iq: (account,xml) ->
     # just log for now.  not sure what to do UI wise.
     #logger.debug("received iq: account=#{account.name} xml=#{xml}")
@@ -229,11 +251,20 @@ crow = new Crow null,
  
   # passthru to our Log UI Widget
   log: (args...)->CrowLog.log(args...)
-
+window.FriendTab = new FriendTab()
 $(document).ready ->
   window.resizeTo(800,600)
   ui.init()
-
+  $(document).scroll ->
+    unless $(".subnav").attr("data-top")
+      return  if $(".subnav").hasClass("subnav-fixed")
+      offset = $(".subnav").offset()
+      $(".subnav").attr "data-top", offset.top
+    if $(".subnav").attr("data-top") - $(".subnav").outerHeight() <= $(this).scrollTop()
+      $(".subnav").addClass "subnav-fixed"
+    else
+      $(".subnav").removeClass "subnav-fixed"
+    
 # TODO: xulrunner these
 #file = require("file")
 #hotkey = require("hotkey")
