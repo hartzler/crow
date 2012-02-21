@@ -312,7 +312,7 @@ class Crow
     @logger.debug "send: conv account: #{account.name}"
     friend = conversation.from
     @logger.debug "send: conv from: #{friend.jid.jid}"
-    account.message(friend.jid.jid,msg.text)
+    account.message("#{friend.jid.jid}/#{friend.resource}",msg.text)
     @logger.debug "send: message sent."
 
   # send raw xml
