@@ -42,15 +42,12 @@ class FriendTab
     for contact in list
       try
         a=Util.clone_template at
-        if contact.name()
-          a.find('.name').text(contact.name())
-        else
-          a.find('.name').html("&nbsp;")
+        a.find('.name').text(contact.display())
         a.find('.jid').text(contact.jid.jid)
-        a.find('.jid').attr("jid",contact.jid.jid)
+        a.find('.jid').attr("jid",contact.safeid())
         a.find('.status').text('disconnected')
         a.find('.delete').on('click', (e)=>@remove(contact.jid.jid))
-        if(! $("#friends .jid[jid='"+contact.jid.jid+"']")[0])
+        if(! $("#friends .jid[jid='"+contact.safeid()+"']")[0])
           $('#friends .contacts').append(a) 
       catch e
         logger.error(e)

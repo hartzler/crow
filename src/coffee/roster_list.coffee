@@ -23,7 +23,8 @@ class RosterList
     presence or= {show: "unavailable", status: null}
     @logger.debug "Looking for jid: #{jid.jid}"
     if @contacts_by_jid[jid.jid]?
-      @contacts_by_jid[jid.jid].presence = presence
+      @contacts_by_jid[jid.jid].presence = presence 
+      @contacts_by_jid[jid.jid].vcard = vcard if vcard
       return @contacts_by_jid[jid.jid]
     contact = new window.Friend(jid,presence,is_room,account,vcard)
     @contacts_by_jid[jid.jid] = contact

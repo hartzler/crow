@@ -168,7 +168,7 @@ class Account
 class Friend
   constructor: (@jid,@presence,@is_room,@account,@vcard={}) ->
     @presence or= {show: "chat", status: null}
-  safeid: () -> @jid.jid.replace(/[^a-zA-Z 0-9]+/g,'')
+  safeid: () => @jid.jid.replace(/[^a-zA-Z 0-9]+/g,'')
   email: () -> @jid.jid
   display: () -> if @vcard.fullname then @vcard.fullname else @jid.jid
   name: () -> if @vcard and @vcard.fullname then @vcard.fullname else null
