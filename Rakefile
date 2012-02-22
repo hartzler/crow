@@ -55,9 +55,9 @@ task :xul do
   unless File.exist?(Cfg.xulsdkdir)
     unless File.exist?(Cfg.xulsdkfile)
       `mkdir -p #{Cfg.cachedir}`
-      `curl "#{Cfg.xuluri[:base]}/#{Cfg.xulsdkfile}" > #{Cfg.xulsdkfile}`
+      `curl "#{Cfg.xuluri[:base]}#{Cfg.xuluri[Cfg.platform]}" > #{Cfg.xulsdkfile}`
     end
-    `tar -xjf cache/#{uri[:file]}`
+    `tar -xjf #{Cfg.xulsdkfile}`
   end
 end
 
