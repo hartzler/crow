@@ -54,7 +54,7 @@ plugins.push(
       iframes = ""
       for url in captures
         try
-          iframes +="<div url='#{url}'>#{url} &nbsp;<"+"script> window.url_text(\"#{url}\")</"+"script></div>"
+          iframes +="<div url='#{url}'>Loading Text for: #{url} &nbsp;<"+"script> window.url_text(\"#{url}\")</"+"script></div>"
           counter+=1
         catch e
           logger.error e
