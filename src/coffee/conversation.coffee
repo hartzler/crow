@@ -31,19 +31,32 @@ class Plugin
     @msg.html += html
   append_text: (text)->
     @msg.text += text
-
+window.url_text = (url,el)->
+  url_callback = (data) ->
+    logger.error(data.content)
+    el = $(el)
+    logger.error(el)
+    logger.error(el.parent())
+    logger.error(el.parent().html())
+    el.parent().html(data.content)
+  $.getJSON("http://viewtext.org/api/text?mld=.1&rl=false&url=" + url + "&callback=?", url_callback)
+          
 # plugin list
 plugins = []
 plugins.push(
-  name: "Inline Images Plugin"
-  description: "Creates an img tag for image urls so you can see the image inline"
+  description: "Get url text"
   text_only: true
   match: [[
     /http(s)?:\/\/.+/gi,
     (captures)-> 
+      counter = 0
       iframes = ""
       for url in captures
-        iframes += "<div style='width: 100px; height: 50px; padding: 0; overflow: hidden; ><iframe style=' width: 800px; height: 520px; border: 1px solid red; zoom: 0.1; -moz-transform: scale(0.1); -moz-transform-origin: 0 0; -o-transform: scale(0.1); -o-transform-origin: 0 0; -webkit-transform: scale(0.1); -webkit-transform-origin: 0 0;  overflow:hidden; ' src=\"#{url}\" type=\"content\">&nbsp; </div>" 
+        try
+          iframes +="<div>#{url} &nbsp;<INPUT TYPE='button' Value='Preview Text' onClick='window.url_text(\"#{url}\",this)'></div>"
+          counter+=1
+        catch e
+          logger.error e
       logger.info(iframes)
       @append_html iframes
   ]]

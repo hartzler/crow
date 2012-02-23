@@ -36,15 +36,17 @@ render_friends = (friends) ->
   chat=[]
   away=[]
   unaval=[]
-
+  seen_friends ={}
+  #TODO: clean this crap code up
   for jid,friend of friends 
     state = friend.show()
     chat.push(jid) if(state=="chat")
     away.push(jid) if(state=="away")
     unaval.push(jid) if(state=="unavailable")
-  for index,jid of chat.concat(away,unaval)
+  for jid,index in chat.concat(away,unaval)
     friend = friends[jid]
-    if(friend)
+    if(friend and not seen_friends[friend.safeid()])
+      seen_friends[friend.safeid()]=true
       fdiv.append friend_div(friend)
   logger.debug "done render_friends."
 
