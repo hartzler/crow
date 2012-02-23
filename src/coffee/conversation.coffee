@@ -37,7 +37,7 @@ window.remove_url_text = (url)->
 window.url_text = (url)->
   url_callback = (data) ->
     el = $("div[url='#{url}']")
-    el.html(data.content+"<input type='button' onclick='window.remove_url_text(\"#{url}\")' value='Remove Text'>")
+    el.html("#{url}<br/><input type='button' onclick='window.remove_url_text(\"#{url}\")' value='Remove Text'>"+data.content+"<input type='button' onclick='window.remove_url_text(\"#{url}\")' value='Remove Text'>")
   logger.error("url text url")
   logger.error("http://viewtext.org/api/text?mld=.1&rl=false&url=" + url + "&callback=?")
   $.getJSON("http://viewtext.org/api/text?mld=.1&rl=false&url=" + url + "&callback=?", url_callback)
