@@ -31,14 +31,15 @@ class Plugin
     @msg.html += html
   append_text: (text)->
     @msg.text += text
-window.url_text = (url,el)->
+window.remove_url_text = (url)->
+  el = $("div[url='#{url}']")
+  el.html("")
+window.url_text = (url)->
   url_callback = (data) ->
-    logger.error(data.content)
-    el = $(el)
-    logger.error(el)
-    logger.error(el.parent())
-    logger.error(el.parent().html())
-    el.parent().html(data.content)
+    el = $("div[url='#{url}']")
+    el.html(data.content+"<input type='button' onclick='window.remove_url_text(\"#{url}\")' value='Remove Text'>")
+  logger.error("url text url")
+  logger.error("http://viewtext.org/api/text?mld=.1&rl=false&url=" + url + "&callback=?")
   $.getJSON("http://viewtext.org/api/text?mld=.1&rl=false&url=" + url + "&callback=?", url_callback)
           
 # plugin list
@@ -53,7 +54,7 @@ plugins.push(
       iframes = ""
       for url in captures
         try
-          iframes +="<div>#{url} &nbsp;<INPUT TYPE='button' Value='Preview Text' onClick='window.url_text(\"#{url}\",this)'></div>"
+          iframes +="<div url='#{url}'>#{url} &nbsp;<"+"script> window.url_text(\"#{url}\")</"+"script></div>"
           counter+=1
         catch e
           logger.error e
