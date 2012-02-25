@@ -9,8 +9,10 @@ dbConn = Services.storage.openDatabase(file)
 try
   dbConn.executeSimpleSQL("select roster_json from rosters limit 1;")
 catch e
-  dbConn.executeSimpleSQL("CREATE  TABLE rosters (roster_json text not null) if not exists")
-  logger.error e
+  try
+    dbConn.executeSimpleSQL("CREATE  TABLE rosters (roster_json text not null) ")
+  catch e
+    logger.error e
 class RosterList
   constructor: ()->
     @contacts_by_jid = {}
