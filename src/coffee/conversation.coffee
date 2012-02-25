@@ -32,16 +32,16 @@ class Plugin
   append_text: (text)->
     @msg.text += text
 window.remove_url_text = (url)->
-  el = $("div[url='#{url}']")
-  el.html("")
+  el = $("div[url='#{url}'] .content")
+  el.html("#{url} <input type='button' onclick='window.url_text(\"#{url}\")' value='Get Text'>")
+
 window.url_text = (url)->
   url_callback = (data) ->
-    el = $("div[url='#{url}']")
-    el.html("#{url}<br/><input type='button' onclick='window.remove_url_text(\"#{url}\")' value='Remove Text'>"+data.content+"<input type='button' onclick='window.remove_url_text(\"#{url}\")' value='Remove Text'>")
-  logger.error("url text url")
-  logger.error("http://viewtext.org/api/text?mld=.1&rl=false&url=" + url + "&callback=?")
+    el = $("div[url='#{url}'] .content")
+    remove_button = "<input type='button' onclick='window.remove_url_text(\"#{url}\")' value='Remove Text'>"
+    el.html("#{url}<br/>#{remove_button}"+data.content+"#{remove_button}")
   $.getJSON("http://viewtext.org/api/text?mld=.1&rl=false&url=" + url + "&callback=?", url_callback)
-          
+
 # plugin list
 plugins = []
 plugins.push(
@@ -51,15 +51,14 @@ plugins.push(
     /http(s)?:\/\/.+/gi,
     (captures)-> 
       counter = 0
-      iframes = ""
+      preview_divs = ""
       for url in captures
         try
-          iframes +="<div url='#{url}'>Loading Text for: #{url} &nbsp;<"+"script> window.url_text(\"#{url}\")</"+"script></div>"
+          preview_divs +="<div url='#{url}'><div class='content'>Loading Text for: #{url} &nbsp;<"+"script> window.url_text(\"#{url}\")</"+"script></div></div>"
           counter+=1
         catch e
           logger.error e
-      logger.info(iframes)
-      @append_html iframes
+      @append_html preview_divs
   ]]
 )
 # example: inline image links plugin
