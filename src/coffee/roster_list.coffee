@@ -37,13 +37,16 @@ class RosterList
         @find_or_create(contact.jid,null,contact.is_room,contact.account,contact.vcard)
     finally
       @loading = false
-  save_to_prefs: ()->
-    return if @loading
-    string = JSON.stringify((contact.toJS() for contact in @friend_list()))
+  clear_stored_roster: ()->
     try
       dbConn.executeSimpleSQL("delete from rosters")
     catch e
       @logger.error("DONT PANIC: i think its ok if we cant delete the rosters at first")
+
+  save_to_prefs: ()->
+    return if @loading
+    string = JSON.stringify((contact.toJS() for contact in @friend_list()))
+    @clear_stored_roster()
     dbConn.executeSimpleSQL("insert into rosters (roster_json) values ('#{string.replace(/'/g,"\\'")}')")
 
   friends_by_state: ()->
