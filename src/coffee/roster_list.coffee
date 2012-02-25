@@ -1,8 +1,45 @@
+
+logger = new Util.Logger("Crow::RosterList", 'debug')
+
+Components.utils.import("resource://gre/modules/Services.jsm")
+Components.utils.import("resource://gre/modules/FileUtils.jsm")
+      
+file = FileUtils.getFile("ProfD", ["roster.sqlite"])
+dbConn = Services.storage.openDatabase(file)
+try
+  dbConn.executeSimpleSQL("select roster_json from rosters limit 1;")
+catch e
+  dbConn.executeSimpleSQL("CREATE  TABLE rosters (roster_json text not null) if not exists")
+  logger.error e
 class RosterList
   constructor: ()->
     @contacts_by_jid = {}
     @contacts_safe_jid_to_jid = {}
-    @logger = new Util.Logger("Crow::RosterList", 'debug')
+    @logger = logger
+  load_from_prefs: ()->
+    try
+      stmt = dbConn.createStatement("select roster_json from rosters limit 1;")
+      while(stmt.step())
+        contacts = stmt.row.roster_json
+    catch e
+      @logger.error(e)
+    contacts or= "[]"
+    try
+      contacts = JSON.parse(contacts)
+    catch e
+      contacts = []
+    try
+      @loading = true
+      for contact in contacts
+        @find_or_create(contact.jid,null,contact.is_room,contact.account,contact.vcard)
+    finally
+      @loading = false
+  save_to_prefs: ()->
+    return if @loading
+    string = JSON.stringify((contact.toJS() for contact in @friend_list()))
+    dbConn.executeSimpleSQL("delete from rosters")
+    dbConn.executeSimpleSQL("insert into rosters (roster_json) values ('#{string.replace(/'/g,"\\'")}')")
+
   friends_by_state: ()->
     states = {}
     for jid,contact of @contacts_by_jid
@@ -19,16 +56,20 @@ class RosterList
     @contacts_by_jid[jid]
   find_by_safe_id: (safe_id)->
     @contacts_by_jid[@contacts_safe_jid_to_jid[safe_id]]
-  find_or_create: (jid,presence,is_room,account,vcard={}) ->
+  find_or_create: (jid,presence,is_room,account,vcard) ->
     presence or= {show: "unavailable", status: null}
     @logger.debug "Looking for jid: #{jid.jid}"
     if @contacts_by_jid[jid.jid]?
-      @contacts_by_jid[jid.jid].presence = presence 
-      @contacts_by_jid[jid.jid].vcard = vcard if vcard
-      return @contacts_by_jid[jid.jid]
+      @logger.debug "Cached object"
+      contact = @contacts_by_jid[jid.jid]
+      contact.presence = presence 
+      contact.vcard = vcard if vcard
+      @save_to_prefs()
+      return contact
     contact = new window.Friend(jid,presence,is_room,account,vcard)
     @contacts_by_jid[jid.jid] = contact
     @contacts_safe_jid_to_jid[contact.safeid()]=jid.jid
+    @save_to_prefs()
     contact
   load_roster: (account,roster)->
     try
@@ -44,10 +85,14 @@ class RosterList
         c=new XMLNode(null, null, "vCard", "vCard")
         c.attributes["xmlns"] = $NS.vcard
         Stanza._addChildren(n,c)
-        account.session.sendStanza n
-        @find_or_create {jid:jid},null,false,account.name
+        friend = @find_or_create {jid:jid},null,false,account.name
+        if not friend.vcard or jQuery.isEmptyObject(friend.vcard)
+          account.session.sendStanza n 
+        friend
+
     catch e
       @logger.error("error load_roster")
       @logger.error(e)
 
-window.roster = new RosterList
+window.roster = new RosterList()
+window.roster.load_from_prefs()

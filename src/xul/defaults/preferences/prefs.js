@@ -17,7 +17,7 @@ pref("extensions.enabledScopes", 5);
 pref("extensions.getAddons.cache.enabled", false);
 pref("extensions.installDistroAddons", false);
 pref("extensions.testpilot.runStudies", false);
-
+pref("dom.storage.enabled",true);
 
 // crap from http://hg.mozilla.org/mozilla-central/file/1dd81c324ac7/build/automation.py.in#l372
 pref("dom.allow_scripts_to_close_windows", false)

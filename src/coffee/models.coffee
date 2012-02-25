@@ -173,6 +173,7 @@ class Account
 class Friend
   constructor: (@jid,@presence,@is_room,@account,@vcard={}) ->
     @presence or= {show: "chat", status: null}
+    @last_vcard_request_time = null
   safeid: () => @jid.jid.replace(/[^a-zA-Z 0-9]+/g,'')
   email: () -> @jid.jid
   display: () -> if @vcard.fullname then @vcard.fullname else @jid.jid
@@ -193,6 +194,8 @@ class Friend
       # other stuff, not handled yet...
       dfault
   toString: ()->"<Friend jid=#{@jid.jid}>"
+  toJS: ()->
+    {jid: @jid,vcard:@vcard,presence:{},is_room:@is_room,account:@account, last_vcard_request_time:@last_vcard_request_time}
 
 class Conversation
   constructor: (@account,@from,@callbacks) ->

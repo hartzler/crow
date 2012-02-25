@@ -54,7 +54,6 @@ render_friends = (friends) ->
 filter_friends = (filter) ->
   logger.debug "filter_friends"
   $('#friends-list .friend').each (i,fdiv)-> 
-    logger.debug $(fdiv).html()
     if(!filter($(fdiv).data('model'))) 
       $(fdiv).hide()
     else
