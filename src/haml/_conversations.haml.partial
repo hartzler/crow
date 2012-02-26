@@ -5,17 +5,30 @@
       #friends-panel
         %h2 Friends
         .input
-          %input#friend-filter{:type=>"text"}
-        #friend-template.template.friend
-          .state
-          .icon
-          .show
-          .name
-          .status
-        #friends-list
+          %input#friend-filter(type="text")
+        #friends-list(data-bind="foreach: friends")
+          .friend
+            .state
+            .icon
+              %img(data-bind="attr: {src: icon_uri}")
+            .show(data-bind="text: show")
+            .name(data-bind="text: name")
+            .status(data-bind="text: status")
   / Conversations widget
   .right.expand.vsplit
-    .pill-content.expand
-      #conversation-template.template.conversation
-    %ul.tabs
+    .pill-content.expand(data-bind="foreach: conversations")
+      .conversation.hsplit(data-bind="attr: {id: safeid}")
+        .left.expand.vsplit
+          .toolbar(data-bind="text: friend.jid")
+          .messages.expand(data-bind="foreach: messages")
+            .chat-line
+              .from(data-bind="text: from")
+              .time(data-bind="text: time")
+              .body(data-bind="text: body")
+          .command
+            %textarea#txt
+        .room-info
 
+    %ul.tabs(data-bind="foreach: conversations")
+      %li
+        %a(data-bind="attr: {href: function(){'#'+safeid()}}, text: friend.name")

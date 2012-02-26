@@ -1,3 +1,5 @@
+dump("*** models.js *** Loading...\n")
+
 # models.coffee
 #   requires xmpp.js, jquery.js, util.coffee
 #
@@ -92,11 +94,11 @@ class Account
         x = new XmppPresence(stanza.convertToString())
         jid = xmpp.Stanza.parseFromJID(stanza)
         presence = xmpp.Stanza.parsePresence(stanza)
-        @callbacks.friend(this, window.roster.find_or_create(jid,presence,false,this.name) ) if jid
+        @callbacks.friend(this, jid,presence) if jid
 
       onMessageStanza: (stanza) => @handle_errors =>
         x = new XmppMessage(stanza.convertToString())
-        @callbacks.message this, x
+        @callbacks.message this, x if x
   
       onIQStanza: (name, stanza) => @handle_errors =>
         x = new XmppMessage(stanza.convertToString())
@@ -170,52 +172,38 @@ class Account
     catch e
       @logger.error('[HANDLE_ERRORS]: ',e)
 
-class Friend
-  constructor: (@jid,@presence,@is_room,@account,@vcard={}) ->
-    @presence or= {show: "chat", status: null}
-    @last_vcard_request_time = null
-  safeid: () => @jid.jid.replace(/[^a-zA-Z 0-9]+/g,'')
-  email: () -> @jid.jid
-  display: () -> if @vcard.fullname then @vcard.fullname else @jid.jid
-  name: () -> if @vcard and @vcard.fullname then @vcard.fullname else null
-  resource: () -> @jid.resource
-  node: () -> @jid.node
-  status: () -> @presence.status
-  show: () -> @presence.show || "chat"
-  has_icon: ()=>
-    if @vcard.icon && @vcard.icon.type && @vcard.icon.binval
-      true
-    else 
-      false
-  icon_uri: (dfault) =>
-    if @vcard.icon && @vcard.icon.type && @vcard.icon.binval
-      "data:#{@vcard.icon.type};base64,#{@vcard.icon.binval}"
-    else
-      # other stuff, not handled yet...
-      dfault
-  toString: ()->"<Friend jid=#{@jid.jid}>"
-  toJS: ()->
-    {jid: @jid,vcard:@vcard,presence:{},is_room:@is_room,account:@account, last_vcard_request_time:@last_vcard_request_time}
+  toModel: ->
+    name: @name, jid: @jid, password: @password, host: @host, port: @port
+
+  id: ->
+    @name
+    
 
 class Conversation
   constructor: (@account,@from,@callbacks) ->
-  safeid: ()-> @from.safeid()
-  toString: ()-> "<Conversation account=#{@account} from=#{@from}>"
+  safeid: -> @from.safeid()
+  toString: -> "<Conversation account=#{@account} from=#{@from}>"
+  toModel: ->
+    account: @account, from: @from
+  id: ->
 
 # 
-# Main interface to manage accounts / conversations
+# Main interface to manage accounts / conversations / friends
 # 
-class Crow
-  constructor: (@logger,@callbacks) ->
+class Main
+  constructor: (@logger) ->
     @settings = {}
     @accounts = {}
-    @conversations = {}
-    @logger or= new Util.Logger("Crow",'debug',@callbacks)
+    @logger or= new Util.Logger("Crow",'debug')
+    @roster = new RosterList()
 
   # wait till UI is ready as might need user intervention
-  load: ()->
+  load: ->
     @logger.info("Loading configured accounts...")
     @_add(a) for a in Account.find(@logger)
+    ui.accounts(a.toModel() for name,a of @accounts)
+    @logger.info("Loading cached roster...")
+    @roster.load_from_prefs()
 
   # get list of configured accounts
   list: ()->
@@ -249,72 +237,59 @@ class Crow
 
   # private?
   # listener for account callbacks
-  _account_listener: ()->
-    error: @callbacks.error
-    connect: @callbacks.connect
-    disconnect: @callbacks.disconnect
-    send_trace: (account,xml)=>
-      @callbacks.send_trace(account.name,xml)
-    receive_trace: (account,xml)=>
-      @callbacks.receive_trace(account.name,xml)
+  _account_listener: ->
+    error: ui.error
+    connect: ui.connected
+    disconnect: ui.disconnected
+    send_trace: (account,xml)=>ui.trace("sent",account.toModel(),xml)
+    receive_trace: (account,xml)=>ui.trace("received",account.toModel(),xml)
     vcard: (account,jid,vcard) =>
-      if window.roster.find(jid.jid)
-        friend = window.roster.find(jid.jid)
+      if friend=@roster.find(jid.jid)
         friend.vcard = vcard
-        window.FriendTab.refresh()
-        @callbacks.friend(account,friend)
+        ui.friends(@roster.friend_list())
     roster: (account,stanza) =>
-      window.roster.load_roster(account,stanza)
-    friend: (account,friend) =>
-      existing = window.roster.find(friend.jid)
+      @roster.load_roster(account,stanza)
+      ui.friends(@roster.friend_list())
+    friend: (account,jid,presence) =>
+      existing = @roster.find(jid)
       if existing
-        existing.presence = friend.presence
-        friend = existing
-      else
-        window.roster.add_friend(friend.jid,friend)
-        account.vcard(friend)
-      @callbacks.friend(account,friend)
-    iq: @callbacks.iq
-    raw: @callbacks.raw
+        existing.presence = presence
+      #  friend = existing
+      #else
+      #  @roster.add_friend(jid,friend)
+      #  account.vcard(friend)
+      ui.friends(@roster.friend_list())
+    iq: ->
+    raw: ->
     message: (account,message) =>
       @logger.debug "message from: #{message.from()}"
       jid = message.from().replace(/\/.*/,'')
       @logger.debug "message from jid: #{jid}"
-      from = window.roster.find_or_create {jid:jid},null,false,account.name
+      from = @roster.find_or_create {jid:jid},null,false,account.name
       @logger.debug "message from friend: #{from.jid.jid}"
-      unless @conversations[jid]
-        @logger.debug "creating conversation from #{jid}"
-        @conversations[jid] = new Conversation(account.name,from)
-        @logger.debug "created conversation#{@conversations[jid]}"
-        @callbacks.conversation(account,@conversations[jid])
       text = message.body()
       @logger.debug "message: text=#{text}"
-      html = message.html()
-      @logger.debug "message: html=#{html}"
-      @callbacks.message(@conversations[jid],jid,text,html)
+      #html = message.html()
+      #@logger.debug "message: html=#{html}"
+      ui.message(from:jid,body:text,time:new Date()) if text
 
   # disconnect an account by name
   disconnect: (name)->
     account = @accounts[name]
     account.disconnect
     account.callbacks = null
-  
-  # start a new conversation given a friend object
-  conversation: (friend) ->
-    @conversations[friend.jid.jid] or= new Conversation(friend.account,friend)
 
   # sub a friend
-  # TODO: implement :)
   friend: (friend) ->
     @accounts[friend.account].friend(friend)
 
   # send a chat message
-  send: (conversation, msg) ->
-    @logger.debug "send: conversation account=#{conversation.account} msg=#{msg.toSource()}"
-    account = @accounts[conversation.account]
-    @logger.debug "send: conv account: #{account.name}"
-    friend = conversation.from
+  send: (msg) ->
+    @logger.debug "send: msg=#{msg.toSource()}"
+    friend = @roster.find(msg.to)
     @logger.debug "send: conv from: #{friend.jid.jid}"
+    account = @accounts[friend.account]
+    @logger.debug "send: account: #{account.name}"
     account.message("#{friend.jid.jid}/#{friend.resource}",msg.text)
     @logger.debug "send: message sent."
 
@@ -322,6 +297,47 @@ class Crow
   send_raw: (name, xml)->
     @accounts[name].send_raw(xml)
 
-# exports
-window.Crow=Crow
-window.Friend=Friend
+  close: (jid)->
+    # todo
+
+# incoming (events the UI triggers on us)
+api = null # will be valid on page load
+init_api= ->
+  api = new Util.API(call_prefix:"crow:ui",listen_prefix:"crow:app",window:$('#ui').get(0).contentWindow,logger:main.logger)
+  api.on
+    add: (account)->
+      main.add(account.name,account.jid,account.password,account.host,account.port)
+    remove: (account)->
+      main.remove(account.name)
+    connect: (account)->
+      main.connect(account.name)
+    disconnect: (account)->
+      main.disconnect(account.name)
+    join: (muc)->
+      main.join(muc)
+    send: (msg)->
+      if msg.to?
+        main.send(msg)
+      else
+        main.send_raw(msg.account,msg.xml)
+    close: (jid)->
+      # todo
+  
+# outgoing (events we raise to the UI)
+ui=
+  accounts: (accounts)->api.call("accounts",accounts)
+  friends: (friends)->api.call("friends",(jid:f.jid.jid,name:f.name(),icon_uri:"default_friend.png",show:f.show(),status:f.status() for f in friends))
+  message: (msg)->api.call("message",msg)
+  connected: (account)->api.call("connected",account:account.name)
+  disconnected: (account)->api.call("disconnected",account:account.name)
+  error: (account,error)->api.call("error",account: account.name, error: error)
+  trace: (type,account,xml)->api.call("trace",type:type,account:account.name,xml:xml)
+  close: (jid)->api.call("close",jid:jid)
+
+main = new Main()
+$(window).on 'load', ->
+  dump("*** models.js *** calling main.load()\n")
+  init_api()
+  main.load()
+
+dump("*** models.js *** Finished Loading.\n")

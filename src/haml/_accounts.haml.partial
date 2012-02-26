@@ -1,10 +1,10 @@
 #accounts.panel
-  .notification
+  .notification(data-bind="text: notify_text")
 
   .summary
     %h2 Accounts
-    %button#connect.btn.success Connect
-    %button#disconnect.btn.primary Disonnect
+    %button#connect.btn.success(data-bind="click: function(){connect()}") Connect
+    %button#disconnect.btn.primary(data-bind="click: function(){disconnect()}") Disonnect
 
     %table
       %thead
@@ -13,38 +13,38 @@
           %th Username
           %th Status
           %th Action
-      %tbody
-        %tr#account-template.template
-          %td.name
-          %td.jid
-          %td.status
+      %tbody(data-bind="foreach: accounts")
+        %tr
+          %td.name(data-bind="text: name")
+          %td.jid(data-bind="text: jid")
+          %td.status(data-bind="text: status")
           %td.action
-            %button.btn.success.connect Connect
-            %button.btn.primary.disconnect Disonnect
-            %button.btn.danger.delete Remove
+            %button.btn.success.connect(data-bind="click: function(){$root.connect($data)}") Connect
+            %button.btn.primary.disconnect(data-bind="click: function(){$root.disconnect($data)}") Disonnect
+            %button.btn.danger.delete(data-bind="click: $parent.remove") Remove
 
-  .add
+  .add(data-bind="with: tmp")
     %form{:action => "#"}
       .clearfix
-        %label{:for => "name"} Name
+        %label(for="name") Name
         .input
-          %input#account_name.xlarge{:name=>'name', :type => "text"}
+          %input#account_name.xlarge(name='name' type="text" data-bind="value: name")
       .clearfix
-        %label{:for => "jid"} JID 
+        %label(for="jid") JID 
         .input
-          %input#account_jid.xlarge{:name=>'jid', :type => "text"}
+          %input#account_jid.xlarge(name='jid' type="text" data-bind="value: jid")
       .clearfix
-        %label{:for => "password"} Password
+        %label(for="password") Password
         .input
-          %input#account_password.xlarge{:type => "password"}
+          %input#account_password.xlarge(type="password"  data-bind="value: password")
       .clearfix
-        %label{:for => "host"} Host
+        %label(for="host") Host
         .input
-          %input#account_host.xlarge{:type => "text"}
+          %input#account_host.xlarge(type="text" data-bind="value: host")
       .clearfix
-        %label{:for => "port"} Port
+        %label(for="port") Port
         .input
-          %input#account_port.xlarge{:type => "text"}
+          %input#account_port.xlarge(type="text" data-bind="value: port")
 
       .actions
-        %button#save.btn.primary Save
+        %button#save.btn.primary(data-bind="click: $parent.save") Save

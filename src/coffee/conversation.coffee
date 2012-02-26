@@ -49,7 +49,7 @@ plugins.push(
   text_only: true
   match: [[
     /http(s)?:\/\/.+/gi,
-    (captures)-> 
+    (captures)->
       counter = 0
       preview_divs = ""
       for url in captures
@@ -111,7 +111,7 @@ plugins.push(
   match:[[
     FACE_REGEX,
     (captures)->
-      logger.info("In face plugin #{captures[0]}") 
+      logger.info("In face plugin #{captures[0]}")
       smile_type = text_to_emote(captures[0])
       @append_html "<div class='emoticon-ubuntu-"+smile_type+"'>&nbsp;</div>" if smile_type
 
@@ -125,9 +125,6 @@ text_to_emote = (text)->
   for types,faces of emotes
     return types if $.trim(text) in faces
   return null
-
-  
-
 
 # let each plugin do its thing!
 apply_plugins = (msg)->
@@ -144,7 +141,7 @@ apply_plugins = (msg)->
         if plugin.text_only?
           captures = copy.text?.match(re)
         else if plugin.html_only?
-          captures = copy.html?.match(re) 
+          captures = copy.html?.match(re)
         else
           captures = copy.html?.match(re) || copy.text?.match(re)
         logger.debug("plugin match: re: #{re} captures: #{captures.toSource()}") if captures?
@@ -182,7 +179,7 @@ api_call = (name,data,callback)->
   request.dispatchEvent(sender)
   logger.debug "dispatched event #{sender} to #{request}"
 
-history_chat = () ->
+history_chat = ->
   last_history = $(command_selector).attr("data-history-chat-index")
   orignal_text = $(command_selector).attr("data-history-chat-text")
   current_text =  $(command_selector).val()
@@ -193,28 +190,27 @@ history_chat = () ->
   parent = $('#messages')
   text = null
   if last_history < 1 && last_history > -1# why does ==0 or is 0 not work? 
-    $(command_selector).attr("data-history-chat-index",last_history-1)    
+    $(command_selector).attr("data-history-chat-index",last_history-1)
     text = orignal_text
-  else 
+  else
     if not last_history or last_history<0
       history = parent.find(".body:last")
       history_length = parent.find(".body").length-1
       $(command_selector).attr("data-history-chat-index",history_length)
       text = history.text()
-    else 
+    else
       history = $(parent.find(".body")[last_history-1])
       $(command_selector).attr("data-history-chat-index",last_history-1)
       text = history.text()
-  logger.debug("History index:#{last_history}, #{history} ::#{text}::") 
+  logger.debug("History index:#{last_history}, #{history} ::#{text}::")
   $(command_selector).val(text) if text
 
 reset_history_chat = () ->
   $(command_selector).attr("data-history-chat-index",null)
   old_text = $(command_selector).attr("data-history-chat-text")
   $(command_selector).attr("data-history-chat-text",null)
-  $(command_selector).val(old_text) 
+  $(command_selector).val(old_text)
    
-
 crow_on = (name,handler) ->
   listener = (e)->
     msg = e.target.getUserData("crow-request")

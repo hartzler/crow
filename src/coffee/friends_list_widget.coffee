@@ -1,3 +1,5 @@
+dump("*** friends_list_widget.js *** Loading...\n")
+
 # friends_list_widget.coffee
 #
 # Controller for Friend List UI widget

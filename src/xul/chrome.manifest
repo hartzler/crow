@@ -1,1 +1,4 @@
+component {3bdb4da3-698a-44cc-9df2-0ea721357e88} components/crowui.js
+contract @mozilla.org/network/protocol;1?name=x-crow-ui {3bdb4da3-698a-44cc-9df2-0ea721357e88}
 content crow content/
+#poop

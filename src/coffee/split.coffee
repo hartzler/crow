@@ -1,3 +1,5 @@
+dump("*** split.js *** Loading...\n")
+
 # split.coffee
 #   requires jquery, query_plugins.coffee
 #

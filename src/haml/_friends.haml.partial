@@ -3,14 +3,14 @@
 
   .summary
     %h2 Friends
-    #contact-template.template
+    .contacts(data-bind="foreach: friends")
       .row
         .icon.span2
-        .name.span3
-        .jid.span3
-        .status.span2
+          %img(data-bind="attr: {src: icon_uri}")
+        .name.span3(data-bind="text: name")
+        .jid.span3(data-bind="text: jid")
+        .status.span2(data-bind="text: status")
         .action.span2
           %button.btn.danger.delete Remove
-    .contacts
 
  

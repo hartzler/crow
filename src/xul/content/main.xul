@@ -1,27 +1,29 @@
 <?xml version="1.0"?>
 <window id="main" title="Crow" width="800" height="600" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+  <!-- dynamic coffee script generation -->
   <script src="javascript/io.js"/>
   <script src="javascript/coffee-script.js"/>
   <script src="javascript/coffee_builder.js"/>
 
-  <!-- deck of untrusted iframes floated over ui iframe to allow secure rish media conversations -->
-  <stack flex="1">
-    <!-- crow ui -->
-    <iframe id="ui" flex="1" src="chrome://crow/content/index.html"/>
-    <deck id="untrusted" top="50px" left="250px">
-    </deck>
-  </stack>
+  <!-- crow model -->
+  <script src="javascript/jquery-1.7.min.js"/>
+  <script src="javascript/util.js"/>
+  <script src="javascript/xmpp.js"/>
+  <script src="javascript/roster_list.js"/>
+  <script src="javascript/models.js"/>
 
-  <!-- resize our untrusted iframe deck -->
+  <!-- x-crow-ui protocol handler (load chrome resources without chrome priv's) -->
   <script type="application/x-javascript">
-    var h=null;
-    var w=null;
-    function resize(e) {
-      var u = document.getElementById("untrusted");
-      u.height = window.innerHeight-90;
-      u.width = window.innerWidth-270;
-    }
-    window.addEventListener("resize",resize,false);
+    try {  
+      dump("forcing x-crow-ui protocol handler component load...\n");
+      Components.classes['@mozilla.org/network/protocol;1?name=x-crow-ui'].name;
+    } catch (anError) {  
+      dump("ERROR: " + anError);  
+    }  
   </script>
+
+  <!-- crow ui -->
+  <browser type="content-primary" id="ui" flex="1" src="x-crow-ui://index.html"/>
+
 </window>

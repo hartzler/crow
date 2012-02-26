@@ -1,3 +1,5 @@
+dump("*** jquery_plugins.js *** Loading...\n")
+
 # jquery plugins
 jQuery.fn.reverse = [].reverse
 jQuery.fn.scrollToBottom = ->

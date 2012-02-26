@@ -4,6 +4,8 @@
 # General utility functions and classes.  Will be required most everywhere,
 # so be very intentional what you put here.
 
+dump("*** util.js *** Loading...\n")
+
 Util = {}
 window.Util = Util
 
@@ -87,6 +89,46 @@ Util.dom_to_string = (e) ->
     "</#{e.nodeName}>"
   else
     '' # screw other node types for now
+
+class API
+  constructor: (options)->
+    @call_prefix = options.call_prefix or ""
+    @listen_prefix = options.listen_prefix or ""
+    @window = options.window or window
+    @logger = options.logger or logger
+  
+  prefix: (prefix,name)->
+    "#{prefix}:#{name}"
+
+  on: (handlers) ->
+    for name, handler of handlers
+      name = @prefix(@listen_prefix,name)
+      @window.addEventListener name, @_listener(name,handler), false
+
+  _listener: (name, handler)->
+    @logger.debug("API: registering listener for #{name}...")
+    (e)=>
+      try
+        data = e.target.getUserData("crow-request")
+        @logger.debug("api received: #{name} -> #{data.toSource()}")
+        @window.document.documentElement.removeChild(e.target)
+        handler(data)
+      catch e
+        @logger.error("API: error in listener for #{name}",e)
+
+  call: (name,data,callback)->
+    name = @prefix(@call_prefix,name)
+    @logger.debug("API: call: #{name} -> #{data.toSource()}")
+    doc = @window.document
+    request = doc.createTextNode('')
+    request.setUserData("crow-request",data,null)
+    doc.documentElement.appendChild(request)
+    sender = doc.createEvent("HTMLEvents")
+    sender.initEvent(name, true, false)
+    request.dispatchEvent(sender)
+    @logger.debug "dispatched event #{sender} to #{request}"
+
+Util.API=API
 
 # exports
 window.Util = Util

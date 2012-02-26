@@ -1,9 +1,37 @@
+dump("*** roster_list.js *** Loading...\n")
 
 logger = new Util.Logger("Crow::RosterList", 'debug')
 
 Components.utils.import("resource://gre/modules/Services.jsm")
 Components.utils.import("resource://gre/modules/FileUtils.jsm")
-      
+
+class Friend
+  constructor: (@jid,@presence,@is_room,@account,@vcard={}) ->
+    @presence or= {show: "chat", status: null}
+    @last_vcard_request_time = null
+  safeid: => @jid.jid.replace(/[^a-zA-Z 0-9]+/g,'')
+  email: -> @jid.jid
+  display: -> if @vcard.fullname then @vcard.fullname else @jid.jid
+  name: -> if @vcard and @vcard.fullname then @vcard.fullname else null
+  resource: -> @jid.resource
+  node: -> @jid.node
+  status: -> @presence.status
+  show: -> @presence.show || "chat"
+  has_icon: =>
+    if @vcard.icon && @vcard.icon.type && @vcard.icon.binval
+      true
+    else
+      false
+  icon_uri: (dfault) =>
+    if @vcard.icon && @vcard.icon.type && @vcard.icon.binval
+      "data:#{@vcard.icon.type};base64,#{@vcard.icon.binval}"
+    else
+      # other stuff, not handled yet...
+      dfault
+  toString: ->"<Friend jid=#{@jid.jid}>"
+  toModel: ->
+    jid: @jid,vcard:@vcard,presence:{},is_room:@is_room,account:@account, last_vcard_request_time:@last_vcard_request_time
+
 file = FileUtils.getFile("ProfD", ["roster.sqlite"])
 dbConn = Services.storage.openDatabase(file)
 try
@@ -39,12 +67,15 @@ class RosterList
       @loading = false
   save_to_prefs: ()->
     return if @loading
-    string = JSON.stringify((contact.toJS() for contact in @friend_list()))
+    string = JSON.stringify(@toModel())
     try
       dbConn.executeSimpleSQL("delete from rosters")
     catch e
       @logger.error("DONT PANIC: i think its ok if we cant delete the rosters at first")
     dbConn.executeSimpleSQL("insert into rosters (roster_json) values ('#{string.replace(/'/g,"\\'")}')")
+
+  toModel: ->
+    (contact.toModel() for contact in @friend_list())
 
   friends_by_state: ()->
     states = {}
@@ -68,11 +99,11 @@ class RosterList
     if @contacts_by_jid[jid.jid]?
       @logger.debug "Cached object"
       contact = @contacts_by_jid[jid.jid]
-      contact.presence = presence 
+      contact.presence = presence
       contact.vcard = vcard if vcard
       @save_to_prefs()
       return contact
-    contact = new window.Friend(jid,presence,is_room,account,vcard)
+    contact = new Friend(jid,presence,is_room,account,vcard)
     @contacts_by_jid[jid.jid] = contact
     @contacts_safe_jid_to_jid[contact.safeid()]=jid.jid
     @save_to_prefs()
@@ -93,12 +124,12 @@ class RosterList
         Stanza._addChildren(n,c)
         friend = @find_or_create {jid:jid},null,false,account.name
         if not friend.vcard or jQuery.isEmptyObject(friend.vcard)
-          account.session.sendStanza n 
+          account.session.sendStanza n
         friend
 
     catch e
       @logger.error("error load_roster")
       @logger.error(e)
 
-window.roster = new RosterList()
-window.roster.load_from_prefs()
+# exports
+window.RosterList = RosterList

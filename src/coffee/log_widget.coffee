@@ -1,3 +1,5 @@
+dump("*** log_widget.js *** Loading...\n")
+
 # log_widget.coffee
 # 
 # Manages the Crow Log UI widget
