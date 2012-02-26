@@ -235,6 +235,12 @@ class Main
   connect: (name)->
     @accounts[name].connect()
 
+  ui_friend: (f)->
+    jid:f.jid.jid,name:f.name(),icon_uri:"default_friend.png",show:f.show(),status:f.status()
+  
+  ui_update_friends: ->
+    ui.friends(@ui_friend(f) for f in @roster.friend_list())
+
   # private?
   # listener for account callbacks
   _account_listener: ->
@@ -246,10 +252,10 @@ class Main
     vcard: (account,jid,vcard) =>
       if friend=@roster.find(jid.jid)
         friend.vcard = vcard
-        ui.friends(@roster.friend_list())
+        @ui_update_friends()
     roster: (account,stanza) =>
       @roster.load_roster(account,stanza)
-      ui.friends(@roster.friend_list())
+      @ui_update_friends()
     friend: (account,jid,presence) =>
       existing = @roster.find(jid)
       if existing
@@ -258,7 +264,7 @@ class Main
       #else
       #  @roster.add_friend(jid,friend)
       #  account.vcard(friend)
-      ui.friends(@roster.friend_list())
+      @ui_update_friends()
     iq: ->
     raw: ->
     message: (account,message) =>
@@ -326,7 +332,7 @@ init_api= ->
 # outgoing (events we raise to the UI)
 ui=
   accounts: (accounts)->api.call("accounts",accounts)
-  friends: (friends)->api.call("friends",(jid:f.jid.jid,name:f.name(),icon_uri:"default_friend.png",show:f.show(),status:f.status() for f in friends))
+  friends: (friends)->api.call("friends",friends)
   message: (msg)->api.call("message",msg)
   connected: (account)->api.call("connected",account:account.name)
   disconnected: (account)->api.call("disconnected",account:account.name)
@@ -338,6 +344,30 @@ main = new Main()
 $(window).on 'load', ->
   dump("*** models.js *** calling main.load()\n")
   init_api()
-  main.load()
+  #main.load()
+  test_ui()
+
+test_data=
+  accounts: [
+    {name:"bardic", jid:"hartzler@bardicgrove.org", password:"b8h534h35", host:"bardicgrove.org", port:"5222"},
+    {name:"gtalk", jid:"matt.hartzler@gmail.com", password:"dome", host:"talk.google.com", port:"433"}
+  ]
+  friends:  [
+    {jid:"matt.hartzler@gmail.com", name:"Matt Hartzler", icon_uri:"default_friend.png", show:"unavailable", status:"Solving the mysteries of Life..."},
+    {jid:"tykebot@bardicgrove.org", name:"TykeBot", icon_uri:"default_friend.png", show:"unavailable", status:null},
+    {jid:"becker@deathbyescalator.com", name:"Becker", icon_uri:"default_friend.png", show:"chat", status:"Happy Beans"},
+    {jid:"sbeckeriv@gmail.com", name:"Becker IV", icon_uri:"default_friend.png", show:"unavailable", status:null}
+  ]
+  messages: [
+    {from:"matt.hartzler@gmail.com",body:"test from matt",time:new Date()},
+    {from:"becker@deathbyescalator.com",body:"becker says hi",time:new Date()},
+    {from:"matt.hartzler@gmail.com",body:"matt says hi again",time:new Date()},
+  ]
+
+test_ui=->
+  ui.accounts(test_data.accounts)
+  ui.friends(test_data.friends)
+  ui.connected(test_data.accounts[0])
+  ui.message(msg) for msg in test_data.messages
 
 dump("*** models.js *** Finished Loading.\n")

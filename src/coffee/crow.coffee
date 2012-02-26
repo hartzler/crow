@@ -29,6 +29,7 @@ class AccountModel
     @status=ko.observable(status)
   toModel:->
     name: @name()
+
 class FriendModel
   constructor: (jid,name,icon_uri,show,status)->
     @jid=ko.observable(jid)
@@ -38,9 +39,10 @@ class FriendModel
     @show=ko.observable(show)
     @status=ko.observable(status)
   safeid: ->
-    @jid().replace(/[^a-zA-Z0-9]/,'')
+    @jid().replace(/[^a-zA-Z 0-9]+/g,'')
   toModel:->
     jid: @jid()
+
 class ConversationModel
   constructor: (@friend)->
     @messages = ko.observableArray([])
@@ -51,12 +53,9 @@ class ConversationModel
   message: (msg)->
     @messages.push(body: msg.body, time: msg.time, from: @friend.name())
 
-
 class FriendsViewModel
   constructor: (friends)->
     @friends = ko.observableArray(friends)
-    ko.applyBindings(@,$('#friends').get(0))
-    ko.applyBindings(@,$('#friends-panel').get(0))
 
   load: (friends)->
     @friends(new FriendModel(f.jid,f.name,f.icon_uri,f.show,f.status) for f in friends)
@@ -70,22 +69,73 @@ class FriendsViewModel
 class ConversationsViewModel
   constructor: ->
     @conversations = ko.observableArray([])
-    ko.applyBindings(@,$('#conversations > .right').get(0))
 
   find: (jid)->
     (c for c in @conversations() when c.friend.jid() is jid)[0]
+
+  add: (c)->
+    @conversations.push(c)
+    splits $('#conversations')
+    $('#conversations .tabs').tabs()
 
   message: (msg)->
     # conversation, fromjid:jid, time: new Date, text:text, html:html, from:conversation.from.display(), klazz:"message"
     c = @find(msg.from)
     unless c
       if friend = ui.friends.find(msg.from)
-        c = new ConversationModel(friend)
-        @conversations.push(c)
+        logger.debug("adding conversation for #{friend.jid()}...")
+        @add c = new ConversationModel(friend)
       else
         throw "HOLY CRAP can't find friend for #{msg.from}"
     c.message(msg)
     c
+
+class AccountsViewModel
+  constructor: (@accounts)->
+    @accounts = ko.observableArray(@accounts)
+    @notify_text = ko.observable()
+    @notify_type = ko.observable()
+    @tmp = ko.observable(new AccountModel())
+
+  load: (accounts)->
+    @accounts(new AccountModel(a.name,a.jid,a.password,a.host,a.port) for a in accounts)
+    
+  # connect to configured accounts
+  connect: (account) ->
+    logger.info "connecting..."
+    for account in (if account? then [account] else @accounts())
+      app.connect(account.toModel())
+
+  # save the account
+  save: (e)->
+    try
+      app.add(@tmp())
+      @accounts.push(@tmp())
+      @notify('success',"Added account #{@tmp().name()}.")
+      @tmp(new AccountModel())
+    catch e
+      logger.error(e.toString())
+      @notify('error',e.toString())
+
+  remove: (account)->
+    try
+      app.remove(name:account.name())
+    catch e
+      logger.error(e.toString())
+      @notify('error',e.toString())
+
+  # disconnect from connected accounts
+  disconnect: (account) ->
+    logger.info "disconnecting..."
+    for account in (if account? then [account] else @accounts())
+      app.disconnect(account.name)
+ 
+  clear_notify: ->
+    @notify(null,null)
+
+  notify: (type,text)->
+    @notify_type(type)
+    @notify_text(text)
 
 class TopLinksWidget
   constructor: ()->
@@ -98,75 +148,31 @@ class TopLinksWidget
         when friends_selector then ui.show_friends(); @activate('friends')
         when logs_selector then ui.show_logs(); @activate('logs')
         when settings_selector then ui.show_settings(); @activate('settings')
-        when firebug_selector then ui.show_firebug()
+        when firebug_selector then ui.toggle_firebug()
       false
-
   activate: (tab)->
     li=$(".topbar ul.nav .#{tab}")
     li.addClass("active")
     li.siblings().removeClass("active")
 
-class AccountsViewModel
-  constructor: (@accounts)->
-    @accounts = ko.observableArray(@accounts)
-    @notify_text = ko.observable()
-    @notify_type = ko.observable()
-    @tmp = ko.observable(new AccountModel())
-    ko.applyBindings(@,$('#accounts').get(0))
-
-  load: (accounts)->
-    @accounts(new AccountModel(a.name,a.jid,a.password,a.host,a.port) for a in accounts)
-    
-  # connect to configured accounts
-  connect: (account) ->
-    logger.info "connecting..."
-    for account in (if account? then [account] else @accounts())
-      crow.connect(account.toModel())
-
-  # save the account
-  save: (e)->
-    try
-      crow.add(@tmp())
-      @accounts.push(@tmp())
-      @notify('success',"Added account #{@tmp().name()}.")
-      @tmp(new AccountModel())
-    catch e
-      logger.error(e.toString())
-      @notify('error',e.toString())
-
-  remove: (account)->
-    try
-      crow.remove(name:account.name())
-    catch e
-      logger.error(e.toString())
-      @notify('error',e.toString())
-
-  # disconnect from connected accounts
-  disconnect: (account) ->
-    logger.info "disconnecting..."
-    for account in (if account? then [account] else @accounts())
-      crow.disconnect(account.name)
- 
-  clear_notify: ->
-    @notify(null,null)
-
-  notify: (type,text)->
-    @notify_type(type)
-    @notify_text(text)
-
 # controller for main UI panels
 class UI
-  constructor: (@xmpp_loggers={})->
+  constructor: ->
+    @xmpp_loggers={}
     @top_links = new TopLinksWidget()
     @accounts = new AccountsViewModel([])
     @friends = new FriendsViewModel([])
     @conversations = new ConversationsViewModel()
+    ko.applyBindings(@accounts,$('#accounts').get(0))
+    ko.applyBindings(@friends,$('#friends').get(0))
+    ko.applyBindings(@friends,$('#friends-panel').get(0))
+    ko.applyBindings(@conversations,$('#conversations > .right').get(0))
 
   init: ->
 
   message: (msg)->
     c = @conversations.message(msg)
-    #$("##{c.safeid}").
+    $("##{c.safeid}").show()
 
   set_accounts: (accounts)->
     @accounts.load(accounts)
@@ -193,18 +199,9 @@ class UI
   show_settings: ->
     @show_panel settings_selector
 
-  show_firebug: ->
-    try
-      page = $(".page")
-      iframe = $("#fbIframe")
-      if iframe.length > 0
-        iframe.remove()
-      else
-        iframe = $('<iframe/>',id:"fbIframe",src:"debug.html",style:"height:200px;width:100%;")
-        page.append(iframe)
-      splits($(".page"))
-    catch e
-      logger.error("fuck you firebug! ",e)
+  toggle_firebug: ->
+    Firebug.chrome.toggle() if Firebug?
+    false # stupid a href
 
   connected: (account)->
     @show_conversations()
@@ -218,7 +215,7 @@ class UI
 
   xmpp_logger: (name)->
     unless @xmpp_loggers[name]
-      @xmpp_loggers[name] = new XmppLog(name,send:(xml)->crow.send_raw(name,xml))
+      @xmpp_loggers[name] = new XmppLog(name,send:(xml)->app.send_raw(name,xml))
     @xmpp_loggers[name]
 
   log: (args...)->
@@ -267,7 +264,7 @@ init_api=->
         ui.xmpp_logger(trace.account).receive(trace.xml)
     
 # outgoing (events we raise to the App)
-crow=
+app=
   add: (account)->api.call("add",accounts)
   remove: (account)->api.call("remove",accounts)
   connect: (account)->api.call("connect",account)

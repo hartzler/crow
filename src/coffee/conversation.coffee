@@ -31,6 +31,10 @@ class Plugin
     @msg.html += html
   append_text: (text)->
     @msg.text += text
+
+# plugin list
+plugins = []
+
 window.remove_url_text = (url)->
   el = $("div[url='#{url}'] .content")
   el.html("#{url} <input type='button' onclick='window.url_text(\"#{url}\")' value='Get Text'>")
@@ -42,8 +46,6 @@ window.url_text = (url)->
     el.html("#{url}<br/>#{remove_button}"+data.content+"#{remove_button}")
   $.getJSON("http://viewtext.org/api/text?mld=.1&rl=false&url=" + url + "&callback=?", url_callback)
 
-# plugin list
-plugins = []
 plugins.push(
   description: "Get url text"
   text_only: true
@@ -128,7 +130,7 @@ text_to_emote = (text)->
 
 # let each plugin do its thing!
 apply_plugins = (msg)->
-  copy = from:msg.from,text:msg.text,html:msg.html,time:msg.time # TODO: how do you clone?
+  copy = from:msg.from,text:msg.text,html:msg.html,time:msg.time # TODO: use $.extend({},msg)
   instance = new Plugin(copy)
   for plugin in plugins
     do (plugin)->
@@ -168,17 +170,6 @@ chat = (msg)->
   parent.find(".time:last").twipsy({'title':'tooltip','offset':5})
   parent.scrollToBottom()
 
-api_call = (name,data,callback)->
-  logger.debug "sending api_call #{name} -> #{data.toSource()}"
-  doc = document
-  request = doc.createTextNode('')
-  request.setUserData("crow-request",data,null)
-  doc.documentElement.appendChild(request)
-  sender = doc.createEvent("HTMLEvents")
-  sender.initEvent(name, true, false)
-  request.dispatchEvent(sender)
-  logger.debug "dispatched event #{sender} to #{request}"
-
 history_chat = ->
   last_history = $(command_selector).attr("data-history-chat-index")
   orignal_text = $(command_selector).attr("data-history-chat-text")
@@ -210,19 +201,6 @@ reset_history_chat = () ->
   old_text = $(command_selector).attr("data-history-chat-text")
   $(command_selector).attr("data-history-chat-text",null)
   $(command_selector).val(old_text)
-   
-crow_on = (name,handler) ->
-  listener = (e)->
-    msg = e.target.getUserData("crow-request")
-    logger.debug("conv listener: #{name} -> #{msg.toSource()}")
-    document.documentElement.removeChild(e.target)
-    handler(msg)
-  $(document).ready ()->
-    window.addEventListener name, listener, false
-
-crow_on receive_event, (msg)->
-  logger.debug("crow_on: #{receive_event} msg: #{msg.toSource()}")
-  chat(msg)
 
 $(document).ready ()->
   logger.debug('conv-ready')

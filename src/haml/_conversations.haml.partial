@@ -17,7 +17,7 @@
   / Conversations widget
   .right.expand.vsplit
     .pill-content.expand(data-bind="foreach: conversations")
-      .conversation.hsplit(data-bind="attr: {id: safeid}")
+      .conversation.hsplit(data-bind="attr: {id: safeid()}")
         .left.expand.vsplit
           .toolbar(data-bind="text: friend.jid")
           .messages.expand(data-bind="foreach: messages")
@@ -26,9 +26,9 @@
               .time(data-bind="text: time")
               .body(data-bind="text: body")
           .command
-            %textarea#txt
+            %textarea
         .room-info
 
     %ul.tabs(data-bind="foreach: conversations")
       %li
-        %a(data-bind="attr: {href: function(){'#'+safeid()}}, text: friend.name")
+        %a(data-bind="attr: {href: '#'+safeid()}, text: friend.name")
