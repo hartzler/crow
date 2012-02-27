@@ -65,6 +65,9 @@ class FriendTab
   refresh:()->
     $('#friends .contacts').empty()
     @render()
+  clear_storage: ()->
+    window.roster.clear_stored_roster()
+
 class TopLinksWidget
   constructor: ()->
     @activate('about')
