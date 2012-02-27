@@ -75,7 +75,7 @@ class ConversationsViewModel
 
   add: (c)->
     @conversations.push(c)
-    splits $('#conversations')
+    splits $('#conversations').find('.vsplit, .hsplit')
     $('#conversations .tabs').tabs()
 
   message: (msg)->
