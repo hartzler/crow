@@ -137,6 +137,21 @@ class AccountsViewModel
     @notify_type(type)
     @notify_text(text)
 
+class SettingsViewModel
+  constructor: ()->
+    @event_json=ko.observable(ko.toJSON [["message",{from:"matt.hartzler@gmail.com",body:"test from matt",time:new Date()}]])
+
+  # simulate events received
+  test: ->
+    try
+      logger.debug("test event JSON: #{@event_json()}")
+      data = JSON.parse(@event_json())
+      logger.debug("event: #{data[0]}")
+      logger.debug("event name: #{data[0][0]}")
+      events[e[0]](e[1]) for e in data
+    catch e
+      logger.error("error parsing event json",e)
+
 class TopLinksWidget
   constructor: ()->
     @activate('about')
@@ -163,10 +178,12 @@ class UI
     @accounts = new AccountsViewModel([])
     @friends = new FriendsViewModel([])
     @conversations = new ConversationsViewModel()
+    @settings = new SettingsViewModel()
     ko.applyBindings(@accounts,$('#accounts').get(0))
     ko.applyBindings(@friends,$('#friends').get(0))
     ko.applyBindings(@friends,$('#friends-panel').get(0))
     ko.applyBindings(@conversations,$('#conversations > .right').get(0))
+    ko.applyBindings(@settings,$('#settings').get(0))
 
   init: ->
 
@@ -222,11 +239,13 @@ class UI
     CrowLog.log(args...)
 
 ui = new UI()
+api = null
 $(document).ready ->
   window.resizeTo(800,600)
-  $('.tabs').tabs()
-  init_api()
+  api = new Util.API(call_prefix:"crow:app",listen_prefix:"crow:ui",logger: logger)
+  api.on events
   ui.init()
+  $('.tabs').tabs()
   ui.show_accounts()
 
   $(document).scroll ->
@@ -239,30 +258,26 @@ $(document).ready ->
     else
       $(".subnav").removeClass "subnav-fixed"
 
-
 # incoming (events the App triggers on us)
-api = null
-init_api=->
-  api = new Util.API(call_prefix:"crow:app",listen_prefix:"crow:ui",logger: logger)
-  api.on
-    accounts: (accounts)->
-      ui.set_accounts(accounts)
-    friends: (friends)->
-      ui.set_friends(friends)
-    message: (msg)->
-      ui.message(msg)
-    connected: (account)->
-      ui.connected(account.name)
-    disconnected: (account)->
-      ui.disconnected(account.name)
-    error: (data)->
-      logger.error("account error: account=#{data.account.name} error=#{data.error}")
-    trace: (trace)->
-      if trace.type == "sent"
-        ui.xmpp_logger(trace.account).send(trace.xml)
-      else
-        ui.xmpp_logger(trace.account).receive(trace.xml)
-    
+events=
+  accounts: (accounts)->
+    ui.set_accounts(accounts)
+  friends: (friends)->
+    ui.set_friends(friends)
+  message: (msg)->
+    ui.message(msg)
+  connected: (account)->
+    ui.connected(account.name)
+  disconnected: (account)->
+    ui.disconnected(account.name)
+  error: (data)->
+    logger.error("account error: account=#{data.account.name} error=#{data.error}")
+  trace: (trace)->
+    if trace.type == "sent"
+      ui.xmpp_logger(trace.account).send(trace.xml)
+    else
+      ui.xmpp_logger(trace.account).receive(trace.xml)
+  
 # outgoing (events we raise to the App)
 app=
   add: (account)->api.call("add",accounts)

@@ -1,2 +1,6 @@
 #settings.panel
   %h2 Settings
+  .alert.alert-info 
+    Test events here.  Enter a JSON array of arrays where each sub array has 2 elements.  The first the name of the event to fire, the second the data object argument appropriate for that event.
+  %textarea(data-bind="value: event_json")
+  %button.btn.btn-primary(data-bind="click: test") Fire Events
