@@ -24,7 +24,7 @@
             .chat-line
               .from(data-bind="text: from")
               .time(data-bind="text: time")
-              .body(data-bind="text: body")
+              .body(data-bind="html: body")
           .command
             %textarea
         .room-info

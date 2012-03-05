@@ -51,7 +51,8 @@ class ConversationModel
   toModel:->
     friend: @friend.toModel()
   message: (msg)->
-    @messages.push(body: msg.body, time: msg.time, from: @friend.name())
+    msg=Crow.apply_plugins(msg)
+    @messages.push(body: msg.html or msg.text, time: msg.time, from: @friend.name())
 
 class FriendsViewModel
   constructor: (friends)->
@@ -139,7 +140,7 @@ class AccountsViewModel
 
 class SettingsViewModel
   constructor: ()->
-    @event_json=ko.observable(ko.toJSON [["message",{from:"matt.hartzler@gmail.com",body:"test from matt",time:new Date()}]])
+    @event_json=ko.observable(ko.toJSON [["message",{from:"matt.hartzler@gmail.com",text:"from matt http://themoviesrevealed.webs.com/waynesworld.jpg",time:new Date()}]])
 
   # simulate events received
   test: ->

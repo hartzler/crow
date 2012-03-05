@@ -277,7 +277,7 @@ class Main
       @logger.debug "message: text=#{text}"
       #html = message.html()
       #@logger.debug "message: html=#{html}"
-      ui.message(from:jid,body:text,time:new Date()) if text
+      ui.message(from:jid,text:text,time:new Date()) if text
 
   # disconnect an account by name
   disconnect: (name)->
@@ -359,9 +359,9 @@ test_data=
     {jid:"sbeckeriv@gmail.com", name:"Becker IV", icon_uri:"default_friend.png", show:"unavailable", status:null}
   ]
   messages: [
-    {from:"matt.hartzler@gmail.com",body:"test from matt",time:new Date()},
-    {from:"becker@deathbyescalator.com",body:"becker says hi",time:new Date()},
-    {from:"matt.hartzler@gmail.com",body:"matt says hi again",time:new Date()},
+    {from:"matt.hartzler@gmail.com",text:"test from matt",time:new Date()},
+    {from:"becker@deathbyescalator.com",text:"becker says hi",time:new Date()},
+    {from:"matt.hartzler@gmail.com",text:"matt says hi again",time:new Date()},
   ]
 
 test_ui=->
