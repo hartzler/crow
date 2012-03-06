@@ -21,10 +21,10 @@
         .left.expand.vsplit
           .toolbar(data-bind="text: friend.jid")
           .messages.expand(data-bind="foreach: messages")
-            .chat-line
+            .chatline
               .from(data-bind="text: from")
               .time(data-bind="text: time")
-              .body(data-bind="html: body")
+              .body(data-bind="html: body, select_class: type")
           .command
             %textarea
         .room-info

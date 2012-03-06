@@ -1,5 +1,11 @@
 dump("*** crow.js *** Loading...\n")
 
+ko.bindingHandlers.select_class=
+    init: (element, valueAccessor, allBindingsAccessor, viewModel)->
+        # This will be called when the binding is first applied to an element
+        # Set up any initial state, event handlers, etc. here
+        $(element).addClass(valueAccessor())
+
 # crow.coffee
 #   requires jquery, util.coffee, models.coffee, *_widget.coffee, pretty much everything else
 #
@@ -52,7 +58,7 @@ class ConversationModel
     friend: @friend.toModel()
   message: (msg)->
     msg=Crow.apply_plugins(msg)
-    @messages.push(body: msg.html or msg.text, time: msg.time, from: @friend.name())
+    @messages.push(body: msg.html or msg.text, time: msg.time, from: @friend.name(), type: msg.type or "message")
 
 class FriendsViewModel
   constructor: (friends)->
