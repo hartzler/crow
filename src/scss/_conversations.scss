@@ -47,13 +47,9 @@
         .messages {
           overflow: auto;
           .chatline {
-            margin-bottom: 1em;
-            margin-left: 1em;
-            margin-right: 1em;
-            padding: 1em;
+            margin: 0px;
+            border-top: 1px solid #ccc;
             font-size: 10pt;
-            border-radius: 4px 4px 4px 4px;
-            border-shadow: 3px 3px 5px rgba(128,128,128,0.5);
             .time {
               float: right;
               margin-left: 0.5em;
@@ -62,6 +58,9 @@
               float: right;
               margin-left: 1em;
             }   
+            .body {
+              padding: 1em;
+            }
           }   
           .self {
             background-color: $scheme3;
