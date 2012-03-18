@@ -66,15 +66,17 @@ class RosterList
   find_by_safe_id: (safe_id)->
     @contacts_by_jid[@contacts_safe_jid_to_jid[safe_id]]
   find_or_create: (jid,presence,is_room,account,vcard) ->
-    presence or= {show: "unavailable", status: null}
     @logger.debug "Looking for jid: #{jid.jid}"
+    @logger.debug jid
     if @contacts_by_jid[jid.jid]?
       @logger.debug "Cached object"
       contact = @contacts_by_jid[jid.jid]
-      contact.presence = presence 
+      contact.jid=jid # has updated resource and other data
+      contact.presence = presence if presence
       contact.vcard = vcard if vcard
       @save_to_prefs()
       return contact
+    presence or= {show: "unavailable", status: null}
     contact = new window.Friend(jid,presence,is_room,account,vcard)
     @contacts_by_jid[jid.jid] = contact
     @contacts_safe_jid_to_jid[contact.safeid()]=jid.jid
