@@ -63,17 +63,24 @@ class RosterList
     @contacts_by_jid[jid] = friend
   find: (jid)->
     @contacts_by_jid[jid]
+
   find_by_safe_id: (safe_id)->
     @contacts_by_jid[@contacts_safe_jid_to_jid[safe_id]]
+  update_friend: (contact,data)->
+    contact.vcard = data.vcard if data.vcard
+    contact.jid = data.jid if data.jid
+    contact.presence = data.presence if data.presence
+
   find_or_create: (jid,presence,is_room,account,vcard) ->
     @logger.debug "Looking for jid: #{jid.jid}"
-    @logger.debug jid
     if @contacts_by_jid[jid.jid]?
       @logger.debug "Cached object"
       contact = @contacts_by_jid[jid.jid]
-      contact.jid=jid # has updated resource and other data
-      contact.presence = presence if presence
-      contact.vcard = vcard if vcard
+      @update_friend(contact,
+        jid: jid
+        presence: presence
+        vcard: vcard
+      )
       @save_to_prefs()
       return contact
     presence or= {show: "unavailable", status: null}

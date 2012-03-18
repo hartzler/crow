@@ -264,10 +264,16 @@ crow = new Crow null,
  
   # passthru to our Log UI Widget
   log: (args...)->CrowLog.log(args...)
+  before_exit: ()->
+    window.roster.save_to_prefs()
+    
 window.FriendTab = new FriendTab()
 $(document).ready ->
   window.resizeTo(800,600)
   ui.init()
+  #TODO: fix this. Figure out a hook. maybe at app level.
+  window.onbeforeunload=crow.before_exit
+
   $(document).scroll ->
     unless $(".subnav").attr("data-top")
       return  if $(".subnav").hasClass("subnav-fixed")
