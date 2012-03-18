@@ -81,6 +81,7 @@ add_conversation = (model,send_callback) ->
   title = model.from.display()
   # do nothing if we already have this conversation open
   if $(selector).length > 0
+    logger.debug( $(selector))
     activate_conversation(model)
     return
  
@@ -128,17 +129,30 @@ add_conversation = (model,send_callback) ->
       activate_conversation(next_model)
 
   logger.debug("add_conversation: hooking up tab li.a")
-
-  li = $("<li/>")
-  a = $("<a/>",{href: selector})
-  a.text title
-  li.append a
-  tabs = $('#conversations ul.tabs')
-  tabs.append li
-
   div = Util.clone_template(conversation_template_selector)
   div.attr('id',id)
   div.data "model", model
+
+  li = $("<li/>")
+  li.attr("id",id)
+  span = $("<span/>")
+  a = $("<a/>",{href: selector})
+  a.text title
+  span.append a
+  exit = $("<a/>",{href: selector})
+  
+  exit.on 'click', (e)=>
+    window.Conversations.close(model)
+    $("li##{id}").remove()
+    $("div##{id}").remove()
+
+
+  exit.text "X" 
+  span.append exit
+  li.append span
+  tabs = $('#conversations ul.tabs')
+  tabs.append li
+
   
   $(conversations_pill_selector).append div
 
@@ -200,11 +214,12 @@ select_xul_conversation = (model)->
   logger.debug("select_xul_conversation: conversation=#{model.toSource()}")
   logger.debug("xul_deck: #{xul_deck()}")
   p = conversation_iframe(model)
-  logger.debug("panel: #{p}")
-  logger.debug("selected id: #{xul_deck().selectedPanel.getAttribute('id')}")
-  xul_deck().selectedPanel = p
-  logger.debug("selected id: #{xul_deck().selectedPanel.getAttribute('id')}")
-  p.contentDocument.getElementById('txt').focus() if p.contentDocument.getElementById('txt') # safe?
+  if p 
+    logger.debug("panel: #{p}")
+    logger.debug("selected id: #{xul_deck().selectedPanel.getAttribute('id')}")
+    xul_deck().selectedPanel = p
+    logger.debug("selected id: #{xul_deck().selectedPanel.getAttribute('id')}")
+    p.contentDocument.getElementById('txt').focus() if p.contentDocument.getElementById('txt') # safe?
 
 find_model_by_index= (n)->
   $(conversations_pill_selector).children().get(n-1)
