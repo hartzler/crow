@@ -43,6 +43,8 @@ id2model = (id) ->
   window.roster.find_by_safe_id(id)
   
 model2id = (model)->
+  logger.debug "model2id"
+  logger.debug model
   "conv-#{model.safeid()}"
 
 # TODO: factor out?
@@ -142,6 +144,18 @@ add_conversation = (model,send_callback) ->
   exit = $("<a/>",{href: selector})
   
   exit.on 'click', (e)=>
+    current = $('#conversations ul.tabs li.active')
+    try
+      next_tab = current.prev()
+      next_id = next_tab.find("a").attr("href").replace("#conv-","")
+    catch e
+      try 
+        next_tab = current.next()
+        next_id = next_tab.find("a").attr("href").replace("#conv-","") 
+    try
+      next_model = id2model(next_id)
+      activate_conversation(next_model)
+
     window.Conversations.close(model)
     $("li##{id}").remove()
     $("div##{id}").remove()
